@@ -4,4 +4,6 @@ package-cache
 play-cache
 Pharo*changes
 Pharo*image
+build/root
+build/Chapters/root
 *zip
