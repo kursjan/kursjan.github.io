@@ -63,6 +63,9 @@ We create a parser by subclassing <code>PP2CompositeNode</code>:
 	poolDictionaries: ''
 	category: 'PetitParser2-Tutorial'</code></pre><figcaption></figcaption></figure>
 
+<section>
+<h4>a. Javascript rule</h4>
+
 <p>
 We define a <code>javascipt</code> rule as follows:
 </p>
@@ -101,8 +104,10 @@ WebGrammarTest&gt;&gt;parserClass
 WebGrammarTest&gt;&gt;testJavascript
 	self parse: '&lt;script&gt;alert(&quot;hi there!&quot;)&lt;/script&gt;' rule: #javascript	</code></pre><figcaption></figcaption></figure>
 
+</section><section>
+<h4>b. Document rule</h4>
 <p>
-To extract a javascript from an html document, we first define the <code>document</code> rule simply as <code>javascript</code> because we are interested only in javascript:
+To extract javascript from an html document, we first define the <code>document</code> rule simply as <code>javascript</code> because we are interested only in javascript:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;document
 	^ (javascript sea ==&gt; #second) star</code></pre><figcaption></figcaption></figure>
@@ -132,6 +137,8 @@ And finally, we write a test for <code>document</code>:
 	self assert: result size equals: 2.</code></pre><figcaption></figcaption></figure>
 
 
+</section></section><section>
+<h3>Complete Sources</h3>
 <p>
 You can download the sources here:
 </p><ul>

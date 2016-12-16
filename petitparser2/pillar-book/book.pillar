@@ -1,6 +1,6 @@
 %!Parsing with PetitParser2
 
-In this tutorial we describe how to quickly build a parser to extract a javascript code from any HTML source.
+In this tutorial we describe how to quickly build a parser to extract a javascript code from any HTML source. 
 
 We show how can we utilize bounded seas - a tool that allows us to focus on the interesting parts of an input (i.e. javascript in our case) and ignore the rest (the remaining HTML code) to
 save time and obtain results as fast as possible.
@@ -19,7 +19,7 @@ In *Optimizations>Chapters/chapter4.pillar* we inspect optimizations capabilitie
 and in *Memoizations>Chapters/chapter5.pillar* we describe tooling of PetitParser2 that will help us to pinpoint the perofrmance bottlenecks and we show some techniques how to fix them.
 
 In TODO we describe how to use the parser to do syntax highlighting.
-@@todo create a chapter
+@@todo create a chapter about syntax highlighting
 
 
 %${inputFile:Chapters/chapter1.pillar}$

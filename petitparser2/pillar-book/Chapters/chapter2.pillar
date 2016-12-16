@@ -21,6 +21,8 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
+!!!!Javascript rule
+
 We define a ==javascipt== rule as follows:
 
 [[[eval=true
@@ -72,7 +74,8 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-To extract a javascript from an html document, we first define the ==document== rule simply as ==javascript== because we are interested only in javascript:
+!!!!Document rule
+To extract javascript from an html document, we first define the ==document== rule simply as ==javascript== because we are interested only in javascript:
 
 [[[eval=true
 | t |
@@ -115,6 +118,7 @@ WebGrammarTest fileOut.
 'WebGrammarTest.st' asFileReference moveTo: ('build/WebGrammarTest.st' asFileReference).
 ]]]
 
+!!!Complete Sources
 You can download the sources here:
 - *==WebGrammar==>../WebGrammar.st* 
 - *==WebGrammarTest==>../WebGrammarTest.st*

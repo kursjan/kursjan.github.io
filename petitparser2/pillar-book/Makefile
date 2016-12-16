@@ -4,7 +4,8 @@ CHAPTERS = \
 	Chapters/chapter2 \
 	Chapters/chapter3 \
 	Chapters/chapter4 \
-	Chapters/chapter5
+	Chapters/chapter5 \
+	Chapters/matchingTags \
 
 OUTPUTDIRECTORY = build
 LATEXTEMPLATE = support/templates/main.latex.mustache

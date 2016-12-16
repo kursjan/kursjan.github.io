@@ -1,0 +1,4 @@
+Before the first run:
+
+$ ./download.sh
+$ ./loadPetitParser2.sh <PATH-TO-PETITPARSER-GIT>

@@ -42,68 +42,46 @@ This text is part of the PetitParser2 series:
 <li><a href="Chapters/../chapter5.html">Memoization</a></li>
 </ul>
 
+<p>
+Additional Information:
+</p><ul>
+<li><a href="Chapters/../matching Tags.html">Matching Tags</a></li>
+</ul>
+
 <section>
 <h1>Extracting the Structure</h1>
 <a id="sec:structure"></a>
 <p>
-In the previous parts of this tutorial we analyzed the anatomy of bounded seas.
+In the previous text we analyzed the anatomy of bounded seas.
 We described how they can be used to:
-</p><ol><li>extract islands --- parts of our interest while skipping the rest as a water (javascript seas in document), and </li>
-<li>implement a starLazy operator that skips an input until an interesting input appears (e.g. <code>(jsString / any) starLazy</code> in <code>jsContent</code>). </li>
+</p><ol><li><em>extract islands</em> - parts of our interest while skipping the rest as a water (javascript seas in document), and </li>
+<li><em>skip unineteresting input</em> by implementing a starLazy operator that skips any input until anything that interests us appears (e.g. <code>(jsString / any) starLazy</code> in <code>jsContent</code>). </li>
 </ol>
 
-
 <p>
-In this part we extend our parser and we extract the HTML structure. 
-We use bounded seas again to skip the content of html elements and recover from malformed or unclosed elements.
+But until now our parser was rather simple, seeing an input as a list of javascripts.
+In this part we extend the parser and we extract the HTML structure. 
+Again, we use bounded seas to ease our task.
+Bounded seas become handy when skipping a text in html elements and when recoverring from unclosed or any other malformed elements.
 </p>
 
 <section>
-<h2>I. Matching the Names</h2>
-
-
-<p>
-The elements of HTML has an interesting property: the name of an opening tag has to match the name of a closing tag. 
-Even though natural for human beings, this is, surprisingly, rather difficult task from the parsing theory point of view.
-</p>
+<h2>1. Matching Open And Close Tags</h2>
 
 <p>
-One of the standard solutions provided by parsing frameworks (including PetitParser) are parsing actions. 
-We define an action to assert that the name of an open tag corresponds to the name of a close tag:
-</p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
-	^ elOpen, content, elClose
-
-	map: [:_open :_content :_close |
-	(_open = _close) ifTrue: [
-		_content
-	] ifFalse: [ 
-		PP2Failure message: ‘open and close do not match’.
-	]</code></pre><figcaption></figcaption></figure>
-
-
-<p>
-Unfortunately, this solution has a problem with unclosed elements like these:
-</p>
-<figure><pre><code class="smalltalk">&lt;b&gt;&lt;i&gt;bold and italics&lt;/b&gt;</code></pre><figcaption></figcaption></figure>
-
-<p>
-The first <code>elOpen</code> consumes <em>&lt;b&gt;</em>, 
-the second <code>elOpen</code> consumes 
-<em>&lt;i&gt;</em>, 
-content consumes <em>bold and italics</em> and 
-<code>elClose</code> consumes <em>&lt;/b&gt;</em>. 
-The action checks if <em>i = b</em> and returns failure. 
-The failure will be the final result because such a code does not restore position to recover from the failure and actions do not offer a way to do so. 
-Other options based on custom parsers or wrapping parsers will sooner or later run into a hard to debug issues with backtracking as well.
+Elements of HTML has an interesting property: the name of an opening tag has to match the name of a closing tag. 
+Though natural for humans, this is, surprisingly, rather difficult task from the parsing theory point of view.
 </p>
 <p>
-The PetitParser2 offers more formal way of such definitions. 
-It can store a result of a rule (e.g. <code>elOpen</code>) onto a stack using the push operator and assert that the result of a rule (e.g. <code>elClose</code>) matches the top of the stack using the match operator and finally pop the result using the pop operator. 
-Here is the concrete example. 
+Unfortunatelly, standard solutions do not fit well into the PetitParser. 
+We describe problem in more details in the supplementary <a href="../matchingTags.html">Matching Tags</a> chapter.
 </p>
-
 <p>
+PetitParser2 comes with a special syntax to express constrains of matching open and close tags.
+It can store a result of a rule (e.g. in rule opening an html tagonto a stack using the push operator and assert that the result of a rule (e.g. in rule closing an html tag) matches the top of the stack using the match operator and finally pop the result using the pop operator (after an html tag is sucessfully recognized). 
+</p>
+<p>
+Here is the concrete example:
 First we define an element name as a repetition of letters and digits:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elementName
@@ -127,7 +105,9 @@ In <code>elClose</code>, we first match the element name against the top of a st
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elClose
 	^ '&lt;/' asPParser, elementName match pop, $&gt; asPParser</code></pre><figcaption></figcaption></figure>
 
-
+<p class="todo">this solution owrks well with unclosed/malformed elements</p>
+</section><section>
+<h2>2. Element Content</h2>
 <p>
 Now we need to define what is a content of an element. 
 It is a list of the following components in the given order: 
@@ -184,8 +164,8 @@ WebGrammarTest&gt;&gt;testElementMalformedUnclosed
 	self parse: '&lt;head&gt;&lt;meta content=&quot;mess&quot;&gt;&lt;/head&gt;' rule: #element.</code></pre><figcaption></figcaption></figure>
 
 </section><section>
-<h2>II. Create an Abstract Syntax Tree</h2>
-
+<h2>3. Create an Abstract Syntax Tree</h2>
+<p class="todo">create a dedicated chapter for this?</p>
 <p>
 That looks good. 
 But our tests are telling us only that element can parse the given input, it does not tell us how it parses the input. 
@@ -435,7 +415,7 @@ WebParser&gt;&gt;elOpen
 	^ super elOpen trimRight</code></pre><figcaption></figcaption></figure>
 <p class="todo">there is no <code>trimLeft</code> in the source code, fix it...</p>
 </section><section>
-<h2>III. Structured Document</h2>
+<h2>4. Structured Document</h2>
 
 <p>
 We defined document in <code>WebGrammar</code> as a repetition of javascript seas. 
@@ -523,7 +503,7 @@ And we cover the rule with a test:
 	self assert: html secondChild name equals: 'body'.</code></pre><figcaption></figcaption></figure>
 
 </section><section>
-<h2>IV. Comments</h2>
+<h2>5. Comments</h2>
 
 <p>
 In this section we focus a bit more how to handle comments. They may contain scripts or other elements and they may confuse the parser. 
