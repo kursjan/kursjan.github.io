@@ -3,8 +3,8 @@ CHAPTERS = \
 	Chapters/chapter1 \
 	Chapters/chapter2 \
 	Chapters/chapter3 \
-	Chapters/chapter4 \
-	Chapters/chapter5 \
+	Chapters/optimizations \
+	Chapters/memoization \
 	Chapters/matchingTags \
 	Chapters/AST \
 

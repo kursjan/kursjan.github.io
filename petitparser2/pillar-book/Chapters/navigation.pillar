@@ -3,7 +3,7 @@ This text is part of the PetitParser2 series:
 - *From Script to Parser>../chapter2.pillar*
 - *Extracting the Structure>../chapter3.pillar*
 - *Abstract Syntax Tree>../AST.pillar*
-- *Optimizations>../chapter4.pillar*
+- *Optimizations>../optimizations.pillar*
 - *Memoization>../chapter5.pillar*
 
 Additional Chapters:

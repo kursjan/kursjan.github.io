@@ -39,7 +39,7 @@ This text is part of the PetitParser2 series:
 <li><a href="Chapters/../chapter2.html">From Script to Parser</a></li>
 <li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
 <li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
-<li><a href="Chapters/../chapter4.html">Optimizations</a></li>
+<li><a href="Chapters/../optimizations.html">Optimizations</a></li>
 <li><a href="Chapters/../chapter5.html">Memoization</a></li>
 </ul>
 
@@ -300,7 +300,7 @@ And finally, for convenience, we trim whitespaces around html elements:
 WebParser&gt;&gt;elOpen
 	^ super elOpen trimRight</code></pre><figcaption></figcaption></figure>
 
-<p class="todo">TODO: explain there is <code>trimRight</code> so that the caching is more efficient</p>
+<p class="todo">explain there is <code>trimRight</code> so that the caching is more efficient</p>
 <p>
 By this time all the tests should pass:
 </p>
@@ -315,14 +315,11 @@ The pieces should be there, we need to connect them.
 Of course, we write tests first:
 </p>
 
-<p>
-[[[
-</p><pre>KeyNotFound: key #testStructuredDocument not found in MethodDictionary</pre>
-<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testStructuredDocument
+<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testStructuredDocumentSimple
 	| input |
 	input := '&lt;html&gt;
 		&lt;body&gt;
-			&lt;script type=&quot;text/javascript&quot;&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
+			&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
 		&lt;/body&gt;
 	&lt;/html&gt;'.
 	
@@ -334,30 +331,83 @@ WebGrammarTest&gt;&gt;testStructuredDocumentWithDoctype
 &lt;!DOCTYPE html&gt;
 &lt;!-- comment --&gt;
 &lt;html&gt;
-	&lt;meta content=&quot;origin&quot; name=&quot;referrer&quot;&gt;
-
-
 	&lt;body&gt;
-		&lt;script type=&quot;text/javascript&quot;&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
+		&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
 	&lt;/body&gt;
 &lt;/html&gt;'.
+	
+	self parse: input rule: #structuredDocument
+
+WebGrammarTest&gt;&gt;testStructuredDocument
+	| input |
+	input := PP2Sources current htmlSample.
 	
 	self parse: input rule: #structuredDocument</code></pre><figcaption></figcaption></figure>
 
 <p>
-We defined document in <code>WebGrammar</code> as a repetition of javascript seas. 
-Now we define structured document, i.e. a document with an html structure. 
+In the previous chapters, we defined document (represented by the <code>document</code> rule) in <code>WebGrammar</code> as a repetition of javascript seas. 
+Now we define a structured document, i.e. a document with an html structure. 
 The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;structuredDocument
 	^ element sea</code></pre><figcaption></figcaption></figure>
 
 
+<p>
+In order to verify the structure we extract from a document, we write the tests for parser:
+</p>
+<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocumentSimple
+	| html body javascript |
+	super testStructuredDocumentSimple.
+	
+	self assert: result name equals: 'DOCUMENT'.
 
+
+	html := result secondChild.
+	self assert: html name equals: 'html'.
+
+	body := html firstChild.
+	self assert: body name equals: 'body'.
+	
+	javascript := body firstChild.
+	self assert: javascript isKindOf: JavascriptElement.
+	self assert: javascript code equals: 'alert(&quot;hello world&quot;)'.
+
+WebParserTest&gt;&gt;testStructuredDocumentWithDoctype
+	| html body javascript |
+	super testStructuredDocumentWithDoctype.
+	
+	self assert: result name equals: 'DOCUMENT'.
+
+
+	html := result secondChild.
+	self assert: html name equals: 'html'.
+
+	body := html firstChild.
+	self assert: body name equals: 'body'.
+	
+	javascript := body firstChild.
+	self assert: javascript isKindOf: JavascriptElement.
+	self assert: javascript code equals: 'alert(&quot;hello world&quot;)'.
+
+
+WebParserTest&gt;&gt;testStructuredDocument
+	| html |
+	super testStructuredDocument.
+	
+	self assert: result name equals: 'DOCUMENT'.
+
+
+	html := result secondChild.
+	self assert: html name equals: 'html'.
+
+
+	self assert: html firstChild name equals: 'head'.	
+	self assert: html secondChild name equals: 'body'.</code></pre><figcaption></figcaption></figure>
 
 
 <p>
-We create a root element from the structured document:
+In order to pass these tests, we create a root element from the structured document:
 </p>
 <figure><pre><code class="smalltalk">WebParser&gt;&gt;structuredDocument
 	^ super structuredDocument
@@ -382,38 +432,27 @@ We create a root element from the structured document:
 	]</code></pre><figcaption></figcaption></figure>
 
 <p>
-And we cover the rule with a test:
-</p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocument
-	| html |
-	super testStructuredDocument.
-	
-	self assert: result name equals: 'DOCUMENT'.
-
-
-	html := result secondChild.
-	self assert: html name equals: 'html'.
-
-
-	self assert: html firstChild name equals: 'head'.	
-	self assert: html secondChild name equals: 'body'.</code></pre><figcaption></figcaption></figure>
+By this time all the tests should pass:
+</p><figure><pre><code class="smalltalk">11 run, 11 passes, 0 skipped, 0 expected failures, 0 failures, 0 errors, 0 unexpected passes</code></pre><figcaption></figcaption></figure>
 
 </section><section>
 <h2>5. Comments</h2>
 
 <p>
 In this section we focus a bit more how to handle comments. They may contain scripts or other elements and they may confuse the parser. 
-Actually this is happening in <code>WebParser</code>, which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:
+</p>
+<p>
+Actually we have been cheating a bit and there is an error in <code>WebParser</code>, which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:
 </p>
 <figure><pre><code class="smalltalk">WebParser new parse: input.</code></pre><figcaption></figcaption></figure>
 
 <p>
 There is a <em>&lt;p&gt;</em> element in the <em>&lt;body&gt;</em>. 
 But <em>&lt;p&gt;</em> is a part of comment, it should not be included in the document structure. 
-We write a test to cover this:
+We fix the <code>testStructuredDocument</code> to cover this:
 </p>
 <figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocument
-	| html |
+	| html body |
 	super testStructuredDocument.
 	
 	self assert: result name equals: 'DOCUMENT'.
@@ -423,14 +462,16 @@ We write a test to cover this:
 
 	self assert: html firstChild name equals: 'head'.	
 	self assert: html secondChild name equals: 'body'.
-
+	
 	body := html secondChild.
 	self assert: body children size equals: 4.</code></pre><figcaption></figcaption></figure>
 
 <p>
-The problem is, as in the case of prematurely ended javascript, that our parser has no notion of a comment and handles a content of comment as an ordinary html code. 
+The problem is tha same as in the case of prematurely ended javascript.
+<code>WebGrammar</code> has no notion of a comment and handles a content of comment as an ordinary html code. 
 Therefore we define what is an html comment:
 </p>
+
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;comment
 	^ '&lt;!--' asPParser, #any asPParser starLazy, '--&gt;' asPParser</code></pre><figcaption></figcaption></figure>
 
@@ -439,6 +480,7 @@ And now we can redefine <code>text</code> so that it knows what is a comment:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
 	^ (comment / #any asPParser) starLazy</code></pre><figcaption></figcaption></figure>
+
 
 <p>
 We already mentioned in the previous text that <code>starLazy</code> utilizes bounded seas and the above code is equivalent to:
@@ -453,10 +495,36 @@ Because now water knows what is a comment, it skips the complete comment includi
 </p>
 
 <p>
-This is it. 
-Your tests are passing right now.
+This is it, we can parse all of it!
+</p>
+</section><section>
+<h2>6. Conclusion </h2>
+<p>
+In this chapter we have applied the test-driven approach to define our AST nodes.
+We defined <code>WebParser</code>, wchid extends the <code>WebGrammar</code> and builds the AST nodes.
+Last but not least, we had a look how to avoid false positives caused by comments.
+</p>
 
-</p></section></section>
+
+<section>
+<h3>Complete Sources</h3>
+<p>
+You can download the sources here:
+</p><ul>
+<li><a href="../WebGrammar.st"><code>WebGrammar</code></a> </li>
+<li><a href="../WebGrammarTest.st"><code>WebGrammarTest</code></a></li>
+<li><a href="../WebParser.st"><code>WebParser</code></a> </li>
+<li><a href="../WebParserTest.st"><code>WebParserTest</code></a></li>
+<li><a href="../WebElement.st"><code>WebElement</code></a></li>
+<li><a href="../JavascriptElement.st"><code>JavascriptElement</code></a></li>
+<li><a href="../HtmlElement.st"><code>HtmlElement</code></a></li>
+<li><a href="../UnknownText.st"><code>UnknownText</code></a></li>
+</ul>
+
+<p>
+The source for this tutorial is also part of the PetitParser2 package.
+
+</p></section></section></section>
       </section>
     </div>
 

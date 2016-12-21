@@ -6,6 +6,7 @@ We show how can we utilize bounded seas - a tool that allows us to focus on the 
 save time and obtain results as fast as possible.
 
 We also describe performance optimizations abilities of PetitParser, that will allow us to generate high-performance parsers from our grammars that have performance comarable to table-driven parsers such as *SmaCC>https://github.com/ThierryGoubier/SmaCC* or hand-written parsers such as RBParser. 
+
 @@todo add some graphs?
 
 @@todo what about streaming capabilities?
@@ -13,18 +14,11 @@ We also describe performance optimizations abilities of PetitParser, that will a
 !!!Structure
 In *Extracting Javascript>Chapters/chapter1.pillar* we start with a simple script.
 Later in *Real Grammar>Chapters/chapter2.pillar*, we turn the script into a proper grammar and add tests.
-In *Extracting Structure>Chapters/chapter3.pillar*, we extend the parser to extract an html structure and we add tolerance for malformed documents.
+In *Extracting Structure>Chapters/chapter3.pillar* and *Abstract Syntax Tree>Chapters/AST.pillar*, we extend the parser to extract an html structure and we add tolerance for malformed documents.
 
-In *Optimizations>Chapters/chapter4.pillar* we inspect optimizations capabilities of PetitParser2
-and in *Memoizations>Chapters/chapter5.pillar* we describe tooling of PetitParser2 that will help us to pinpoint the perofrmance bottlenecks and we show some techniques how to fix them.
+In *Optimizations>Chapters/optimizations.pillar* we inspect optimizations capabilities of PetitParser2
+and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitParser2 that will help us to pinpoint the perofrmance bottlenecks and we show some techniques how to fix them.
 
-In TODO we describe how to use the parser to do syntax highlighting.
 @@todo create a chapter about syntax highlighting
 
-
-%${inputFile:Chapters/chapter1.pillar}$
-%${inputFile:Chapters/chapter2.pillar}$
-%${inputFile:Chapters/chapter3.pillar}$
-%${inputFile:Chapters/chapter4.pillar}$
-%${inputFile:Chapters/chapter5.pillar}$
 
