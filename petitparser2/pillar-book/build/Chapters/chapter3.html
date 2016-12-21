@@ -37,13 +37,14 @@ This text is part of the PetitParser2 series:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
 <li><a href="Chapters/../chapter2.html">From Script to Parser</a></li>
-<li><a href="Chapters/../chapter3.html">Extracting Structure</a></li>
+<li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
+<li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
 <li><a href="Chapters/../chapter4.html">Optimizations</a></li>
 <li><a href="Chapters/../chapter5.html">Memoization</a></li>
 </ul>
 
 <p>
-Additional Information:
+Additional Chapters:
 </p><ul>
 <li><a href="Chapters/../matching Tags.html">Matching Tags</a></li>
 </ul>
@@ -62,7 +63,7 @@ We described how they can be used to:
 But until now our parser was rather simple, seeing an input as a list of javascripts.
 In this part we extend the parser and we extract the HTML structure. 
 Again, we use bounded seas to ease our task.
-Bounded seas become handy when skipping a text in html elements and when recoverring from unclosed or any other malformed elements.
+Bounded seas become handy when skipping a text in html elements and when recoverring from unclosed or malformed elements.
 </p>
 
 <section>
@@ -73,12 +74,12 @@ Elements of HTML has an interesting property: the name of an opening tag has to 
 Though natural for humans, this is, surprisingly, rather difficult task from the parsing theory point of view.
 </p>
 <p>
-Unfortunatelly, standard solutions do not fit well into the PetitParser. 
+Unfortunately, standard solutions do not fit well into the PetitParser. 
 We describe problem in more details in the supplementary <a href="../matchingTags.html">Matching Tags</a> chapter.
 </p>
 <p>
 PetitParser2 comes with a special syntax to express constrains of matching open and close tags.
-It can store a result of a rule (e.g. in rule opening an html tagonto a stack using the push operator and assert that the result of a rule (e.g. in rule closing an html tag) matches the top of the stack using the match operator and finally pop the result using the pop operator (after an html tag is sucessfully recognized). 
+It can store a result of a rule (e.g. in the rule opening an html tag) onto a stack using the push operator and assert that the result of a rule (e.g. in the rule closing an html tag) matches the top of the stack using the match operator and finally pop the result using the pop operator (after an html tag is sucessfully recognized). 
 </p>
 <p>
 Here is the concrete example:
@@ -90,6 +91,7 @@ First we define an element name as a repetition of letters and digits:
 <p>
 Than we define element as a sequence of <code>elOpen</code>, <code>elContent</code> and <code>elClose</code>:
 </p>
+
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
 	^ (elOpen, elContent, elClose)</code></pre><figcaption></figcaption></figure>
 
@@ -97,7 +99,7 @@ Than we define element as a sequence of <code>elOpen</code>, <code>elContent</co
 In <code>elOpen</code>, we push the element name as well as we consume water in case an element contains arguments:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elOpen
-	^ $&lt; asPParser, elementName push, #any starLazy, $&gt; asPParser ==&gt; #second</code></pre><figcaption></figcaption></figure>
+	^ $&lt; asPParser, elementName push, #any asPParser starLazy, $&gt; asPParser ==&gt; #second</code></pre><figcaption></figcaption></figure>
 
 <p>
 In <code>elClose</code>, we first match the element name against the top of a stack and we pop the stack in case of success:
@@ -105,460 +107,93 @@ In <code>elClose</code>, we first match the element name against the top of a st
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elClose
 	^ '&lt;/' asPParser, elementName match pop, $&gt; asPParser</code></pre><figcaption></figcaption></figure>
 
-<p class="todo">this solution owrks well with unclosed/malformed elements</p>
 </section><section>
 <h2>2. Element Content</h2>
 <p>
-Now we need to define what is a content of an element. 
-It is a list of the following components in the given order: 
+Now we need to define <code>elContent</code> rule, which represents the content of an element. 
+<code>elContent</code> is zero or more repetitions of the following components in the given order: 
 </p><ol><li>a javascript code, </li>
 <li>another element or </li>
 <li>an unknown text. </li>
 </ol>
 <p>
-We add javascript to the first position because it is kind of an element and therefore must be ordered first to take precedence. 
+We add javascript to the first position because it is <em>kind of</em> an element and therefore must be ordered first to take precedence. 
 The same goes for an element, it is also <em>kind of</em> a text. 
 </p>
-
-<p>
-Furthermore, we mark text as <code>nonEpsilon</code>, which allows only for non-empty parses. 
-Remember <code>#water asPParser</code> can consume anything, even the empty string. 
-The star repetition would end up in an infinite loop recognizing an epsilon in each of its iteration, never failing, never stopping.
-</p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
-	^ #any starLazy
-
-WebGrammar&gt;&gt;elContent
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elContent
 	^ (javascript / element / text nonEpsilon) star</code></pre><figcaption></figcaption></figure>
 
 
 <p>
+Text can be anything.
+Therefore, we define it as with the help of bounded seas:
+</p>
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
+	^ #any starLazy</code></pre><figcaption></figcaption></figure>
+
+
+<section>
+<h3>Epsilon in Repetitions</h3>
+<p>
+Note, we mark text as <code>nonEpsilon</code>.
+<code>nonEpsilon</code> operator is an extension of PEGs that allows only for non-empty parses. 
+The reason for this is that <code>#any asPParser starLazy</code> can consume anything, even the empty string. 
+The star repetition of <code>elContent</code> would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+</p>
+</section></section><section>
+<h2>3. Testing the Code</h2>
+<p>
 We have defined a lots of code. Let us try, if it works. 
 We start with <code>text</code>:
 </p>
+
 <figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testText
 	self parse: 'foobar' rule: #text</code></pre><figcaption></figcaption></figure>
+
 
 <p>
 And <code>element</code> follows:
 </p>
 <figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testElementEmpty
 	self parse: '&lt;foo&gt;&lt;/foo&gt;' rule: #element
+[PASS]
 
 WebGrammarTest&gt;&gt;testElement
 	self parse: '&lt;p&gt;lorem ipsum&lt;/p&gt;' rule: #element
+[PASS]
 
 WebGrammarTest&gt;&gt;testElementNested
-	self parse: '&lt;p&gt;lorem &lt;i&gt;ipsum&lt;/i&gt;&lt;/p&gt;' rule: #element</code></pre><figcaption></figcaption></figure>
+	self parse: '&lt;p&gt;lorem &lt;i&gt;ipsum&lt;/i&gt;&lt;/p&gt;' rule: #element
+[PASS]</code></pre><figcaption></figcaption></figure>
 
 <p>
-We should be able to parse malformed elements as well:
+We should be able to parse malformed elements as well. 
+Lets see if the <code>push</code>, <code>match</code>, <code>pop</code> magic works, as expected:
 </p>
 <figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testElementMalformedWrongClose
 	self parse: '&lt;foo&gt;&lt;bar&gt;meh&lt;/baz&gt;&lt;/foo&gt;' rule: #element.
+[PASS]
 
 WebGrammarTest&gt;&gt;testElementMalformedExtraClose
 	self parse: '&lt;foo&gt;&lt;bar&gt;meh&lt;/bar&gt;&lt;/fii&gt;&lt;/foo&gt;' rule: #element
+[PASS]
 
 WebGrammarTest&gt;&gt;testElementMalformedUnclosed
-	self parse: '&lt;head&gt;&lt;meta content=&quot;mess&quot;&gt;&lt;/head&gt;' rule: #element.</code></pre><figcaption></figcaption></figure>
+	self parse: '&lt;head&gt;&lt;meta content=&quot;mess&quot;&gt;&lt;/head&gt;' rule: #element.
+[PASS]</code></pre><figcaption></figcaption></figure>
 
 </section><section>
-<h2>3. Create an Abstract Syntax Tree</h2>
-<p class="todo">create a dedicated chapter for this?</p>
+<h2>4. Conclusion</h2>
+
 <p>
-That looks good. 
+So far it looks good. 
 But our tests are telling us only that element can parse the given input, it does not tell us how it parses the input. 
 We should assert that the proper element names and the right content is extracted. 
 </p>
 
 <p>
-It is the time to return a more convenient representation of the input: <em>an abstract syntax tree</em>. 
-Abstract syntax tree, contrary to the very low-level and detailed array of arrays  (so called concrete syntax tree), contains information closer to the target domain. 
-In our case the domain should be some kind of a javascript and html representation.
-</p>
-
-<p>
-It is considered to be a good practice in PetitParser to split grammar, which returns concrete syntax tree, from parser, which returns abstract syntax tree. 
-We do this by subclassing <code>WebGrammar</code>:
-</p>
-<figure><pre><code class="smalltalk">WebGrammar subclass: #WebParser
-	instanceVariableNames: ''
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'</code></pre><figcaption></figcaption></figure>
-
-<p>
-Parsing is great use case for test driven development. 
-If you made it so far, you probably mean it with parsing.
-So let us abandon on a totorial friendly mode and do it the proper way:
-start with tests. 
-Actually, they give us a clear idea what kind of interface do we expect from our abstract syntax tree:
-</p>
-<figure><pre><code class="smalltalk">WebGrammarTest subclass: #WebParserTest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
-
-WebParserTest&gt;&gt;parserClass
-	^ WebParser
-
-WebParserTest&gt;&gt;testElement
-	super testElement.
-	
-	self assert: result name equals: 'p'.
-	self assert: result firstChild text equals: 'lorem ipsum'
-
-WebParserTest&gt;&gt;testElementEmpty
-	super testElementEmpty.
-	
-	self assert: result name equals: 'foo'.
-
-WebParserTest&gt;&gt;testElementNested
-	super testElementNested.
-	
-	self assert: result name equals: 'p'.
-	self assert: result firstChild text trim equals: 'lorem'.
-	self assert: result secondChild name equals: 'i'.
-	self assert: result secondChild firstChild text equals: 'ipsum'</code></pre><figcaption></figcaption></figure>
-
-<p>
-And for malformed elements, we expect the following results:
-</p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testElementMalformed
-	super testElementMalformed.
-	
-	self assert: result name equals: 'foo'.
-	self assert: result firstChild text equals: '&lt;bar&gt;meh&lt;/baz&gt;'
-
-WebParserTest&gt;&gt;testElementMalformedExtraClose
-	super testElementMalformedExtraClose.
-	
-	self assert: result name equals: 'foo'.
-	self assert: result secondChild text equals: '&lt;/fii&gt;'
-
-WebParserTest&gt;&gt;testElementMalformedUnclosed
-	super testElementMalformedUnclosed.
-	
-	self assert: result name equals: 'head'.
-	self assert: result firstChild text trim equals: '&lt;meta content=&quot;mess&quot;&gt;'
-
-WebParserTest&gt;&gt;testElementMalformedWrongClose
-	super testElementMalformedWrongClose.
-	
-	self assert: result name equals: 'foo'.
-	self assert: result firstChild text equals: '&lt;bar&gt;meh&lt;/baz&gt;'</code></pre><figcaption></figcaption></figure>
-
-
-
-<p>
-And of course, we expect javascript code to be extracted as follows:
-</p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testJavascript
-	super testJavascript.
-	
-	self assert: result code equals: 'alert(1+2)'
-
-WebParserTest&gt;&gt;testJavascriptWithString
-	super testJavascriptWithString.
-	
-	self assert: result code equals: 'alert(''&lt;/script&gt;'')'</code></pre><figcaption></figcaption></figure>
-
-
-
-<p>
-If we want to pass these test, the result of a parse should be a tree consisting of three different nodes: 
-</p><ol><li>an html element </li>
-<li>a javascript code and </li>
-<li>a text</li>
-</ol>
-<p>
-We define these nodes as follows, starting with its abstract predecessor <code>WebElement</code>:
-</p>
-
-<figure><pre><code class="smalltalk">Object subclass: #WebElement
-	instanceVariableNames: ''
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
-
-WebElement&gt;&gt;children
-	^ #()
-
-WebElement&gt;&gt;firstChild
-	&quot;Just for convenience&quot;
-	^ self children first
-
-WebElement&gt;&gt;secondChild
-	&quot;Just for convenience&quot;
-	^ self children second
-
-WebElement&gt;&gt;gtTreeViewIn: composite
-	&lt;gtInspectorPresentationOrder: 40&gt;
-
-	composite tree
-		title: 'Tree';
-		children: [:n | n children ];
-		format: [:n| n displayText printStringLimitedTo: 50 ];
-		shouldExpandToLevel: 6</code></pre><figcaption></figcaption></figure>
-
-
-<p>
-<code>HtmlElement</code> follows:
-</p>
-<figure><pre><code class="smalltalk">WebElement subclass: #HtmlElement
-	instanceVariableNames: 'name children'
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
-
-HtmlElement&gt;&gt;children
-	^ children
-
-children: anObject
-	children := anObject
-
-name
-	^ name
-
-name: newName
-	name := newName
-	
-displayText
-	^ self name</code></pre><figcaption></figcaption></figure>
-
-
-<p>
-As well as <code>UnknownText</code>:
-</p><figure><pre><code class="smalltalk">WebElement subclass: #UnknownText
-	instanceVariableNames: 'text'
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
-
-
-UnknownText&gt;&gt;text
-	^ text
-
-UnknownText&gt;&gt;text: anObject
-	text := anObject
-
-UnknownText&gt;&gt;displayText
-	^ self text trim
-
-UnknownText&gt;&gt;gtText: composite
-	&lt;gtInspectorPresentationOrder: 40&gt;
-	
-	composite text
-		title: 'Text';
-		display: [ :context | text ]</code></pre><figcaption></figcaption></figure>
-
-
-<p>
-Last but not least there is <code>JavascriptElement</code>:
-</p><figure><pre><code class="smalltalk">WebElement subclass: #JavascriptElement
-	instanceVariableNames: 'code'
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
-
-JavascriptElement&gt;&gt;code
-	^ code
-
-JavascriptElement&gt;&gt;code: anObject
-	code := anObject
-
-JavascriptElement&gt;&gt;displayText
-	^ self code
-
-JavascriptElement&gt;&gt;gtText: composite
-	&lt;gtInspectorPresentationOrder: 40&gt;
-	
-	composite text
-		title: 'Text';
-		display: [ :context | code ]</code></pre><figcaption></figcaption></figure>
-
-<p>
-Now we use <code>WebParser</code> to update the <code>javascript</code> rule, to return <code>JavascriptElement</code>, the <code>element</code> rule to return <code>HtmlElement</code> and the <code>text</code> rule to return <code>UnknownText</code>:
-</p>
-<figure><pre><code class="smalltalk">WebParser&gt;&gt;javascript
-	^ super javascript 
-	
-	map: [ :_open :_content :_close | 
-	 	(JavascriptElement new)
-			code: _content;
-			yourself
-	]
-
-WebParser&gt;&gt;element
-	^ super element 
-	
-	map: [ :_open :_content :_close | 
-	 	(HtmlElement new)
-			name: _open;
-			children: _content;
-			yourself
-	]
-
-WebParser&gt;&gt;text
-	^ super text 
-	
-	map: [ :_value | 
-		UnknownText new
-			text: _value;
-			yourself	
-	]</code></pre><figcaption></figcaption></figure>
-
-<p>
-And finally, for convenience, we trim whitespaces around html elements:
-</p>
-
-<figure><pre><code class="smalltalk">WebParser&gt;&gt;elClose
-	^ super elClose trimLeft
-
-WebParser&gt;&gt;elOpen
-	^ super elOpen trimRight</code></pre><figcaption></figcaption></figure>
-<p class="todo">there is no <code>trimLeft</code> in the source code, fix it...</p>
-</section><section>
-<h2>4. Structured Document</h2>
-
-<p>
-We defined document in <code>WebGrammar</code> as a repetition of javascript seas. 
-Now we define structured document, i.e. a document with an html structure. 
-The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
-</p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;structuredDocument
-	^ element sea
-
-WebGrammar&gt;&gt;start
-	^ structuredDocument</code></pre><figcaption></figcaption></figure>
-
-
-<p>
-And we should write tests for this:
-</p>
-<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testStructuredDocument
-	| input |
-	input := '&lt;html&gt;
-		&lt;body&gt;
-			&lt;script type=&quot;text/javascript&quot;&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
-		&lt;/body&gt;
-	&lt;/html&gt;'.
-	
-	self parse: input rule: #structuredDocument
-
-WebGrammarTest&gt;&gt;testStructuredDocumentWithDoctype
-	| input |
-	input := '
-&lt;!DOCTYPE html&gt;
-&lt;!-- comment --&gt;
-&lt;html&gt;
-	&lt;meta content=&quot;origin&quot; name=&quot;referrer&quot;&gt;
-
-
-	&lt;body&gt;
-		&lt;script type=&quot;text/javascript&quot;&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
-	&lt;/body&gt;
-&lt;/html&gt;'.
-	
-	self parse: input rule: #structuredDocument</code></pre><figcaption></figcaption></figure>
-
-
-
-<p>
-We create a root element from the structured document:
-</p>
-<figure><pre><code class="smalltalk">WebParser&gt;&gt;structuredDocument
-	^ super structuredDocument
-	
-	map: [ :_bw :_document :_aw |
-		| beforeWater afterWater |
-		beforeWater := UnknownText new
-			text: _bw;
-			yourself.
-			
-		afterWater := UnknownText new
-			text: _aw;
-			yourself.
-			
-		HtmlElement new
-			name: 'DOCUMENT';
-			children: (Array with: beforeWater 
-					 with: _document 
-					 with: afterWater);
-			yourself
-	
-	]</code></pre><figcaption></figcaption></figure>
-
-<p>
-And we cover the rule with a test:
-</p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocument
-	| html |
-	super testStructuredDocument.
-	
-	self assert: result name equals: 'DOCUMENT'.
-
-
-	html := result secondChild.
-	self assert: html name equals: 'html'.
-
-
-	self assert: html firstChild name equals: 'head'.	
-	self assert: html secondChild name equals: 'body'.</code></pre><figcaption></figcaption></figure>
-
-</section><section>
-<h2>5. Comments</h2>
-
-<p>
-In this section we focus a bit more how to handle comments. They may contain scripts or other elements and they may confuse the parser. 
-Actually this is happening in <code>WebParser</code>, which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:
-</p>
-<figure><pre><code class="smalltalk">WebParser new parse: input.</code></pre><figcaption></figcaption></figure>
-
-<p>
-There is a <em>&lt;p&gt;</em> element in the <em>&lt;body&gt;</em>. 
-But <em>&lt;p&gt;</em> is a part of comment, it should not be included in the document structure. 
-We write a test to cover this:
-</p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocument
-	| html |
-	super testStructuredDocument.
-	
-	self assert: result name equals: 'DOCUMENT'.
-
-	html := result secondChild.
-	self assert: html name equals: 'html'.
-
-	self assert: html firstChild name equals: 'head'.	
-	self assert: html secondChild name equals: 'body'.
-
-	body := html secondChild.
-	self assert: body children size equals: 4.</code></pre><figcaption></figcaption></figure>
-
-<p>
-The problem is, as in the case of prematurely ended javascript, that our parser has no notion of a comment and handles a content of comment as an ordinary html code. 
-Therefore we define what is an html comment:
-</p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;comment
-	^ '&lt;!--' asPParser, #any asPParser starLazy, '--&gt;' asPParser</code></pre><figcaption></figcaption></figure>
-
-<p>
-And now we can redefine <code>text</code> so that it knows what is a comment:
-</p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
-	^ (comment / #any asPParser) starLazy</code></pre><figcaption></figcaption></figure>
-
-<p>
-We already mentioned in the previous text that <code>starLazy</code> utilizes bounded seas and the above code is equivalent to:
-</p>
-<figure><pre><code class="smalltalk">(#epsilon asPParser)
-  waterToken: (comment / #any asPParser);
-  yourself	 </code></pre><figcaption></figcaption></figure>
-
-
-<p>
-Because now water knows what is a comment, it skips the complete comment including the <em>&lt;p&gt;</em> element inside.
-</p>
-
-<p>
-This is it. 
-Your tests are passing right now.
+It is the time to return a more convenient representation of the input: <em>an abstract syntax tree</em>.
+We will do this in the <a href="AST.html">following chapter</a>.
 
 </p></section></section>
       </section>

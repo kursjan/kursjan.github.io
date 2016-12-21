@@ -6,6 +6,7 @@ CHAPTERS = \
 	Chapters/chapter4 \
 	Chapters/chapter5 \
 	Chapters/matchingTags \
+	Chapters/AST \
 
 OUTPUTDIRECTORY = build
 LATEXTEMPLATE = support/templates/main.latex.mustache
