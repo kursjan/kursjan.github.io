@@ -1,15 +1,16 @@
 ${inputFile:Chapters/navigation.pillar}$
 
-!!Create an Abstract Syntax Tree
+!Create an Abstract Syntax Tree
 
 In the previous chapter we tested that our grammar parses the nested elements,
 but we have wery bad idea how does the extracted structure looks like.
 The output of a parser is typically very detailed and not well readable concrete syntax tree, which is (in the case of PetitParser) array of arrays of arrays with characters and strings as terminals.
 
-It is the time to return a more convenient representation of the input: ''an abstract syntax tree''. 
-Abstract syntax tree, contrary to the very low-level and detailed array of arrays  (so called concrete syntax tree), contains information closer to the target domain. 
+It is the time to return a more convenient representation of the input: ''an abstract syntax tree'', in short AST. 
+Abstract syntax tree, contrary to the very low-level and detailed array of arrays, so called concrete syntax tree (CST), contains information closer to the target domain. 
 In our case the domain should be some kind of a javascript and html representation.
 
+!!Testing First
 
 It is considered to be a good practice in PetitParser to split grammar, which returns concrete syntax tree, from parser, which returns abstract syntax tree. 
 We do this by subclassing ==WebGrammar==:
@@ -31,7 +32,6 @@ So let us abandon on a totorial-friendly mode and do the development the recomme
 ''start with tests''. 
 
 Tests give us a clear idea what kind of interface do we expect from our abstract syntax tree:
-
 
 [[[eval=true
 | t |
@@ -70,190 +70,177 @@ stream
 
 And of course, we expect javascript code to be extracted as follows:
 
-[[[
-WebParserTest>>testJavascript
-	super testJavascript.
-	
-	self assert: result code equals: 'alert(1+2)'
-
-WebParserTest>>testJavascriptWithString
-	super testJavascriptWithString.
-	
-	self assert: result code equals: 'alert(''</script>'')'
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #testJavascript in: WebParserTest); lf;
+	lf;
+	nextPutAll: (t sourceFor: #testJavascriptWithString in: WebParserTest); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
 
-
-
+!!AST Nodes
 If we want to pass these test, the result of a parse should be a tree consisting of three different nodes: 
 # an html element 
 # a javascript code and 
 # a text
-We define these nodes as follows, starting with its abstract predecessor ==WebElement==:
 
+We define these nodes as follows, starting with its abstract predecessor ==WebElement==, which contains only convinience methods.
 
-[[[
-Object subclass: #WebElement
-	instanceVariableNames: ''
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
-
-WebElement>>children
-	^ #()
-
-WebElement>>firstChild
-	"Just for convenience"
-	^ self children first
-
-WebElement>>secondChild
-	"Just for convenience"
-	^ self children second
-
-WebElement>>gtTreeViewIn: composite
-	<gtInspectorPresentationOrder: 40>
-
-	composite tree
-		title: 'Tree';
-		children: [:n | n children ];
-		format: [:n| n displayText printStringLimitedTo: 50 ];
-		shouldExpandToLevel: 6
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t definitionFor: WebElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #children in: WebElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #firstChild in: WebElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #secondChild in: WebElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #gtTreeViewIn: in: WebElement); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
-
 
 ==HtmlElement== follows:
 
-[[[
-WebElement subclass: #HtmlElement
-	instanceVariableNames: 'name children'
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
-
-HtmlElement>>children
-	^ children
-
-children: anObject
-	children := anObject
-
-name
-	^ name
-
-name: newName
-	name := newName
-	
-displayText
-	^ self name
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t definitionFor: HtmlElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #children in: HtmlElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #name in: HtmlElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #name: in: HtmlElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #displayText in: HtmlElement); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
 
 
 As well as ==UnknownText==:
-[[[
-WebElement subclass: #UnknownText
-	instanceVariableNames: 'text'
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
 
-
-UnknownText>>text
-	^ text
-
-UnknownText>>text: anObject
-	text := anObject
-
-UnknownText>>displayText
-	^ self text trim
-
-UnknownText>>gtText: composite
-	<gtInspectorPresentationOrder: 40>
-	
-	composite text
-		title: 'Text';
-		display: [ :context | text ]
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t definitionFor: UnknownText); lf;
+	lf;
+	nextPutAll: (t sourceFor: #text in: UnknownText); lf;
+	lf;
+	nextPutAll: (t sourceFor: #text: in: UnknownText); lf;
+	lf;
+	nextPutAll: (t sourceFor: #gtText: in: UnknownText); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
 
 
 Last but not least there is ==JavascriptElement==:
-[[[
-WebElement subclass: #JavascriptElement
-	instanceVariableNames: 'code'
-	classVariableNames: ''
-	package: 'PetitParser2-SeasTutorial'
 
-JavascriptElement>>code
-	^ code
-
-JavascriptElement>>code: anObject
-	code := anObject
-
-JavascriptElement>>displayText
-	^ self code
-
-JavascriptElement>>gtText: composite
-	<gtInspectorPresentationOrder: 40>
-	
-	composite text
-		title: 'Text';
-		display: [ :context | code ]
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t definitionFor: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #code in: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #code: in: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #displayText in: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #gtText: in: JavascriptElement); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
 
-Now we use ==WebParser== to update the ==javascript== rule, to return ==JavascriptElement==, the ==element== rule to return ==HtmlElement== and the ==text== rule to return ==UnknownText==:
+!!From Grammar to Parser
 
-[[[
-WebParser>>javascript
-	^ super javascript 
-	
-	map: [ :_open :_content :_close | 
-	 	(JavascriptElement new)
-			code: _content;
-			yourself
-	]
+Now we override the rules in ==WebParser==, so that the ==javascript== rule returns ==JavascriptElement==, the ==element== rule returns ==HtmlElement== and the ==text== rule returns ==UnknownText==:
 
-WebParser>>element
-	^ super element 
-	
-	map: [ :_open :_content :_close | 
-	 	(HtmlElement new)
-			name: _open;
-			children: _content;
-			yourself
-	]
 
-WebParser>>text
-	^ super text 
-	
-	map: [ :_value | 
-		UnknownText new
-			text: _value;
-			yourself	
-	]
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #javascript in: WebParser); lf;
+	lf;
+	nextPutAll: (t sourceFor: #element in: WebParser); lf;
+	lf;
+	nextPutAll: (t sourceFor: #text in: WebParser); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
 
 And finally, for convenience, we trim whitespaces around html elements:
 
-
-[[[
-WebParser>>elClose
-	^ super elClose trimLeft
-
-WebParser>>elOpen
-	^ super elOpen trimRight
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #elClose in: WebParser); lf;
+	lf;
+	nextPutAll: (t sourceFor: #elOpen in: WebParser); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
-@@todo there is no ==trimLeft== in the source code, fix it...
+
+@@todo TODO: explain there is ==trimRight== so that the caching is more efficient
+
+By this time all the tests should pass:
+
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t testResultsFor: #(
+		#testElement
+		#testElementEmpty
+		#testElementNested
+		#testElementMalformedUnclosed
+		#testElementMalformedExtraClose
+		#testElementMalformedWrongClose
+		#testJavascript
+		#testJavascriptWithString) in: WebParserTest); lf;
+	lf;
+	nextPutAll: ']]]'
+]]]
 
 !!Structured Document
 
-We defined document in ==WebGrammar== as a repetition of javascript seas. 
-Now we define structured document, i.e. a document with an html structure. 
-The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
+Now the whole HTML document.
+The pieces should be there, we need to connect them.
+Of course, we write tests first:
 
-[[[
-WebGrammar>>structuredDocument
-	^ element sea
 
-WebGrammar>>start
-	^ structuredDocument
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #testStructuredDocument in: WebGrammar); lf;
+	lf;
+	nextPutAll: (t sourceFor: #testStructuredDocumentWithDoctype in: WebGrammar); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
-
-
-And we should write tests for this:
 
 [[[
 WebGrammarTest>>testStructuredDocument
@@ -282,6 +269,21 @@ WebGrammarTest>>testStructuredDocumentWithDoctype
 	
 	self parse: input rule: #structuredDocument
 ]]]
+
+We defined document in ==WebGrammar== as a repetition of javascript seas. 
+Now we define structured document, i.e. a document with an html structure. 
+The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
+
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #structuredDocument in: WebGrammar); lf;
+	nextPutAll: ']]]'
+]]]
+
+
 
 
 
