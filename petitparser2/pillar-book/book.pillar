@@ -1,20 +1,27 @@
 %!Parsing with PetitParser2
 
-In this tutorial we describe how to quickly build a parser to extract a javascript code from any HTML source. 
+In this series we describe *PetitParser2>https://github.com/kursjan/petitparser2* \-\-\- a modular and flexible high-performance top-down parsing framework.
+This series is divided into two parts: 
 
-We show how can we utilize bounded seas - a tool that allows us to focus on the interesting parts of an input (i.e. javascript in our case) and ignore the rest (the remaining HTML code) to
-save time and obtain results as fast as possible.
+!!!Part I, Basics
+In the first part, basics, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source.
 
-We also describe performance optimizations abilities of PetitParser, that will allow us to generate high-performance parsers from our grammars that have performance comarable to table-driven parsers such as *SmaCC>https://github.com/ThierryGoubier/SmaCC* or hand-written parsers such as RBParser. 
+We start from prototyping in a playground until we reach a full-fledged and well-tested parser. 
+We will utilize bounded seas \-\-\- a tool that allows a programmer to focus on the interesting parts of an input (i.e. Javascript in our case) and ignore the rest (the remaining HTML code).
+We will use optimizations capabilities of PetitParser2 to turn our prototype into a production-ready parser. 
+
+
+!!!Part II, Advanced Topics
+In the second part we describe advanced topics such as context-sensitive parsing, optimizations with caches and parser specializations, streaming capabilities or efficient highlighting of a text, when PetitParser is capable of continuous re-parsing of the whole input with every keystroke.
+
+On a concrete example of a Smalltalk grammar, we describe how to develop a high-performance parser comparable to a table-driven such as *SmaCC>https://github.com/ThierryGoubier/SmaCC* or hand-written parsers such as RBParser. 
 
 @@todo add some graphs?
-
-@@todo what about streaming capabilities?
 
 !!!Structure
 In *Extracting Javascript>Chapters/chapter1.pillar* we start with a simple script.
 Later in *Real Grammar>Chapters/chapter2.pillar*, we turn the script into a proper grammar and add tests.
-In *Extracting Structure>Chapters/chapter3.pillar* and *Abstract Syntax Tree>Chapters/AST.pillar*, we extend the parser to extract an html structure and we add tolerance for malformed documents.
+In *Extracting Structure>Chapters/chapter3.pillar* and *Abstract Syntax Tree>Chapters/AST.pillar*, we extend the parser to extract an HTML structure and we add tolerance for malformed documents.
 
 In *Optimizations>Chapters/optimizations.pillar* we inspect optimizations capabilities of PetitParser2
 and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitParser2 that will help us to pinpoint the perofrmance bottlenecks and we show some techniques how to fix them.

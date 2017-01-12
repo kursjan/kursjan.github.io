@@ -144,3 +144,5 @@ In this text we briefly described how inefficiencies of PEG-based parser combina
 Unfortunatelly, not all the optimizations can be done automatically.
 You might have noticed that we described only three out of four different caches used in the PetitParser. 
 The last fourth cache is a bit special and we will dedicate a whole *Memoization>memoization.pillar* chapter to it.
+
+${inputFile:Chapters/toc.pillar}$

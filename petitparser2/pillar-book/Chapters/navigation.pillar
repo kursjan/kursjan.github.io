@@ -1,12 +1,2 @@
-This text is part of the PetitParser2 series:
-- *Extracting Javascript>../chapter1.pillar*
-- *From Script to Parser>../chapter2.pillar*
-- *Extracting the Structure>../chapter3.pillar*
-- *Abstract Syntax Tree>../AST.pillar*
-- *Optimizations>../optimizations.pillar*
-- *Memoization>../memoization.pillar*
-
-Additional Chapters:
-- *Matching Tags>../matchingTags.pillar*
-- *Specializations in Detail>../smalltalkOptimization.pillar*
-- *Caches in Detail>../caches.pillar*
+This text is part of the *Parsing With PetitParser2>../../book.pillar* series.
+The whole table of content can be found *at the end of the chapter>@toc*.
