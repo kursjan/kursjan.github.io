@@ -48,11 +48,12 @@ Additional Chapters:
 </p><ul>
 <li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
 <li><a href="Chapters/../smalltalkOptimization.html">Optimizing Smalltalk Grammar</a></li>
+<li><a href="Chapters/../caches.html">Caches in Detail</a></li>
 </ul>
-
 
 <section>
 <h1>Optimizations Overview</h1>
+
 
 <p class="note">Please note that the <code>WebGrammar</code> exported in the previous chapter contains already optimized version of <code>element</code> rule. In this and the following chapter, we suppose what we stated in <a href="chapter3.html">Extracting the Structure</a> chapter about the <code>element</code> definition, i.e. it looks like this:</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
 	^ (elOpen, elContent, elClose)</code></pre><figcaption></figcaption></figure>
@@ -182,7 +183,7 @@ Let us try the Debug view:
 </figure>
 </p>
 <p>
-We see that total number of invoked parsers is 55144, roughly 30x less. 
+We see that the total number of invoked parsers is 55144, roughly 30x less. 
 We also see that, as in the previous case, most of the parsers were invoked in the before-water of the initial sea, even though roughly 10x less. 
 But we can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively! 
 </p>
@@ -207,7 +208,7 @@ This is done by the <code>PP2Cache</code> strategy (you can see its profiling ve
 
 <p>
 Another optimizations applied by PetitParser two are specializations.
-The way haw specializations work can be demonstrated on parsing the <em>html</em> text.
+The way specializations work can be demonstrated on the opening of an html element: <em>&lt;html lang=&quot;mul&quot; dir=&quot;ltr&quot; class=&quot;js-enabled&quot;&gt;</em>.
 </p>
 <p>
 <a id="elOpenOptimized"></a>
@@ -217,70 +218,24 @@ The way haw specializations work can be demonstrated on parsing the <em>html</em
 </figure>
 </p>
 <p>
-One can see that the text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.1</a>).
+One can see that the <em>html</em> text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.1</a>).
 In the unoptimized case the <em>html</em> text was parsed using the <em>PossessiveRepeating</em> strategy.
-In the optimized case (see Figure<a href="#elOpenOptimized">0.2</a>) the strategy used is <em>PlusPredicateObject</em> which is implemented as a while loop without the underlying parser invocations, which is much more efficient.
+In the optimized case (see Figure <a href="#elOpenOptimized">0.2</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without underlying parser invocations hence is more efficient.
 </p>
-</section></section><section>
-<h2>3. Caches</h2>
 <p>
-We already mentioned <code>PP2Cache</code>, but PetitParser2 utilizes four different caches that can be split into two categories:
+The same thing happened with the mapping node. 
+The specializations recognized an <em>any-star-lazy</em> pattern, which, in this case, means to consume any character until end of the tag <code>&gt;</code> appears.
+This can be implemented as a single while loop saving 252 parser invocations.
 </p>
-<ul>
-<li>First category contains fast and memory efficient caches, which remember only the last result of an underlying parser. If it happens that a parser is invoked at the same position again, the result is returned without any parsing. If the position differs, the underlying parser is invoked and the result is remembered for the new position. <ul>
-<li>The fast caches cannot be applied for the context-sensitive parsers, i.e. for parsers whose result depends on some other parameters than a position, e.g. the parser generated from the <code>elClose</code> rule.<s>
-
-
-- The second category contains slower and more memory intense caches, which remember every result for the given position, we call these caches memoizing caches. If it happens that a parser is invoked at any position it has been invoked before, the result is returned without any parsing. </s>Furthermore, if a parser is context-sensitive, the cache uses the whole context as a key.--</li>
-</ul>
-</li>
+<p>
+We investigate these optimizations in more details in these chapters:
+</p><ul>
+<li>Specializations are described in detail in the <a href="smalltalkOptimizations.html">Smalltalk Parser</a> chapter</li>
+<li>Caches are described in more detail in the <a href="Cacheds in Detail"></a> chapter</li>
 </ul>
 
-
-<p>
-You can inspect the performance of caches in the cache view:
-</p>
-<p>
-
-<figure>
-	<img src="figures/optimized-caches.png" width="100%%"/>
-	<figcaption></figcaption>
-</figure>
-</p>
-<p>
-There are three caches visble in the cache view: (i) cache and (ii) trimming cache belong to the first category and (iii) sea memoization cache belongs to the second category. 
-</p>
-<section>
-<h3>Cache</h3>
-<dl><dd>Cache improves performance of choice that has alternatives with the same prefix, e.g.:</dd>
-</dl>
-<figure><pre><code class="smalltalk">identifier, $: asPParser not / identifier</code></pre><figcaption></figcaption></figure>
-
-<p>
-Normally, if the identifier is not followed by $:, the parser backtracks and parses identifier again. 
-Optimizations of PetitParser2 can detect such a case and enwrap the identifier with a cache, preventing superfluous invocations.
-</p>
-
-</section><section>
-<h3>Trimming Cache</h3>
-<dl><dd>The trimming cache improves the performance of grammars using trimmed tokens, e.g.:</dd>
-</dl>
-<figure><pre><code class="smalltalk">keyword token trim, identifier token trim</code></pre><figcaption></figcaption></figure>
-<p>
-Because each token trims whitespaces before and after itself, the trimming in between tokens happens twice. 
-The trimming cache prevents this. 
-</p>
-</section><section>
-<h3>Sea Memoization Cache</h3>
-<dl><dd>The sea memoization cache is tailored to bounded seas. </dd>
-</dl>
-<p>
-In some cases, parsing a grammar with bounded can seas result in an exponential complexity, performing lots of redundant work. 
-Because the traditional cache would not be able to reduce the exponential complexity, the seas are memoized.
-This will preserve the linear complexity of parsing expression grammars.
-</p>
 </section></section><section>
-<h2>4. Specializations</h2>
+<h2>3. Specializations</h2>
 <p>
 The nature of <code>WebGrammar</code> profits mostly from caching optimizations, therefore we describe them in detail in this text.
 </p>
@@ -289,8 +244,9 @@ Nevertheless, for other grammars, specializations of PetitParser2 significantly 
 We investigate specializations in more details in the <a href="smalltalkOptimizations.html">Smalltalk Parser</a> chapter.
 </p>
 <p class="todo">create text about optimization of SmalltalkParser + comparsion with SmaCC.</p>
+
 </section><section>
-<h2>5. Conclusion</h2>
+<h2>4. Conclusion</h2>
 <p>
 In this text we briefly described how inefficiencies of PEG-based parser combinators and we showed how can the <code>optimize</code> method fix most of these.
 </p>

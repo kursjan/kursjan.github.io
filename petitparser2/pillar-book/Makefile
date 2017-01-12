@@ -7,6 +7,7 @@ CHAPTERS = \
 	Chapters/memoization \
 	Chapters/matchingTags \
 	Chapters/AST \
+	Chapters/caches \
 
 OUTPUTDIRECTORY = build
 LATEXTEMPLATE = support/templates/main.latex.mustache

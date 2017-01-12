@@ -8,4 +8,5 @@ This text is part of the PetitParser2 series:
 
 Additional Chapters:
 - *Matching Tags>../matchingTags.pillar*
-- *Optimizing Smalltalk Grammar>../smalltalkOptimization.pillar*
+- *Specializations in Detail>../smalltalkOptimization.pillar*
+- *Caches in Detail>../caches.pillar*

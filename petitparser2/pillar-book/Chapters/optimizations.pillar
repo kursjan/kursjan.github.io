@@ -1,7 +1,7 @@
 ${inputFile:Chapters/navigation.pillar}$
 
-
 !Optimizations Overview
+
 
 @@note Please note that the ==WebGrammar== exported in the previous chapter contains already optimized version of ==element== rule. In this and the following chapter, we suppose what we stated in *Extracting the Structure>chapter3.pillar* chapter about the ==element== definition, i.e. it looks like this:
 [[[
@@ -93,7 +93,7 @@ Let us try the Debug view:
 
 +>figures/optimized-debug.png|width=100%+
 
-We see that total number of invoked parsers is 55144, roughly 30x less. 
+We see that the total number of invoked parsers is 55144, roughly 30x less. 
 We also see that, as in the previous case, most of the parsers were invoked in the before-water of the initial sea, even though roughly 10x less. 
 But we can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively! 
 
@@ -113,53 +113,21 @@ This is done by the ==PP2Cache== strategy (you can see its profiling version in 
 !!!Specializations
 
 Another optimizations applied by PetitParser two are specializations.
-The way haw specializations work can be demonstrated on parsing the ''html'' text.
+The way specializations work can be demonstrated on the opening of an html element: ''<html lang="mul" dir="ltr" class="js-enabled">''.
 
 +Optimized parse of ==elOpen==>figures/optimized-elOpen.png|width=100%|label=elOpenOptimized+
 
-One can see that the text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
+One can see that the ''html'' text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
 In the unoptimized case the ''html'' text was parsed using the ''PossessiveRepeating'' strategy.
-In the optimized case (see Figure*@elOpenOptimized*) the strategy used is ''PlusPredicateObject'' which is implemented as a while loop without the underlying parser invocations, which is much more efficient.
+In the optimized case (see Figure *@elOpenOptimized*) the used strategy is ''PlusPredicateObject'', which is implemented as a while loop without underlying parser invocations hence is more efficient.
 
-!!Caches
-We already mentioned ==PP2Cache==, but PetitParser2 utilizes four different caches that can be split into two categories:
+The same thing happened with the mapping node. 
+The specializations recognized an ''any-star-lazy'' pattern, which, in this case, means to consume any character until end of the tag ==>== appears.
+This can be implemented as a single while loop saving 252 parser invocations.
 
-- First category contains fast and memory efficient caches, which remember only the last result of an underlying parser. If it happens that a parser is invoked at the same position again, the result is returned without any parsing. If the position differs, the underlying parser is invoked and the result is remembered for the new position. 
---The fast caches cannot be applied for the context-sensitive parsers, i.e. for parsers whose result depends on some other parameters than a position, e.g. the parser generated from the ==elClose== rule.--
-
-
-- The second category contains slower and more memory intense caches, which remember every result for the given position, we call these caches memoizing caches. If it happens that a parser is invoked at any position it has been invoked before, the result is returned without any parsing. --Furthermore, if a parser is context-sensitive, the cache uses the whole context as a key.--
-
-
-You can inspect the performance of caches in the cache view:
-
-+>figures/optimized-caches.png|width=100%+
-
-There are three caches visble in the cache view: (i) cache and (ii) trimming cache belong to the first category and (iii) sea memoization cache belongs to the second category. 
-
-!!!Cache
-:Cache improves performance of choice that has alternatives with the same prefix, e.g.:
-[[[
-identifier, $: asPParser not / identifier
-]]]
-
-Normally, if the identifier is not followed by $:, the parser backtracks and parses identifier again. 
-Optimizations of PetitParser2 can detect such a case and enwrap the identifier with a cache, preventing superfluous invocations.
-
-
-!!!Trimming Cache
-:The trimming cache improves the performance of grammars using trimmed tokens, e.g.:
-[[[
-keyword token trim, identifier token trim
-]]]
-Because each token trims whitespaces before and after itself, the trimming in between tokens happens twice. 
-The trimming cache prevents this. 
-
-!!!Sea Memoization Cache
-:The sea memoization cache is tailored to bounded seas. 
-In some cases, parsing a grammar with bounded can seas result in an exponential complexity, performing lots of redundant work. 
-Because the traditional cache would not be able to reduce the exponential complexity, the seas are memoized.
-This will preserve the linear complexity of parsing expression grammars.
+We investigate these optimizations in more details in these chapters:
+- Specializations are described in detail in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter
+- Caches are described in more detail in the *Cacheds in Detail* chapter
 
 !!Specializations
 The nature of ==WebGrammar== profits mostly from caching optimizations, therefore we describe them in detail in this text.
@@ -168,6 +136,7 @@ Nevertheless, for other grammars, specializations of PetitParser2 significantly 
 We investigate specializations in more details in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter.
 
 @@todo create text about optimization of SmalltalkParser + comparsion with SmaCC.
+
 
 !!Conclusion
 In this text we briefly described how inefficiencies of PEG-based parser combinators and we showed how can the ==optimize== method fix most of these.
