@@ -1,4 +1,12 @@
+${inputFile:Chapters/navigation.pillar}$
+
 !Manual Memoization
+
+@@note Please note that the ==WebGrammar== exported in the previous chapter contains already optimized version of ==element== rule. In this and the following chapter, we suppose what we stated in *Extracting the Structure>chapter3.pillar* chapter about the ==element== definition, i.e. it looks like this:
+[[[
+WebGrammar>>element
+	^ (elOpen, elContent, elClose)
+]]]
 
 We can try to parse the real sources. 
 The home page of we wikipedia, github, facebook and google can be parsed invoking this commands:

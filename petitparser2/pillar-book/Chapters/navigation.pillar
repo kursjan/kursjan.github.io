@@ -4,7 +4,8 @@ This text is part of the PetitParser2 series:
 - *Extracting the Structure>../chapter3.pillar*
 - *Abstract Syntax Tree>../AST.pillar*
 - *Optimizations>../optimizations.pillar*
-- *Memoization>../chapter5.pillar*
+- *Memoization>../memoization.pillar*
 
 Additional Chapters:
-- *Matching Tags>../matching Tags.pillar*
+- *Matching Tags>../matchingTags.pillar*
+- *Optimizing Smalltalk Grammar>../smalltalkOptimization.pillar*

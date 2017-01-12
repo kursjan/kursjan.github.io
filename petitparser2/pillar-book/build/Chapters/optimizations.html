@@ -40,13 +40,14 @@ This text is part of the PetitParser2 series:
 <li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
 <li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
 <li><a href="Chapters/../optimizations.html">Optimizations</a></li>
-<li><a href="Chapters/../chapter5.html">Memoization</a></li>
+<li><a href="Chapters/../memoization.html">Memoization</a></li>
 </ul>
 
 <p>
 Additional Chapters:
 </p><ul>
-<li><a href="Chapters/../matching Tags.html">Matching Tags</a></li>
+<li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
+<li><a href="Chapters/../smalltalkOptimization.html">Optimizing Smalltalk Grammar</a></li>
 </ul>
 
 
@@ -128,6 +129,22 @@ If the next parser happens to be another sea (as in the case of <code>WebGrammar
 We see that the element rule took approximately one half of the invocations (750598). 
 Majority of 751559 invocations of before water were spent by testing for element. 
 </p>
+<p>
+Another glimpse of ineffectivness can be seen in the <code>elOpen</code> rule.
+</p>
+<p>
+<a id="elOpenUnoptimized"></a>
+<figure>
+	<img src="figures/unoptimized-elOpen.png" width="100%%"/>
+	<figcaption>0.1. </figcaption>
+</figure>
+</p>
+<p>
+You can see that the whole <em>&lt;html lang=&quot;html&quot; dir=&quot;ltr&quot; class=&quot;js-enabled&quot;&gt;</em> is parsed by invoking 272 parsers.
+This is rather too much for a line with 55 characters.
+One of the reasons is how are the identifiers parsed.
+You can see that when recognizing the <em>html</em> text, 6 different parsers are invoked; for each letter one and two extra parsers.
+</p>
 </section></section><section>
 <h2>2. Using the <code>optimize</code> method</h2>
 <p>
@@ -169,8 +186,11 @@ We see that total number of invoked parsers is 55144, roughly 30x less.
 We also see that, as in the previous case, most of the parsers were invoked in the before-water of the initial sea, even though roughly 10x less. 
 But we can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively! 
 </p>
+</section><section>
+<h3>Caches</h3>
+
 <p>
-This is because of caching. 
+The main reason of reduced invocations is caching. 
 Under the <code>element</code> rule, there is a mapping node. 
 The mapping node returns the complete HTML element just in two invocations. 
 The fact that the result has been cached is visualized via the result reference. 
@@ -183,14 +203,24 @@ This is done by the <code>PP2Cache</code> strategy (you can see its profiling ve
 </p>
 
 </section><section>
-<h3>Caches</h3>
-
-<p class="todo">brief overview of caches</p>
-</section><section>
 <h3>Specializations</h3>
-<p class="todo">brief overview of specializations</p>
-<p class="todo">create text about optimization of SmalltalkParser + comparsion with SmaCC.</p>
 
+<p>
+Another optimizations applied by PetitParser two are specializations.
+The way haw specializations work can be demonstrated on parsing the <em>html</em> text.
+</p>
+<p>
+<a id="elOpenOptimized"></a>
+<figure>
+	<img src="figures/optimized-elOpen.png" width="100%%"/>
+	<figcaption>0.2. Optimized parse of <code>elOpen</code></figcaption>
+</figure>
+</p>
+<p>
+One can see that the text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.1</a>).
+In the unoptimized case the <em>html</em> text was parsed using the <em>PossessiveRepeating</em> strategy.
+In the optimized case (see Figure<a href="#elOpenOptimized">0.2</a>) the strategy used is <em>PlusPredicateObject</em> which is implemented as a while loop without the underlying parser invocations, which is much more efficient.
+</p>
 </section></section><section>
 <h2>3. Caches</h2>
 <p>
@@ -255,10 +285,10 @@ This will preserve the linear complexity of parsing expression grammars.
 The nature of <code>WebGrammar</code> profits mostly from caching optimizations, therefore we describe them in detail in this text.
 </p>
 <p>
-Nevertheless, for different grammars, the specializations of PetitParser2 significantly speeds up the parser execution as well.
+Nevertheless, for other grammars, specializations of PetitParser2 significantly speeds up the parser's execution.
 We investigate specializations in more details in the <a href="smalltalkOptimizations.html">Smalltalk Parser</a> chapter.
 </p>
-<p class="todo">Write the Smalltalk Parser optimization chapter.</p>
+<p class="todo">create text about optimization of SmalltalkParser + comparsion with SmaCC.</p>
 </section><section>
 <h2>5. Conclusion</h2>
 <p>

@@ -60,6 +60,15 @@ If the next parser happens to be another sea (as in the case of ==WebGrammar==),
 We see that the element rule took approximately one half of the invocations (750598). 
 Majority of 751559 invocations of before water were spent by testing for element. 
 
+Another glimpse of ineffectivness can be seen in the ==elOpen== rule.
+
++>figures/unoptimized-elOpen.png|width=100%|label=elOpenUnoptimized+
+
+You can see that the whole ''<html lang="html" dir="ltr" class="js-enabled">'' is parsed by invoking 272 parsers.
+This is rather too much for a line with 55 characters.
+One of the reasons is how are the identifiers parsed.
+You can see that when recognizing the ''html'' text, 6 different parsers are invoked; for each letter one and two extra parsers.
+
 !!Using the ==optimize== method
 Luckily, PetitParser2 comes with an automated optimizations that are able to reduce most of the unnecessary overhead. 
 Let it give a try:
@@ -88,7 +97,9 @@ We see that total number of invoked parsers is 55144, roughly 30x less.
 We also see that, as in the previous case, most of the parsers were invoked in the before-water of the initial sea, even though roughly 10x less. 
 But we can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively! 
 
-This is because of caching. 
+!!!Caches
+
+The main reason of reduced invocations is caching. 
 Under the ==element== rule, there is a mapping node. 
 The mapping node returns the complete HTML element just in two invocations. 
 The fact that the result has been cached is visualized via the result reference. 
@@ -99,15 +110,16 @@ The parser remembered it and it returned the result without invoking the parser 
 This is done by the ==PP2Cache== strategy (you can see its profiling version in the screenshot). The cache has been added to the element during the optimization phase. 
 
 
-!!!Caches
-
-@@todo brief overview of caches
-
 !!!Specializations
-@@todo brief overview of specializations
 
-@@todo create text about optimization of SmalltalkParser + comparsion with SmaCC.
+Another optimizations applied by PetitParser two are specializations.
+The way haw specializations work can be demonstrated on parsing the ''html'' text.
 
++Optimized parse of ==elOpen==>figures/optimized-elOpen.png|width=100%|label=elOpenOptimized+
+
+One can see that the text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
+In the unoptimized case the ''html'' text was parsed using the ''PossessiveRepeating'' strategy.
+In the optimized case (see Figure*@elOpenOptimized*) the strategy used is ''PlusPredicateObject'' which is implemented as a while loop without the underlying parser invocations, which is much more efficient.
 
 !!Caches
 We already mentioned ==PP2Cache==, but PetitParser2 utilizes four different caches that can be split into two categories:
@@ -152,10 +164,10 @@ This will preserve the linear complexity of parsing expression grammars.
 !!Specializations
 The nature of ==WebGrammar== profits mostly from caching optimizations, therefore we describe them in detail in this text.
 
-Nevertheless, for different grammars, the specializations of PetitParser2 significantly speeds up the parser execution as well.
+Nevertheless, for other grammars, specializations of PetitParser2 significantly speeds up the parser's execution.
 We investigate specializations in more details in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter.
 
-@@todo Write the Smalltalk Parser optimization chapter.
+@@todo create text about optimization of SmalltalkParser + comparsion with SmaCC.
 
 !!Conclusion
 In this text we briefly described how inefficiencies of PEG-based parser combinators and we showed how can the ==optimize== method fix most of these.
