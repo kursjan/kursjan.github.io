@@ -2,13 +2,11 @@ ${inputFile:Chapters/navigation.pillar}$
 
 !Optimizations Overview
 
-
-@@note Please note that the ==WebGrammar== exported in the previous chapter contains already optimized version of ==element== rule. In this and the following chapter, we suppose what we stated in *Extracting the Structure>chapter3.pillar* chapter about the ==element== definition, i.e. it looks like this:
+@@note Please note that the ==WebGrammar== offered to download in the *Abstract Syntax Tree>AST.pillar* chapter contains already optimized version of an ==element== rule. In this chapter we suppose that ==element== definition looks like defined in *Extracting the Structure>chapter3.pillar* chapter, i.e. it looks like this:b
 [[[
 WebGrammar>>element
 	^ (elOpen, elContent, elClose)
 ]]]
-
 
 !!Basic Analysis
 When running the ==testStructuredDocument==, you might have noticed that the performance is not good. 

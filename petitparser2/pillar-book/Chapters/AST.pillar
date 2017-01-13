@@ -422,3 +422,5 @@ You can download the sources here:
 - *==UnknownText==>../UnknownText.st*
 
 The source for this tutorial is also part of the PetitParser2 package.
+
+${inputFile:Chapters/toc.pillar}$

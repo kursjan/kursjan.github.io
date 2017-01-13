@@ -41,12 +41,14 @@ The table of content can be found <a href="#toc">at the end of the chapter</a>.
 <section>
 <h1>Manual Memoization</h1>
 
-<p class="note">Please note that the <code>WebGrammar</code> exported in the previous chapter contains already optimized version of <code>element</code> rule. In this and the following chapter, we suppose what we stated in <a href="chapter3.html">Extracting the Structure</a> chapter about the <code>element</code> definition, i.e. it looks like this:</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
+<p class="note">Please note that the <code>WebGrammar</code> offered to download in the <a href="AST.html">Abstract Syntax Tree</a> chapter contains already optimized version of an <code>element</code> rule. In this chapter we suppose that <code>element</code> definition looks like defined in <a href="chapter3.html">Extracting the Structure</a> chapter, i.e. it looks like this:b</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
 	^ (elOpen, elContent, elClose)</code></pre><figcaption></figcaption></figure>
 
+
 <p>
-We can try to parse the real sources. 
-The home page of we wikipedia, github, facebook and google can be parsed invoking this commands:
+In the previous chapter <a href="optimizations.html">Optimizations</a> we have greatly improved the performance of our parser. 
+So let's parse the real sources.
+The home page of we <a href="https://wikipedia.org">wikipedia</a>, <a href="https://github.com">github</a>, <a href="https://facebook.com">facebook</a> and <a href="https://google.com">google</a> can be parsed invoking this commands:
 </p>
 <figure><pre><code class="smalltalk">sources := PP2Sources current htmlSourcesAll.
 parser := WebParser new optimize.
@@ -56,11 +58,11 @@ sources collect: [ :s |
 
 <p>
 Unfortunately, this still takes too much time even though we applied the automated optimizations. 
-Can we do something, that the optimizations can’t? 
+Can we do something, that the optimizations can't? 
+Usually, hard to say, but in this case, we can.
 </p>
 <p>
-Actually we can. 
-It is a good time to check the events morph of a debug result. Events morph shows timeline of parser invocations (dot) at a given position (x axis) in a given order (y axis).
+It is a good time to check the events morph of a debug result. Events morph shows timeline of parser invocations (dot) at a given position (x axis) in a given time (y axis).
 </p>
 
 <p>
@@ -78,7 +80,8 @@ Inspect a result of the following command again:
 </p>
 
 <p>
-On a screenshot we see only a part of the story: parsing progress pretty fast towards the end of input. 
+On a screenshot we see only a part of the story, because we don't have such a high window.
+Anyhow, the story is that parsing progress pretty fast towards the end of input. 
 This is the good part. 
 But when scrolling down, one can notice that at some point, parser backtracks and returns to the beginning. 
 Over and over again.
@@ -87,12 +90,14 @@ And this is the bad part.
 
 <p>
 Even though optimizations in PetitParser2 work reasonably good, not all of them can be applied automatically. 
-Some grammars do a lot of backtracking which is hard to detect automatically. 
-If I ask you why is the backtracking happening you would probably have a hard time to figure this out. <sup><a href="#footnote1">[1]</a></sup>
+Some grammars do a lot of backtracking and automated optimizations can reduce only part of it.
+If I ask you why is the backtracking happening you would probably have a hard time to figure this out<sup><a href="#footnote1">[1]</a></sup>.
+So does have the code trying to apply the optimizations, so we have to do this manually.
 </p>
 
 <p>
-Luckily, there are tools to help you. Because of the format of this blog, we will more compact and simplified input.
+Luckily, there are tools to help you. 
+For convenience of visualization, we use compact and simplified input.
 </p>
 <figure><pre><code class="smalltalk">compact := '
 &lt;!a&gt;
@@ -120,9 +125,9 @@ WebParser new optimize debug: compact.</code></pre><figcaption></figcaption></fi
 
 
 <p>
-In the events morph we see how is the parser backtracking over and over. 
+In the events morph we see how is the parser backtracking, over and over. 
 We have to play a bit of detective to figure out when and why. 
-Let us navigate through the parsing until the body (the b element) is parsed:
+Let us navigate through the parsing until the HTML body (represented by the <code>b</code> element in the <code>compact</code> input) is parsed:
 </p>
 
 
@@ -150,26 +155,33 @@ Now switch to the traces tab:
 The yellow rectangle highlights 872 underlying invocations of the element rule. 
 The dark red rectangle highlights another invocations of the same element rule that started at the same position. 
 And we see there are quite a few of them. 
-In general, one does not want to see repeating and high dark rectangles. 
+In general, one does not want to see repeating dark-red rectangles, and the more of them or the higher these dark-red rectangles are, the worse. 
 It simply means redundant computations. 
 Remember, each pixel on the y-axis is a parser innvocation.
 </p>
 
 <p>
 Why do these redundant invocations happen? 
-Because of the unclosed meta elements (named only m in the compact input). 
+Because of the unclosed HTML <code>meta</code> elements (represented by <code>m</code> in the <code>compact</code> input). 
 The parser sees meta, starts an element, parses the content of meta, including the body element. 
 But it does not find the closing meta. 
-So it returns before the meta element, skips the meta part as a water and continues parsing. Which effectively means it re-parses the body element again. 
-The <code>PP2Cache</code> does not help much, because the last invocation of an element rule is the failed meta element. 
-Thus the result of the body element is forgotten.
+So it returns before the meta element, skips the meta part as a water and continues parsing. 
+This means it re-parses the body element again. 
+The more <code>meta</code> elements, the worse.
+</p>
+<p>
+If yo are watchful, you might have noticed a line behind a dark-red bar. 
+This line is created by <code>PP2Cache</code> which immediately returns the result of a <code>body</code> element and prevents the whole execution.
+But because it can remember only last result, it can prevent only half of the executions.
 </p>
 </section><section>
 <h2>2. Fixing the Cause</h2>
 <p>
-There is a solution to this, called memoization, which remembers all the results for all the positions. 
+There is a solution to this, called memoization. 
+Memoization is a technique to remember all the results for all the positions. 
 We already saw memoizations applied to the bounded seas.
-Now we can suggest to PetitParser2 to try the same trick for the element rule:
+Now we should suggest PetitParser2 to apply the same trick for the element rule.
+We do this by adding a <code>memoize</code> keyword to the <code>element</code> rule.
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
 	^ (elOpen, elContent, elClose)
@@ -177,8 +189,8 @@ Now we can suggest to PetitParser2 to try the same trick for the element rule:
 		yourself</code></pre><figcaption></figcaption></figure>
 
 <p>
-We have to specify memoize manually, because memoization are hard to detect automatically. 
-One has to understand, how is the input structured and how does the parser works to apply it efficiently. 
+As we have alredy discussed, <code>memoize</code> must be set manually, because suitable positions for memoization are hard to detect automatically.
+</p><p>
 And it is better not to use memoizations superfluously, because they are relatively expensive and not worth in most of the cases.
 </p>
 
