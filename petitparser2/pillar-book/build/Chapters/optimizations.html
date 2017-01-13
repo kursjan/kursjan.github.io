@@ -189,7 +189,9 @@ The reference indicates that at the time of that invocation the result has alrea
 The parser remembered it and it returned the result without invoking the parser again. 
 This is done by the <code>PP2Cache</code> strategy (you can see its profiling version in the screenshot). The cache has been added to the element during the optimization phase. 
 </p>
-
+<p>
+More about caches can be found in the <a href="caches.html">Caching chapter</a>.
+</p>
 </section><section>
 <h3>Specializations</h3>
 
@@ -214,26 +216,9 @@ The same thing happened with the mapping node.
 The specializations recognized an <em>any-star-lazy</em> pattern, which, in this case, means to consume any character until end of the tag <code>&gt;</code> appears.
 This can be implemented as a single while loop saving 252 parser invocations.
 </p>
-<p>
-We investigate these optimizations in more details in these chapters:
-</p><ul>
-<li>Specializations are described in detail in the <a href="smalltalkOptimizations.html">Smalltalk Parser</a> chapter</li>
-<li>Caches are described in more detail in the <a href="Cacheds in Detail"></a> chapter</li>
-</ul>
-
+<p class="todo">More details about specializations are provided in the <a href="smalltalkOptimizations.html">Smalltalk Parser</a> chapter.</p>
 </section></section><section>
-<h2>3. Specializations</h2>
-<p>
-The nature of <code>WebGrammar</code> profits mostly from caching optimizations, therefore we describe them in detail in this text.
-</p>
-<p>
-Nevertheless, for other grammars, specializations of PetitParser2 significantly speeds up the parser's execution.
-We investigate specializations in more details in the <a href="smalltalkOptimizations.html">Smalltalk Parser</a> chapter.
-</p>
-<p class="todo">create text about optimization of SmalltalkParser + comparsion with SmaCC.</p>
-
-</section><section>
-<h2>4. Conclusion</h2>
+<h2>3. Conclusion</h2>
 <p>
 In this text we briefly described how inefficiencies of PEG-based parser combinators and we showed how can the <code>optimize</code> method fix most of these.
 </p>

@@ -122,3 +122,5 @@ WebGrammarTest fileOut.
 You can download the sources here:
 - *==WebGrammar==>../WebGrammar.st* 
 - *==WebGrammarTest==>../WebGrammarTest.st*
+
+${inputFile:Chapters/toc.pillar}$

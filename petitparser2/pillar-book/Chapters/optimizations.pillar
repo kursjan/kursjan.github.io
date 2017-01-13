@@ -109,6 +109,7 @@ The reference indicates that at the time of that invocation the result has alrea
 The parser remembered it and it returned the result without invoking the parser again. 
 This is done by the ==PP2Cache== strategy (you can see its profiling version in the screenshot). The cache has been added to the element during the optimization phase. 
 
+More about caches can be found in the *Caching chapter>caches.pillar*.
 
 !!!Specializations
 
@@ -125,18 +126,7 @@ The same thing happened with the mapping node.
 The specializations recognized an ''any-star-lazy'' pattern, which, in this case, means to consume any character until end of the tag ==>== appears.
 This can be implemented as a single while loop saving 252 parser invocations.
 
-We investigate these optimizations in more details in these chapters:
-- Specializations are described in detail in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter
-- Caches are described in more detail in the *Cacheds in Detail* chapter
-
-!!Specializations
-The nature of ==WebGrammar== profits mostly from caching optimizations, therefore we describe them in detail in this text.
-
-Nevertheless, for other grammars, specializations of PetitParser2 significantly speeds up the parser's execution.
-We investigate specializations in more details in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter.
-
-@@todo create text about optimization of SmalltalkParser + comparsion with SmaCC.
-
+@@todo More details about specializations are provided in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter.
 
 !!Conclusion
 In this text we briefly described how inefficiencies of PEG-based parser combinators and we showed how can the ==optimize== method fix most of these.

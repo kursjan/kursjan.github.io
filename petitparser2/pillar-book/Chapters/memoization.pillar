@@ -45,7 +45,7 @@ And this is the bad part.
 
 Even though optimizations in PetitParser2 work reasonably good, not all of them can be applied automatically. 
 Some grammars do a lot of backtracking which is hard to detect automatically. 
-If I ask you why is the backtracking happening you would probably have a hard time to figure this out. ${footnote:actually, it was not easy for the author of this text to pinpoint the root cause as well}
+If I ask you why is the backtracking happening you would probably have a hard time to figure this out. ${footnote: actually, it was not easy for the author of this text to pinpoint the root cause as well}$
 
 
 Luckily, there are tools to help you. Because of the format of this blog, we will more compact and simplified input.
@@ -152,3 +152,5 @@ The sources can be found here:
 
 The image with the VMs for Linux, Mac OS and Windows can be found here:
 @@todo image
+
+${inputFile:Chapters/toc.pillar}$
