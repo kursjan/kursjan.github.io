@@ -28,7 +28,7 @@ First of all, we define what we want to parse:
 source := PP2Sources current htmlSample.
 ]]]
 
-The source is based on the HMTL of *Wikipedia>wikipedia.org* and contains the following text:
+The source very simplified version of *Wikipedia>wikipedia.org* and contains the following text:
 [[[eval=true
 stream 
 	nextPutAll: '[[[language=xml';
@@ -197,3 +197,5 @@ stream
 
 If your island is parse an empty string (e.g. island is optional, zero or more repetitions or simply epsilon), seas postpone the epsilon parse as far as possible, until the boundary is found.
 Therefore, in case of ==starLazy==, all the consumed input is in the before water and after water is empty.
+
+${inputFile:Chapters/toc.pillar}$

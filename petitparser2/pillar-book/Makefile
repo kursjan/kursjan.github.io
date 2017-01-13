@@ -8,6 +8,7 @@ CHAPTERS = \
 	Chapters/matchingTags \
 	Chapters/AST \
 	Chapters/caches \
+	LICENSE \
 
 OUTPUTDIRECTORY = build
 LATEXTEMPLATE = support/templates/main.latex.mustache
