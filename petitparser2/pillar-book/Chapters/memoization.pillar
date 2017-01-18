@@ -125,9 +125,9 @@ WebGrammar>>element
 		yourself
 ]]]
 
-As we have alredy discussed, ==memoize== must be set manually, because suitable positions for memoization are hard to detect automatically.
-@@todo here:
-Furthermore, memoizations are expensiveAnd it is better not to use memoizations superfluously, because they are relatively expensive and not worth in most of the cases.
+As we have already discussed, ==memoize== is specified manually. 
+Suitable positions for memoization are hard to detect automatically and memoizations are relatively expensive. 
+Mamoizations should not be used superfluously
 
 
 Let us check the result now:
@@ -141,11 +141,10 @@ WebParser new optimize debug: compact.
 
 
 This is the result we want to see. 
-Even though the parser still backtracks because of the nature of the grammar (i.e. meta rules, we see two big backtrackings, one for each meta in the input), the html body itself is not reparsed over and over again and the precious time is saved.
+Even though the parser still backtracks because of the nature of the grammar (i.e. we see two big backtrackings, one for each ==meta== in the input), the html body itself is not reparsed over and over again and the precious time is saved.
 
 
 You can try to parse some big sources as well. 
-You will get the results in a reasonable time (considering the simplicity of the grammar and effort we put into specifying it):
 
 [[[
 sources := PP2Sources current htmlSourcesAll.
@@ -155,11 +154,36 @@ sources collect: [ :s |
 ]
 ]]]
 
+!!Conclusion
+This is the last chapter about the html parser.
+We started with a prototype in the playground in the *first chapter>chapter1.pillar* and end up with a full-fledged and tested parser that is able to parser real sources and being tolerant to malformed inputs in this chapter. 
+
+In each step, we wrote only a code that describes what we are interested in
+and we got feedback from the early stages of the development.
+This is in contrast with a traditional parser development, where a grammar implementor has to specify most or a complete grammar before obtaining useful results.
+
+PetitParser allows a grammar implementor to use such a agile approach to parsing thanks to 
+(i) bounded seas, which allows for the tolerant parsing, and (ii) automated optimizations, which significantly improve performance of a removing the burden from the grammar implementor.
+
+!!!Suggestions and ideas?
+The parser we implemented has a reasonable performance considering the simplicity of the grammar and effort we put into specifying it.
+Of course, PetitParser allows you to specify even faster parser, but at a cost of higher implementation effort.
+We discuss optimizations of a high-performance grammar on the concrete example of a *Smalltalk grammar>smalltalkOptimizations.pillar* which can reach the performance of a hand-written parser.
+
 If you know how to improve the performance even more, please share the ideas or contribute!
 
+!!!Sources
+The sources of the html parser can be found here: 
+- *==WebGrammar==>../WebGrammar.st* 
+- *==WebGrammarTest==>../WebGrammarTest.st*
+- *==WebParser==>../WebParser.st* 
+- *==WebParserTest==>../WebParserTest.st*
+- *==WebElement==>../WebElement.st*
+- *==JavascriptElement==>../JavascriptElement.st*
+- *==HtmlElement==>../HtmlElement.st*
+- *==UnknownText==>../UnknownText.st*
 
-The sources can be found here: 
-@@todo sources
+The source for this tutorial is also part of the PetitParser2 package.
 
 The image with the VMs for Linux, Mac OS and Windows can be found here:
 @@todo image
