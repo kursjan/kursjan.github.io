@@ -8,6 +8,7 @@ CHAPTERS = \
 	Chapters/matchingTags \
 	Chapters/AST \
 	Chapters/caches \
+	Chapters/starLazy \
 	LICENSE \
 
 OUTPUTDIRECTORY = build

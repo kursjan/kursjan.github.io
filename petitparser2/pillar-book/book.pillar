@@ -3,8 +3,12 @@
 In this series we describe *PetitParser2>https://github.com/kursjan/petitparser2* \-\-\- a modular and flexible high-performance top-down parsing framework.
 
 @@note Please note the text is not yet complete. See the *changelog>@changelog*.
+
+
+!!Structure
  
-This series is organized in two parts: 
+The text is organized into two parts, the first part covers basics of PetitParser and is suitable for anyone who would like to start with PetitParser.
+The second part covers advanced topics and is for those who already use PetitParser and who would like to better understand its internals or extend PetitParser to better fit their needs:
 
 !!!Part I, Basics
 In the first part, basics, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
@@ -16,6 +20,13 @@ Nevertheless, the following ones are unique to PetitParser:
 # We utilize context-sensitive rules that will allow us to properly (and formally!) detect matching begin and end HTML tags and recover from malformed inputs.
 # Last but not least, we use optimizations capabilities of PetitParser to turn our prototype into a an efficient top-down parser. 
 
+In *Extracting Javascript>Chapters/chapter1.pillar* we start with a simple script.
+Later in *Real Grammar>Chapters/chapter2.pillar*, we turn the script into a proper grammar and add tests.
+In *Extracting Structure>Chapters/chapter3.pillar* we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In *Abstract Syntax Tree>Chapters/AST.pillar*, we show how to build a suitable representation of the HTML source.
+
+In *Optimizations>Chapters/optimizations.pillar* we inspect optimizations capabilities of PetitParser2
+and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitParser2 that will help us to pinpoint the performance bottlenecks and we show techniques how to fix them.
+
 
 !!!Part II, Advanced Topics
 In the second part we describe advanced topics or get into the details of the topics we mentioned in the first part.
@@ -25,20 +36,6 @@ On a concrete example of a Smalltalk grammar, we describe how to develop a parse
 
 @@todo add some graphs?
 
-!!Structure
-
-The text is divided into two parts, the first part covers basics of PetitParser and is suitable for anyone who would like to start with PetitParser.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to better understand its internals or extend PetitParser to better fit their needs.
-
-!!!Part I, Basics
-In *Extracting Javascript>Chapters/chapter1.pillar* we start with a simple script.
-Later in *Real Grammar>Chapters/chapter2.pillar*, we turn the script into a proper grammar and add tests.
-In *Extracting Structure>Chapters/chapter3.pillar* we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In *Abstract Syntax Tree>Chapters/AST.pillar*, we show how to build a suitable representation of the HTML source.
-
-In *Optimizations>Chapters/optimizations.pillar* we inspect optimizations capabilities of PetitParser2
-and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitParser2 that will help us to pinpoint the performance bottlenecks and we show techniques how to fix them.
-
-!!!Part II, Advanced Topics
 - *Matching Tags>../matchingTags.pillar*
 - *Caches in Detail>../caches.pillar*
 

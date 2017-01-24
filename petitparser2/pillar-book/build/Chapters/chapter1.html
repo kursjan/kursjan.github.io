@@ -35,7 +35,7 @@
         <a id="top"></a>
 <p>
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
-The table of content can be found <a href="#toc">at the end of the chapter</a>.
+The <a href="#toc">table of content</a> can be found at the end of the chapter.
 
 </p>
 <section>
@@ -60,6 +60,10 @@ Alternatively, you can download clean <a href="http://pharo.org">Pharo 6</a> (or
 	repository: 'github://kursjan/petitparser2';
    	load</code></pre><figcaption></figcaption></figure>
 
+<p>
+In case nothing of the previous works, please <a href="mailto:kurs.jan@gmail.com">contact me</a> or use the following archive, wich contains Pharo images with loaded PetitParser and virutal machines for Linux, Mac and Windows to run the image.
+</p>
+<p class="todo">create a loaded image.</p>
 </section><section>
 <h3>Hands On</h3>
 <p>
@@ -101,12 +105,13 @@ Second, we define javascript as a <code>js</code> rule:
 	==&gt; #second.</code></pre><figcaption></figcaption></figure>
 
 <p>
-The <code>starLazy</code> operator is a new feature of PetitParser2 and it is build on top of bounded seas. 
-It repetitively invokes the given given parser (any character in this case) until a string recognized by the following parser appears. 
-What makes it convenient is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
+The <code>starLazy</code> operator is a new feature of PetitParser2.<sup><a href="#footnote1">[1]</a></sup>
+It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser appears. 
+What makes <code>starLazy</code> useful is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
+Of course, with any change in the grammar, the <code>starLazy</code> updates itself.
 If you want to define the same rule in PetitParser, it would be:
 </p>
-<figure><pre><code class="smalltalk">#any asParser starLazy: ‘&lt;script&gt;’ asParser.</code></pre><figcaption></figcaption></figure>
+<figure><pre><code class="smalltalk">#any asParser starLazy: '&lt;script&gt;' asParser.</code></pre><figcaption></figcaption></figure>
 
 <p>
 In order to extract the javascript itself and throw away the begin and end tags, we use 
@@ -137,6 +142,7 @@ Sea returns an array of three elements:
 <p>
 Island is the result of the javascript rule, before and after water contain the rest of an input. We are interested only in the the javascript, so we redefine the document rule as follows:
 </p>
+
 <figure><pre><code class="smalltalk">jsSea := js sea ==&gt; #second.
 jsSea parse: source.</code></pre><figcaption></figcaption></figure>
 
@@ -157,18 +163,24 @@ jsSea := js sea ==&gt; #second.
 document := jsSea star.</code></pre><figcaption></figcaption></figure>
 
 <p>
-Now by calling <code>document parse: source</code> we extract both scripts, the result should look like: 
+Now by calling <code>document parse: source</code> we extract both javascripts from the source, the result should look like: 
 </p>
 <figure><pre><code class="javascript">document.documentElement.className = document.documentElement.className.replace( /(^|\s)no-js(\s|$)/, &quot;$1js-enabled$2&quot; );
+
 alert(&quot;All scripts ends with: '</code></pre><figcaption></figcaption></figure>
 
 <p>
 Yet, there is something fishy about the second result. 
-The second javascript is has ended prematurely! 
-It is because the javascript rule as we defined it does not know about strings. 
+The second javascript ended prematurely!
+It should look like this:
+</p><figure><pre><code class="javascript">alert(&quot;All scripts ends with: '&lt;/script&gt;'...&quot;)</code></pre><figcaption></figcaption></figure>
+
+<p>
+It is prematurely ended, because the javascript rule as we defined it does not know about strings. 
 Therefore, the javascript rule thinks that there is a closing of the script tag even though it is a part of the alert message string. 
 We fix it by defining javascript strings and redefining the <code>js</code> rule:
 </p>
+<p class="todo">fix the source, <code>any</code> is not reused</p>
 <figure><pre><code class="smalltalk">jsString := $' asPParser, #any asPParser starLazy, $' asPParser.
 any := #any asPParser.
 js := '&lt;script&gt;' asPParser, ((jsString / any) starLazy) flatten, '&lt;/script&gt;' asPParser
@@ -181,54 +193,21 @@ document := jsSea star.</code></pre><figcaption></figcaption></figure>
 The result looks better now:
 </p>
 <figure><pre><code class="javascript">document.documentElement.className = document.documentElement.className.replace( /(^|\s)no-js(\s|$)/, &quot;$1js-enabled$2&quot; );
+
 alert(&quot;All scripts ends with: '&lt;/script&gt;'...&quot;)</code></pre><figcaption></figcaption></figure>
 
 <p>
 Great, everything works as expected!
 </p>
-</section><section>
-<h3>StarLazy </h3>
+</section></section><section>
+<h1>Conclusion</h1>
 <p>
-In this section, we shortly inspect how does the <code>startLazy</code> operator works. 
-The code  parser <code>starLazy</code> is a shorthand for the following:
-</p>
-<figure><pre><code class="smalltalk">^ (#epsilon asPParser sea)
-	waterToken: parser;
-	yourself</code></pre><figcaption></figcaption></figure>
-
-<p>
-The island of the sea is <code>#epsilon</code>. 
-Such an island will always be found, because it accepts an empty string. 
-Furthermore it will be surrounded by water that consumes anything until the next parser succeeds. 
-You specify contents of a water by setting the <code>waterToken</code>. 
-By default you can use <code>#any asPParser</code>. 
-This means that the sea moves character by character betwen tests when to stop. 
+In this part, we have quickly prototyped a parser to extract javascript from html files.
 </p>
 <p>
-Yet as we have seen in the case of the <code>javascript</code> rule, invoking <code>#any asPParser</code> may not be sufficient, the water can get confused by an end tag hidden in a string. 
-Therefore, bounded seas allow you to define tokens that are expected in water. 
-Such token can be a string or a comment and thus does not confuse the parser. 
-In our case the tokens are either <code>jsString</code> or any character:
+Contrary to the first version of PetitParser, we could utilize bounded seas and <code>starLazy</code> operator that simplify our task by skipping over uninteresting input.
 </p>
-<figure><pre><code class="smalltalk">^ (#epsilon asPParser sea)
-	waterToken: jsString / #any asPParser;
-	flatten</code></pre><figcaption></figcaption></figure>
-
-<p>
-We have missed one detail.
-The actual implementation of <code>starLazy</code> actually extracts only before water:
-</p><figure><pre><code class="smalltalk">PP2Node&gt;&gt;starLazy
-	^ ((#epsilon asPParser sea)
-		waterToken: self)
-	map: [:_before :_epsilon :_after | 
-		&quot;return just before water, because island is nil and after water is empty&quot;
-		_before
-	] </code></pre><figcaption></figcaption></figure>
-
-<p>
-If your island is parse an empty string (e.g. island is optional, zero or more repetitions or simply epsilon), seas postpone the epsilon parse as far as possible, until the boundary is found.
-Therefore, in case of <code>starLazy</code>, all the consumed input is in the before water and after water is empty.
-</p>
+<p class="todo">conclusion</p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>
 <p>
@@ -248,6 +227,7 @@ Part I, Basics:
 <p>
 Part II, Advanced Topics:
 </p><ul>
+<li><a href="Chapters/../starLazy.html">The <code>starLazy</code> Operator</a></li>
 <li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
 <li><a href="Chapters/../smalltalkOptimization.html">Specializations in Detail</a></li>
 <li><a href="Chapters/../caches.html">Caches in Detail</a></li>
@@ -255,7 +235,10 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
-</p></section></section></section>
+</p></section></section>
+<hr></hr>
+<sup id="footnote1">[1]  It is build on top of bounded seas, but we will talk about this in more detail later.</sup><br/>
+
       </section>
     </div>
 

@@ -36,9 +36,14 @@
 <p>
 In this series we describe <a href="https://github.com/kursjan/petitparser2">PetitParser2</a> --- a modular and flexible high-performance top-down parsing framework.
 </p>
-<p class="note">Please note the text is not yet complete. See the <a href="#changelog">0.2 changelog</a>.</p><p>
+<p class="note">Please note the text is not yet complete. See the <a href="#changelog">0.2 changelog</a>.</p>
+
+<section>
+<h2>1. Structure</h2>
+<p>
  
-This series is organized in two parts: 
+The text is organized into two parts, the first part covers basics of PetitParser and is suitable for anyone who would like to start with PetitParser.
+The second part covers advanced topics and is for those who already use PetitParser and who would like to better understand its internals or extend PetitParser to better fit their needs:
 </p>
 <section>
 <h3>Part I, Basics</h3>
@@ -54,6 +59,15 @@ Nevertheless, the following ones are unique to PetitParser:
 <li>Last but not least, we use optimizations capabilities of PetitParser to turn our prototype into a an efficient top-down parser. </li>
 </ol>
 
+<p>
+In <a href="Chapters/chapter1.html">Extracting Javascript</a> we start with a simple script.
+Later in <a href="Chapters/chapter2.html">Real Grammar</a>, we turn the script into a proper grammar and add tests.
+In <a href="Chapters/chapter3.html">Extracting Structure</a> we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In <a href="Chapters/AST.html">Abstract Syntax Tree</a>, we show how to build a suitable representation of the HTML source.
+</p>
+<p>
+In <a href="Chapters/optimizations.html">Optimizations</a> we inspect optimizations capabilities of PetitParser2
+and in <a href="Chapters/memoization.html">Memoizations</a> we describe tooling of PetitParser2 that will help us to pinpoint the performance bottlenecks and we show techniques how to fix them.
+</p>
 
 </section><section>
 <h3>Part II, Advanced Topics</h3>
@@ -65,26 +79,6 @@ For example, we provide more details to context-sensitive parsing, optimizations
 On a concrete example of a Smalltalk grammar, we describe how to develop a parser whose performance is comparable to a table-driven parsers such as <a href="https://github.com/ThierryGoubier/SmaCC">SmaCC</a> or hand-written parsers such as RBParser.<sup><a href="#footnote2">[2]</a></sup>
 </p>
 <p class="todo">add some graphs?</p>
-</section><section>
-<h2>1. Structure</h2>
-
-<p>
-The text is divided into two parts, the first part covers basics of PetitParser and is suitable for anyone who would like to start with PetitParser.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to better understand its internals or extend PetitParser to better fit their needs.
-</p>
-<section>
-<h3>Part I, Basics</h3>
-<p>
-In <a href="Chapters/chapter1.html">Extracting Javascript</a> we start with a simple script.
-Later in <a href="Chapters/chapter2.html">Real Grammar</a>, we turn the script into a proper grammar and add tests.
-In <a href="Chapters/chapter3.html">Extracting Structure</a> we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In <a href="Chapters/AST.html">Abstract Syntax Tree</a>, we show how to build a suitable representation of the HTML source.
-</p>
-<p>
-In <a href="Chapters/optimizations.html">Optimizations</a> we inspect optimizations capabilities of PetitParser2
-and in <a href="Chapters/memoization.html">Memoizations</a> we describe tooling of PetitParser2 that will help us to pinpoint the performance bottlenecks and we show techniques how to fix them.
-</p>
-</section><section>
-<h3>Part II, Advanced Topics</h3>
 <ul>
 <li><a href="../matchingTags.html">Matching Tags</a></li>
 <li><a href="../caches.html">Caches in Detail</a></li>

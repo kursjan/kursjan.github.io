@@ -11,6 +11,7 @@ Part I, Basics:
 - *Memoization>../memoization.pillar*
 
 Part II, Advanced Topics:
+- *The ==starLazy== Operator>../starLazy.pillar*
 - *Matching Tags>../matchingTags.pillar*
 - *Specializations in Detail>../smalltalkOptimization.pillar*
 - *Caches in Detail>../caches.pillar*
