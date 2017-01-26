@@ -61,9 +61,9 @@ Alternatively, you can download clean <a href="http://pharo.org">Pharo 6</a> (or
    	load</code></pre><figcaption></figcaption></figure>
 
 <p>
-In case nothing of the previous works, please <a href="mailto:kurs.jan@gmail.com">contact me</a> or use the following archive, wich contains Pharo images with loaded PetitParser and virutal machines for Linux, Mac and Windows to run the image.
+In case nothing of the previous works, please <a href="mailto:kurs.jan@gmail.com">let us know</a>. 
 </p>
-<p class="todo">create a loaded image.</p>
+
 </section><section>
 <h3>Hands On</h3>
 <p>
@@ -73,7 +73,7 @@ First of all, we define what we want to parse:
 <figure><pre><code class="smalltalk">source := PP2Sources current htmlSample.</code></pre><figcaption></figcaption></figure>
 
 <p>
-The source very simplified version of <a href="wikipedia.org">Wikipedia</a> and contains the following text:
+The source very simplified (and slightly modified) version of <a href="wikipedia.org">Wikipedia</a> and contains the following text:
 </p><figure><pre><code class="smalltalk">&lt;!DOCTYPE html&gt;
 &lt;!-- saved from url=(0026)https://www.wikipedia.org/ --&gt;
 &lt;html lang=&quot;mul&quot; dir=&quot;ltr&quot; class=&quot;js-enabled&quot;&gt;
@@ -180,9 +180,8 @@ It is prematurely ended, because the javascript rule as we defined it does not k
 Therefore, the javascript rule thinks that there is a closing of the script tag even though it is a part of the alert message string. 
 We fix it by defining javascript strings and redefining the <code>js</code> rule:
 </p>
-<p class="todo">fix the source, <code>any</code> is not reused</p>
-<figure><pre><code class="smalltalk">jsString := $' asPParser, #any asPParser starLazy, $' asPParser.
-any := #any asPParser.
+<figure><pre><code class="smalltalk">any := #any asPParser.
+jsString := $' asPParser, any starLazy, $' asPParser.
 js := '&lt;script&gt;' asPParser, ((jsString / any) starLazy) flatten, '&lt;/script&gt;' asPParser
 	 ==&gt; #second.
 
@@ -203,11 +202,13 @@ Great, everything works as expected!
 <h1>Conclusion</h1>
 <p>
 In this part, we have quickly prototyped a parser to extract javascript from html files.
+Contrary to the first version of PetitParser, we could utilize bounded seas and <code>starLazy</code> operator, which skip an uninteresting input without us specifying how to skip it. 
 </p>
 <p>
-Contrary to the first version of PetitParser, we could utilize bounded seas and <code>starLazy</code> operator that simplify our task by skipping over uninteresting input.
+If you think that such a task could be done using regular expression you are right.
+But contrary to regular expressions, this is just a first step for PetitParser, which will boldly go where no regular expression has gone before.
 </p>
-<p class="todo">conclusion</p>
+
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>
 <p>

@@ -32,27 +32,25 @@
         <h1>Parsing with PetitParser2</h1>
         <div class="attribution"></div>
 
-        <p>
+        <a id="top"></a>
+<p>
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
-The whole table of content can be found <a href="#toc">at the end of the chapter</a>.
+The <a href="#toc">table of content</a> can be found at the end of the chapter.
 
 </p>
 <section>
 <h1>Extracting the Structure</h1>
 <a id="sec:structure"></a>
 <p>
-In the previous text we analyzed the anatomy of bounded seas.
-We described how they can be used to:
-</p><ol><li><em>extract islands</em> - parts of our interest while skipping the rest as a water (javascript seas in document), and </li>
-<li><em>skip unineteresting input</em> by implementing a starLazy operator that skips any input until anything that interests us appears (e.g. <code>(jsString / any) starLazy</code> in <code>jsContent</code>). </li>
-</ol>
-
-<p>
-But until now our parser was rather simple, seeing an input as a list of javascripts.
+In the previous chapters we created a parser to extract javascript from HTML source.
+But our parser is rather simple. 
+It sees an input as a list of javascripts.
 In this part we extend the parser and we extract the HTML structure. 
 Again, we use bounded seas to ease our task.
 Bounded seas become handy when skipping a text in html elements and when recoverring from unclosed or malformed elements.
 </p>
+
+
 
 <section>
 <h2>1. Matching Open And Close Tags</h2>

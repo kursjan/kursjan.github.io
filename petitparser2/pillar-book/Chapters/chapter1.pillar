@@ -20,9 +20,10 @@ Metacello new
    	load
 ]]]
 
-In case nothing of the previous works, please *contact me>kurs.jan@gmail.com* or use the following archive, wich contains Pharo images with loaded PetitParser and virutal machines for Linux, Mac and Windows to run the image.
+In case nothing of the previous works, please *let us know>kurs.jan@gmail.com*. 
+%or use the following archive, wich contains Pharo images with loaded PetitParser and virutal machines for Linux, Mac and Windows to run the image.
 
-@@todo create a loaded image.
+%@@todo create a loaded image.
 
 !!!Hands On
 Open your playground and let's start coding. 
@@ -32,7 +33,7 @@ First of all, we define what we want to parse:
 source := PP2Sources current htmlSample.
 ]]]
 
-The source very simplified version of *Wikipedia>wikipedia.org* and contains the following text:
+The source very simplified (and slightly modified) version of *Wikipedia>wikipedia.org* and contains the following text:
 [[[eval=true
 stream 
 	nextPutAll: '[[[language=xml';
@@ -147,8 +148,6 @@ It is prematurely ended, because the javascript rule as we defined it does not k
 Therefore, the javascript rule thinks that there is a closing of the script tag even though it is a part of the alert message string. 
 We fix it by defining javascript strings and redefining the ==js== rule:
 
-@@todo fix the source, ==any== is not reused
-
 [[[eval=true
 stream 
 	nextPutAll: '[[[';
@@ -178,9 +177,10 @@ Great, everything works as expected!
 
 !Conclusion
 In this part, we have quickly prototyped a parser to extract javascript from html files.
+Contrary to the first version of PetitParser, we could utilize bounded seas and ==starLazy== operator, which skip an uninteresting input without us specifying how to skip it. 
 
-Contrary to the first version of PetitParser, we could utilize bounded seas and ==starLazy== operator that simplify our task by skipping over uninteresting input.
+If you think that such a task could be done using regular expression you are right.
+But contrary to regular expressions, this is just a first step for PetitParser, which will boldly go where no regular expression has gone before.
 
-@@todo conclusion
 
 ${inputFile:Chapters/toc.pillar}$

@@ -4,7 +4,7 @@ This text is part of the *Parsing With PetitParser2>../../book.pillar* series.
 
 Part I, Basics:
 - *Extracting Javascript>../chapter1.pillar*
-- *From Script to Parser>../chapter2.pillar*
+- *From a Script to a Parser>../chapter2.pillar*
 - *Extracting the Structure>../chapter3.pillar*
 - *Abstract Syntax Tree>../AST.pillar*
 - *Optimizations>../optimizations.pillar*

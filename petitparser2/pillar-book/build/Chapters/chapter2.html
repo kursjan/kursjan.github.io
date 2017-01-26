@@ -35,21 +35,23 @@
         <a id="top"></a>
 <p>
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
-The table of content can be found <a href="#toc">at the end of the chapter</a>.
+The <a href="#toc">table of content</a> can be found at the end of the chapter.
 
 </p>
 <section>
 <h1>Turning the script into a real parser</h1>
 <a id="sec:grammar"></a>
 <p>
-Once you decide to extend the grammar, it is inconvenient to keep it in a script. 
-It is a good practice to define a proper parser, because it allows us to
-manage cyclic dependencies, 
-simplify testing and 
-extend with new functionality. 
-</p>
+If we are happy with the prototype and we decide to extend the grammar, it is inconvenient to keep it in a playground script. 
+It is a good practice to define a proper parser, it allows us to:
+</p><ul>
+<li>manage cyclic dependencies, </li>
+<li>simplify testing and </li>
+<li>extend with new functionality. </li>
+</ul>
+
 <section>
-<h3>Hands On</h3>
+<h2>1. Hands On</h2>
 <p>
 We create a parser by subclassing <code>PP2CompositeNode</code>:
 </p>
@@ -60,7 +62,7 @@ We create a parser by subclassing <code>PP2CompositeNode</code>:
 	category: 'PetitParser2-Tutorial'</code></pre><figcaption></figcaption></figure>
 
 <section>
-<h4>a. Javascript rule</h4>
+<h3>Javascript rule</h3>
 
 <p>
 We define a <code>javascipt</code> rule as follows:
@@ -85,8 +87,8 @@ WebGrammar&gt;&gt;any
 	^ #any asPParser</code></pre><figcaption></figcaption></figure>
 
 <p>
-First, we would like to cover <code>javascript</code> rule with some test to make sure the rule works as expected. 
-We start by subclassing <code>PP2CompositeParserTest</code>:
+First, we would like to cover <code>javascript</code> rule with a test to make sure the rule works as expected. 
+We do this by subclassing <code>PP2CompositeParserTest</code> and adding the test method;
 </p>
 <figure><pre><code class="smalltalk">PP2CompositeNodeTest subclass: #WebGrammarTest
 	instanceVariableNames: ''
@@ -101,7 +103,7 @@ WebGrammarTest&gt;&gt;testJavascript
 	self parse: '&lt;script&gt;alert(&quot;hi there!&quot;)&lt;/script&gt;' rule: #javascript	</code></pre><figcaption></figcaption></figure>
 
 </section><section>
-<h4>b. Document rule</h4>
+<h3>Document rule</h3>
 <p>
 To extract javascript from an html document, we first define the <code>document</code> rule simply as <code>javascript</code> because we are interested only in javascript:
 </p>
@@ -134,13 +136,21 @@ And finally, we write a test for <code>document</code>:
 
 
 </section></section><section>
-<h3>Complete Sources</h3>
+<h2>2. Complete Sources</h2>
 <p>
 You can download the sources here:
 </p><ul>
 <li><a href="../WebGrammar.st"><code>WebGrammar</code></a> </li>
 <li><a href="../WebGrammarTest.st"><code>WebGrammarTest</code></a></li>
 </ul>
+
+</section><section>
+<h2>3. Conclusion</h2>
+<p>
+In this chapter we have turned the script form the previous chapter into the class, following the practices of PetitParser.
+We have also added some tests to verify the rules are working as expected.
+This step allows us to add a new functionality as we will do in the next chapter. 
+</p>
 
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>
@@ -151,7 +161,7 @@ This text is part of the <a href="Chapters/../../book.html">Parsing With PetitPa
 Part I, Basics:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
-<li><a href="Chapters/../chapter2.html">From Script to Parser</a></li>
+<li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
 <li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
 <li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
 <li><a href="Chapters/../optimizations.html">Optimizations</a></li>
@@ -161,6 +171,7 @@ Part I, Basics:
 <p>
 Part II, Advanced Topics:
 </p><ul>
+<li><a href="Chapters/../starLazy.html">The <code>starLazy</code> Operator</a></li>
 <li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
 <li><a href="Chapters/../smalltalkOptimization.html">Specializations in Detail</a></li>
 <li><a href="Chapters/../caches.html">Caches in Detail</a></li>

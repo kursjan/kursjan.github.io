@@ -3,13 +3,13 @@ ${inputFile:Chapters/navigation.pillar}$
 !Turning the script into a real parser
 @sec:grammar
 
-Once you decide to extend the grammar, it is inconvenient to keep it in a script. 
-It is a good practice to define a proper parser, because it allows us to
-manage cyclic dependencies, 
-simplify testing and 
-extend with new functionality. 
+If we are happy with the prototype and we decide to extend the grammar, it is inconvenient to keep it in a playground script. 
+It is a good practice to define a proper parser, it allows us to:
+-manage cyclic dependencies, 
+-simplify testing and 
+-extend with new functionality. 
 
-!!!Hands On
+!!Hands On
 We create a parser by subclassing ==PP2CompositeNode==:
 
 [[[eval=true
@@ -21,7 +21,7 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-!!!!Javascript rule
+!!!Javascript rule
 
 We define a ==javascipt== rule as follows:
 
@@ -54,8 +54,8 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-First, we would like to cover ==javascript== rule with some test to make sure the rule works as expected. 
-We start by subclassing ==PP2CompositeParserTest==:
+First, we would like to cover ==javascript== rule with a test to make sure the rule works as expected. 
+We do this by subclassing ==PP2CompositeParserTest== and adding the test method;
 
 [[[eval=true
 | t |
@@ -74,7 +74,7 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-!!!!Document rule
+!!!Document rule
 To extract javascript from an html document, we first define the ==document== rule simply as ==javascript== because we are interested only in javascript:
 
 [[[eval=true
@@ -118,9 +118,15 @@ WebGrammarTest fileOut.
 'WebGrammarTest.st' asFileReference moveTo: ('build/WebGrammarTest.st' asFileReference).
 ]]]
 
-!!!Complete Sources
+!!Complete Sources
 You can download the sources here:
 - *==WebGrammar==>../WebGrammar.st* 
 - *==WebGrammarTest==>../WebGrammarTest.st*
+
+!!Conclusion
+In this chapter we have turned the script form the previous chapter into the class, following the practices of PetitParser.
+We have also added some tests to verify the rules are working as expected.
+This step allows us to add a new functionality as we will do in the next chapter. 
+
 
 ${inputFile:Chapters/toc.pillar}$
