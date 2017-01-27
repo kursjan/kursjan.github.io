@@ -71,9 +71,7 @@ It can store a result of a rule (e.g. in the rule opening an html tag) onto a st
 Here is the concrete example:
 First we define an element name as a repetition of letters and digits:
 </p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elementName
-	^ #word asPParser plus flatten</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 Than we define element as a sequence of <code>elOpen</code>, <code>elContent</code> and <code>elClose</code>:
 </p>
@@ -84,15 +82,11 @@ Than we define element as a sequence of <code>elOpen</code>, <code>elContent</co
 <p>
 In <code>elOpen</code>, we push the element name as well as we consume water in case an element contains arguments:
 </p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elOpen
-	^ $&lt; asPParser, elementName push, #any asPParser starLazy, $&gt; asPParser ==&gt; #second</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 In <code>elClose</code>, we first match the element name against the top of a stack and we pop the stack in case of success:
 </p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elClose
-	^ '&lt;/' asPParser, elementName match pop, $&gt; asPParser</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 </section><section>
 <h2>2. Element Content</h2>
 <p>
@@ -106,9 +100,7 @@ Now we need to define <code>elContent</code> rule, which represents the content 
 We add javascript to the first position because it is <em>kind of</em> an element and therefore must be ordered first to take precedence. 
 The same goes for an element, it is also <em>kind of</em> a text. 
 </p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elContent
-	^ (javascript / element / text nonEpsilon) star</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 Text can be anything.
@@ -133,41 +125,17 @@ We have defined a lots of code. Let us try, if it works.
 We start with <code>text</code>:
 </p>
 
-<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testText
-	self parse: 'foobar' rule: #text</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 And <code>element</code> follows:
 </p>
-<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testElementEmpty
-	self parse: '&lt;foo&gt;&lt;/foo&gt;' rule: #element
-[PASS]
-
-WebGrammarTest&gt;&gt;testElement
-	self parse: '&lt;p&gt;lorem ipsum&lt;/p&gt;' rule: #element
-[PASS]
-
-WebGrammarTest&gt;&gt;testElementNested
-	self parse: '&lt;p&gt;lorem &lt;i&gt;ipsum&lt;/i&gt;&lt;/p&gt;' rule: #element
-[PASS]</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 We should be able to parse malformed elements as well. 
 Lets see if the <code>push</code>, <code>match</code>, <code>pop</code> magic works, as expected:
 </p>
-<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testElementMalformedWrongClose
-	self parse: '&lt;foo&gt;&lt;bar&gt;meh&lt;/baz&gt;&lt;/foo&gt;' rule: #element.
-[PASS]
-
-WebGrammarTest&gt;&gt;testElementMalformedExtraClose
-	self parse: '&lt;foo&gt;&lt;bar&gt;meh&lt;/bar&gt;&lt;/fii&gt;&lt;/foo&gt;' rule: #element
-[PASS]
-
-WebGrammarTest&gt;&gt;testElementMalformedUnclosed
-	self parse: '&lt;head&gt;&lt;meta content=&quot;mess&quot;&gt;&lt;/head&gt;' rule: #element.
-[PASS]</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 </section><section>
 <h2>4. Conclusion</h2>
 

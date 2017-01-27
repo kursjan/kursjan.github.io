@@ -35,7 +35,7 @@
         <a id="top"></a>
 <p>
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
-The table of content can be found <a href="#toc">at the end of the chapter</a>.
+The <a href="#toc">table of content</a> can be found at the end of the chapter.
 
 </p>
 <section>
@@ -58,12 +58,7 @@ In our case the domain should be some kind of a javascript and html representati
 It is considered to be a good practice in PetitParser to split grammar, which returns concrete syntax tree, from parser, which returns abstract syntax tree. 
 We do this by subclassing <code>WebGrammar</code>:
 </p>
-<figure><pre><code class="smalltalk">WebGrammar subclass: #WebParser
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 Parsing is great use case for test driven development. 
 If you made it so far, you probably mean it with parsing.
@@ -73,70 +68,17 @@ So let us abandon on a totorial-friendly mode and do the development the recomme
 <p>
 Tests give us a clear idea what kind of interface do we expect from our abstract syntax tree:
 </p>
-<figure><pre><code class="smalltalk">WebGrammarTest subclass: #WebParserTest
-	uses: TPP2TypeAssertions
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'
-WebParserTest&gt;&gt;parserClass
-	^ WebParser
-
-WebParserTest&gt;&gt;testElement
-	super testElement.
-	
-	self assert: result name equals: 'p'.
-	self assert: result firstChild text equals: 'lorem ipsum'
-
-WebParserTest&gt;&gt;testElementEmpty
-	super testElementEmpty.
-	
-	self assert: result name equals: 'foo'.
-
-WebParserTest&gt;&gt;testElementNested
-	super testElementNested.
-	
-	self assert: result name equals: 'p'.
-	self assert: result firstChild text trim equals: 'lorem'.
-	self assert: result secondChild name equals: 'i'.
-	self assert: result secondChild firstChild text equals: 'ipsum'</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 And for malformed elements, we expect the following results:
 </p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testElementMalformedExtraClose
-	super testElementMalformedExtraClose.
-	
-	self assert: result name equals: 'foo'.
-	self assert: result secondChild text equals: '&lt;/fii&gt;'
-
-WebParserTest&gt;&gt;testElementMalformedWrongClose
-	super testElementMalformedWrongClose.
-	
-	self assert: result name equals: 'foo'.
-	self assert: result firstChild text equals: '&lt;bar&gt;meh&lt;/baz&gt;'
-
-WebParserTest&gt;&gt;testElementMalformedUnclosed
-	super testElementMalformedUnclosed.
-	
-	self assert: result name equals: 'head'.
-	self assert: result firstChild text trim equals: '&lt;meta content=&quot;mess&quot;&gt;'</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 And of course, we expect javascript code to be extracted as follows:
 </p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testJavascript
-	super testJavascript.
-	
-	self assert: result code equals: 'alert(&quot;hi there!&quot;)'
-
-WebParserTest&gt;&gt;testJavascriptWithString
-	super testJavascriptWithString.
-	
-	self assert: result code equals: 'alert(''&lt;/script&gt;'')'</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 </section><section>
 <h2>2. AST Nodes</h2>
 <p>
@@ -149,102 +91,21 @@ If we want to pass these test, the result of a parse should be a tree consisting
 <p>
 We define these nodes as follows, starting with its abstract predecessor <code>WebElement</code>, which contains only convinience methods.
 </p>
-<figure><pre><code class="smalltalk">Object subclass: #WebElement
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'
-
-WebElement&gt;&gt;children
-	^ #()
-
-WebElement&gt;&gt;firstChild
-	&quot;Just for convenience&quot;
-	^ self children first
-
-WebElement&gt;&gt;secondChild
-	&quot;Just for convenience&quot;
-	^ self children second
-
-WebElement&gt;&gt;gtTreeViewIn: composite
-	&lt;gtInspectorPresentationOrder: 40&gt;
-
-	composite tree
-		title: 'Tree';
-		children: [:n | n children ];
-		format: [:n| n displayText printStringLimitedTo: 50 ];
-		shouldExpandToLevel: 6</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 <code>HtmlElement</code> follows:
 </p>
-<figure><pre><code class="smalltalk">WebElement subclass: #HtmlElement
-	instanceVariableNames: 'name children'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'
-
-HtmlElement&gt;&gt;children
-	^ children
-
-HtmlElement&gt;&gt;name
-	^ name
-
-HtmlElement&gt;&gt;name: newName
-	name := newName
-
-HtmlElement&gt;&gt;displayText
-	^ self name</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 As well as <code>UnknownText</code>:
 </p>
-<figure><pre><code class="smalltalk">WebElement subclass: #UnknownText
-	instanceVariableNames: 'text'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'
-
-UnknownText&gt;&gt;text
-	^ text
-
-UnknownText&gt;&gt;text: anObject
-	text := anObject
-
-UnknownText&gt;&gt;gtText: composite
-	&lt;gtInspectorPresentationOrder: 40&gt;
-	
-	composite text
-		title: 'Text';
-		display: [ :context | text ]</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 Last but not least there is <code>JavascriptElement</code>:
 </p>
-<figure><pre><code class="smalltalk">WebElement subclass: #JavascriptElement
-	instanceVariableNames: 'code'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'
-
-JavascriptElement&gt;&gt;code
-	^ code
-
-JavascriptElement&gt;&gt;code: anObject
-	code := anObject
-
-JavascriptElement&gt;&gt;displayText
-	^ self code
-
-JavascriptElement&gt;&gt;gtText: composite
-	&lt;gtInspectorPresentationOrder: 40&gt;
-	
-	composite text
-		title: 'Text';
-		display: [ :context | code ]</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 </section><section>
 <h2>3. From Grammar to Parser</h2>
 
@@ -252,49 +113,16 @@ JavascriptElement&gt;&gt;gtText: composite
 Now we override the rules in <code>WebParser</code>, so that the <code>javascript</code> rule returns <code>JavascriptElement</code>, the <code>element</code> rule returns <code>HtmlElement</code> and the <code>text</code> rule returns <code>UnknownText</code>:
 </p>
 
-<figure><pre><code class="smalltalk">WebParser&gt;&gt;javascript
-	^ super javascript
-	
-	map: [ :_code | 
-		(JavascriptElement new)
-			code: _code;
-			yourself
-	]
-
-WebParser&gt;&gt;element
-	^ super element 
-	
-	map: [ :_open :_content :_close | 
-	 	(HtmlElement new)
-			name: _open;
-			children: _content;
-			yourself
-	]
-
-WebParser&gt;&gt;text
-	^ super text flatten
-	
-	map: [ :_value | 
-		UnknownText new
-			text: _value;
-			yourself	
-	]</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 And finally, for convenience, we trim whitespaces around html elements:
 </p>
-<figure><pre><code class="smalltalk">WebParser&gt;&gt;elClose
-	^ super elClose trim
-
-WebParser&gt;&gt;elOpen
-	^ super elOpen trimRight</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p class="todo">explain there is <code>trimRight</code> so that the caching is more efficient</p>
 <p>
 By this time all the tests should pass:
 </p>
-<figure><pre><code class="smalltalk">8 run, 8 passes, 0 skipped, 0 expected failures, 0 failures, 0 errors, 0 unexpected passes</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 </section><section>
 <h2>4. Structured Document</h2>
 
@@ -304,96 +132,18 @@ The pieces should be there, we need to connect them.
 Of course, we write tests first:
 </p>
 
-<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testStructuredDocumentSimple
-	| input |
-	input := '&lt;html&gt;
-		&lt;body&gt;
-			&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
-		&lt;/body&gt;
-	&lt;/html&gt;'.
-	
-	self parse: input rule: #structuredDocument
-
-WebGrammarTest&gt;&gt;testStructuredDocumentWithDoctype
-	| input |
-	input := '
-&lt;!DOCTYPE html&gt;
-&lt;!-- comment --&gt;
-&lt;html&gt;
-	&lt;body&gt;
-		&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;
-	&lt;/body&gt;
-&lt;/html&gt;'.
-	
-	self parse: input rule: #structuredDocument
-
-WebGrammarTest&gt;&gt;testStructuredDocument
-	| input |
-	input := PP2Sources current htmlSample.
-	
-	self parse: input rule: #structuredDocument</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 In the previous chapters, we defined document (represented by the <code>document</code> rule) in <code>WebGrammar</code> as a repetition of javascript seas. 
 Now we define a structured document, i.e. a document with an html structure. 
 The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
 </p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;structuredDocument
-	^ element sea</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 In order to verify the structure we extract from a document, we write the tests for parser:
 </p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocumentSimple
-	| html body javascript |
-	super testStructuredDocumentSimple.
-	
-	self assert: result name equals: 'DOCUMENT'.
-
-
-	html := result secondChild.
-	self assert: html name equals: 'html'.
-
-	body := html firstChild.
-	self assert: body name equals: 'body'.
-	
-	javascript := body firstChild.
-	self assert: javascript isKindOf: JavascriptElement.
-	self assert: javascript code equals: 'alert(&quot;hello world&quot;)'.
-
-WebParserTest&gt;&gt;testStructuredDocumentWithDoctype
-	| html body javascript |
-	super testStructuredDocumentWithDoctype.
-	
-	self assert: result name equals: 'DOCUMENT'.
-
-
-	html := result secondChild.
-	self assert: html name equals: 'html'.
-
-	body := html firstChild.
-	self assert: body name equals: 'body'.
-	
-	javascript := body firstChild.
-	self assert: javascript isKindOf: JavascriptElement.
-	self assert: javascript code equals: 'alert(&quot;hello world&quot;)'.
-
-
-WebParserTest&gt;&gt;testStructuredDocument
-	| html |
-	super testStructuredDocument.
-	
-	self assert: result name equals: 'DOCUMENT'.
-
-
-	html := result secondChild.
-	self assert: html name equals: 'html'.
-
-
-	self assert: html firstChild name equals: 'head'.	
-	self assert: html secondChild name equals: 'body'.</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 In order to pass these tests, we create a root element from the structured document:
@@ -422,8 +172,7 @@ In order to pass these tests, we create a root element from the structured docum
 
 <p>
 By this time all the tests should pass:
-</p><figure><pre><code class="smalltalk">11 run, 11 passes, 0 skipped, 0 expected failures, 0 failures, 0 errors, 0 unexpected passes</code></pre><figcaption></figcaption></figure>
-
+</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 </section><section>
 <h2>5. Comments</h2>
 
@@ -440,36 +189,18 @@ There is a <em>&lt;p&gt;</em> element in the <em>&lt;body&gt;</em>.
 But <em>&lt;p&gt;</em> is a part of comment, it should not be included in the document structure. 
 We fix the <code>testStructuredDocument</code> to cover this:
 </p>
-<figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocument
-	| html body |
-	super testStructuredDocument.
-	
-	self assert: result name equals: 'DOCUMENT'.
-
-	html := result secondChild.
-	self assert: html name equals: 'html'.
-
-	self assert: html firstChild name equals: 'head'.	
-	self assert: html secondChild name equals: 'body'.
-	
-	body := html secondChild.
-	self assert: body children size equals: 4.</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 The problem is tha same as in the case of prematurely ended javascript.
 <code>WebGrammar</code> has no notion of a comment and handles a content of comment as an ordinary html code. 
 Therefore we define what is an html comment:
 </p>
 
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;comment
-	^ '&lt;!--' asPParser, #any asPParser starLazy, '--&gt;' asPParser</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <p>
 And now we can redefine <code>text</code> so that it knows what is a comment:
 </p>
-<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
-	^ (comment / #any asPParser) starLazy</code></pre><figcaption></figcaption></figure>
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 
 <p>
 We already mentioned in the previous text that <code>starLazy</code> utilizes bounded seas and the above code is equivalent to:
@@ -494,7 +225,7 @@ We defined <code>WebParser</code>, wchid extends the <code>WebGrammar</code> and
 Last but not least, we had a look how to avoid false positives caused by comments.
 </p>
 
-
+<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
 <section>
 <h3>Complete Sources</h3>
 <p>
@@ -522,7 +253,7 @@ This text is part of the <a href="Chapters/../../book.html">Parsing With PetitPa
 Part I, Basics:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
-<li><a href="Chapters/../chapter2.html">From Script to Parser</a></li>
+<li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
 <li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
 <li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
 <li><a href="Chapters/../optimizations.html">Optimizations</a></li>
@@ -532,6 +263,7 @@ Part I, Basics:
 <p>
 Part II, Advanced Topics:
 </p><ul>
+<li><a href="Chapters/../starLazy.html">The <code>starLazy</code> Operator</a></li>
 <li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
 <li><a href="Chapters/../smalltalkOptimization.html">Specializations in Detail</a></li>
 <li><a href="Chapters/../caches.html">Caches in Detail</a></li>

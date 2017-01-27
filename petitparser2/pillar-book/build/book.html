@@ -36,7 +36,7 @@
 <p>
 In this series we describe <a href="https://github.com/kursjan/petitparser2">PetitParser2</a> --- a modular and flexible high-performance top-down parsing framework.
 </p>
-<p class="note">Please note the text is not yet complete. See the <a href="#changelog">0.2 changelog</a>.</p>
+<p class="note">Please note the text is not yet complete. See the <a href="#changelog">0.3 changelog</a>.</p>
 
 <section>
 <h2>1. Structure</h2>
@@ -61,8 +61,8 @@ Nevertheless, the following ones are unique to PetitParser:
 
 <p>
 In <a href="Chapters/chapter1.html">Extracting Javascript</a> we start with a simple script.
-Later in <a href="Chapters/chapter2.html">Real Grammar</a>, we turn the script into a proper grammar and add tests.
-In <a href="Chapters/chapter3.html">Extracting Structure</a> we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In <a href="Chapters/AST.html">Abstract Syntax Tree</a>, we show how to build a suitable representation of the HTML source.
+Later in <a href="Chapters/chapter2.html">From a Script to a Parser</a>, we turn the script into a proper grammar and add tests.
+In <a href="Chapters/chapter3.html">Extracting the Structure</a> we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In <a href="Chapters/AST.html">Abstract Syntax Tree</a>, we show how to build a suitable representation of the HTML source.
 </p>
 <p>
 In <a href="Chapters/optimizations.html">Optimizations</a> we inspect optimizations capabilities of PetitParser2
@@ -90,13 +90,35 @@ On a concrete example of a Smalltalk grammar, we describe how to develop a parse
 </ul>
 
 </section></section><section>
-<h2>2. Changelog</h2>
+<h2>2. Get Started</h2>
+<p>
+Lets get started with one of the chapters:
+</p><ul>
+<li><a href="Chapters/chapter1.html">Extracting Javascript</a>.</li>
+<li><a href="Chapters/chapter2.html">From a Script to a Parser</a>.</li>
+<li><a href="Chapters/chapter3.html">Extracting the Structure</a>.</li>
+<li><a href="Chapters/AST.html">Abstract Syntax Tree</a>.</li>
+<li><a href="Chapters/optimization.html">Optimizations</a>.</li>
+<li><a href="Chapters/memoization.html">Memoization</a>.</li>
+</ul>
+
+<p>
+Interested in some details?
+</p><ul>
+<li><a href="Chapters/starLazy.html">The <code>starLazy</code> operator</a></li>
+<li><a href="Chapters>matchingTags.html">Matching Tags</a> (context-sensitive parsing)</li>
+<li><a href="specializations.html">Specializations in Detail</a></li>
+<li><a href="caches.html">Caches in Detail</a></li>
+</ul>
+
+</section><section>
+<h2>3. Changelog</h2>
 <a id="changelog"></a>
 <p>
 <em>2017-01-19</em> - First draft of he Part I
 </p>
 </section><section>
-<h2>3. License</h2>
+<h2>4. License</h2>
 <p>
 The text is released under the <a href="LICENSE.html">MIT license</a>.
 </p>
