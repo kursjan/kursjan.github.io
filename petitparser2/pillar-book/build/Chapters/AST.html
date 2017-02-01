@@ -289,7 +289,7 @@ And finally, for convenience, we trim whitespaces around html elements:
 WebParser&gt;&gt;elOpen
 	^ super elOpen trimRight</code></pre><figcaption></figcaption></figure>
 
-<p class="todo">explain there is <code>trimRight</code> so that the caching is more efficient</p>
+<p class="note">There is <code>trimRight</code> in <code>elOpen</code>, which means that only the whitespace on the right is trimmed. This makes caching of PetitParser slightly more efficient, because element always starts at the first non-whitespace character. If there is a trimming from left and right (using the <code>trim</code>), it might start at any preceding whitespace or the first non-whitespace character and this would lead into lower cache-hit ratio.</p>
 <p>
 By this time all the tests should pass:
 </p>
@@ -299,11 +299,14 @@ By this time all the tests should pass:
 <h2>4. Structured Document</h2>
 
 <p>
-Now the whole HTML document.
-The pieces should be there, we need to connect them.
-Of course, we write tests first:
+Now let us construct the whole HTML document.
+The pieces are already there, we just need to connect them.
 </p>
-
+<p>
+In the previous chapters, we defined document (represented by the <code>document</code> rule) in <code>WebGrammar</code> as a repetition of javascript seas. 
+Now we define a structured document (<code>structuredDocument</code>), i.e. a document with an html structure. 
+Of course, we write tests first and we start with <code>WebGrammarTest</code>:
+</p>
 <figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testStructuredDocumentSimple
 	| input |
 	input := '&lt;html&gt;
@@ -334,16 +337,14 @@ WebGrammarTest&gt;&gt;testStructuredDocument
 	self parse: input rule: #structuredDocument</code></pre><figcaption></figcaption></figure>
 
 <p>
-In the previous chapters, we defined document (represented by the <code>document</code> rule) in <code>WebGrammar</code> as a repetition of javascript seas. 
-Now we define a structured document, i.e. a document with an html structure. 
-The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
+From the tests we see that the root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define structured document as an element surrounded by a sea:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;structuredDocument
 	^ element sea</code></pre><figcaption></figcaption></figure>
 
-
 <p>
-In order to verify the structure we extract from a document, we write the tests for parser:
+Furthermore, we verify that we extract the correct structure of the document. 
+This can be done in the <code>WebParserTest</code>:
 </p>
 <figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocumentSimple
 	| html body javascript |
@@ -381,27 +382,26 @@ WebParserTest&gt;&gt;testStructuredDocumentWithDoctype
 
 
 WebParserTest&gt;&gt;testStructuredDocument
-	| html |
+	| html body |
 	super testStructuredDocument.
 	
 	self assert: result name equals: 'DOCUMENT'.
 
-
 	html := result secondChild.
 	self assert: html name equals: 'html'.
-
 
 	self assert: html firstChild name equals: 'head'.	
 	self assert: html secondChild name equals: 'body'.</code></pre><figcaption></figcaption></figure>
 
 
 <p>
-In order to pass these tests, we create a root element from the structured document:
+In order to pass these tests, we create a root element called <em>DOCUMENT</em> in <code>structuredDocument</code>.
+Furthermore we add to it the html element as well a its surroundings:
 </p>
 <figure><pre><code class="smalltalk">WebParser&gt;&gt;structuredDocument
 	^ super structuredDocument
 	
-	map: [ :_bw :_document :_aw |
+	map: [ :_bw :_html :_aw |
 		| beforeWater afterWater |
 		beforeWater := UnknownText new
 			text: _bw;
@@ -413,11 +413,11 @@ In order to pass these tests, we create a root element from the structured docum
 			
 		HtmlElement new
 			name: 'DOCUMENT';
-			children: (Array with: beforeWater 
-					 with: _document 
-					 with: afterWater);
+			children: (Array 
+				with: beforeWater 
+				with: _html 
+				with: afterWater);
 			yourself
-	
 	]</code></pre><figcaption></figcaption></figure>
 
 <p>
@@ -428,7 +428,9 @@ By this time all the tests should pass:
 <h2>5. Comments</h2>
 
 <p>
-In this section we focus a bit more how to handle comments. They may contain scripts or other elements and they may confuse the parser. 
+In this section we focus a bit on comments. 
+Comments can contain scripts or other elements that are not part of the html document, they are only comments. 
+And they may confuse the parser. 
 </p>
 <p>
 Actually we have been cheating a bit and there is an error in <code>WebParser</code>, which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:

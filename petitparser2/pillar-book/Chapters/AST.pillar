@@ -202,7 +202,7 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-@@todo explain there is ==trimRight== so that the caching is more efficient
+@@note There is ==trimRight== in ==elOpen==, which means that only the whitespace on the right is trimmed. This makes caching of PetitParser slightly more efficient, because element always starts at the first non-whitespace character. If there is a trimming from left and right (using the ==trim==), it might start at any preceding whitespace or the first non-whitespace character and this would lead into lower cache-hit ratio.
 
 By this time all the tests should pass:
 
@@ -226,10 +226,12 @@ stream
 
 !!Structured Document
 
-Now the whole HTML document.
-The pieces should be there, we need to connect them.
-Of course, we write tests first:
+Now let us construct the whole HTML document.
+The pieces are already there, we just need to connect them.
 
+In the previous chapters, we defined document (represented by the ==document== rule) in ==WebGrammar== as a repetition of javascript seas. 
+Now we define a structured document (==structuredDocument==), i.e. a document with an html structure. 
+Of course, we write tests first and we start with ==WebGrammarTest==:
 
 [[[eval=true
 | t |
@@ -245,9 +247,7 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-In the previous chapters, we defined document (represented by the ==document== rule) in ==WebGrammar== as a repetition of javascript seas. 
-Now we define a structured document, i.e. a document with an html structure. 
-The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
+From the tests we see that the root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define structured document as an element surrounded by a sea:
 
 [[[eval=true
 | t |
@@ -258,8 +258,8 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-
-In order to verify the structure we extract from a document, we write the tests for parser:
+Furthermore, we verify that we extract the correct structure of the document. 
+This can be done in the ==WebParserTest==:
 
 [[[eval=true
 | t |
@@ -272,47 +272,33 @@ stream
 	lf;
 	nextPutAll: '
 WebParserTest>>testStructuredDocument
-	| html |
+	| html body |
 	super testStructuredDocument.
 	
 	self assert: result name equals: ''DOCUMENT''.
 
-
 	html := result secondChild.
 	self assert: html name equals: ''html''.
 
-
 	self assert: html firstChild name equals: ''head''.	
 	self assert: html secondChild name equals: ''body''.
-';
+
+'; lf;
+	lf;
 	nextPutAll: ']]]'
 ]]]
 
 
-In order to pass these tests, we create a root element from the structured document:
+In order to pass these tests, we create a root element called ''DOCUMENT'' in ==structuredDocument==.
+Furthermore we add to it the html element as well a its surroundings:
 
-[[[
-WebParser>>structuredDocument
-	^ super structuredDocument
-	
-	map: [ :_bw :_document :_aw |
-		| beforeWater afterWater |
-		beforeWater := UnknownText new
-			text: _bw;
-			yourself.
-			
-		afterWater := UnknownText new
-			text: _aw;
-			yourself.
-			
-		HtmlElement new
-			name: 'DOCUMENT';
-			children: (Array with: beforeWater 
-					 with: _document 
-					 with: afterWater);
-			yourself
-	
-	]
+[[[eval=true
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #structuredDocument in: WebParser); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
 
 By this time all the tests should pass:
@@ -339,9 +325,14 @@ stream
 
 !!Comments
 
-In this section we focus a bit more how to handle comments. They may contain scripts or other elements and they may confuse the parser. 
+In this section we focus a bit on comments. 
+Comments can contain scripts or other elements that are not part of the html document, they are only comments. 
+And they may confuse the parser. 
 
-Actually we have been cheating a bit and there is an error in ==WebParser==, which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:
+Actually they do.
+We have been cheating a bit and there is an error in ==WebParser==. 
+@@todo here
+which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:
 
 [[[
 WebParser new parse: input.
