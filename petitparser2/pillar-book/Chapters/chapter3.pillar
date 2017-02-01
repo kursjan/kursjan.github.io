@@ -7,8 +7,7 @@ In the previous chapters we created a parser to extract javascript from HTML sou
 Yet our parser is rather simple.
 It sees an input as a list of javascripts.
 In this part we extend the parser and we extract the HTML structure. 
-To ease our task we use bounded seas, which help us to skip an uninteresting parts of the html document and to recover from unclosed or malformed elements.
-@@todo where are the seas here?
+%To ease our task we use bounded seas, which help us to skip an uninteresting parts of the html document and to recover from unclosed or malformed elements.
 
 %analyzed the anatomy of bounded seas%.
 %We described how they can be used to:
@@ -73,7 +72,7 @@ Now we need to define ==elContent== rule, which represents the content of an ele
 # a javascript code; 
 # another element; or 
 # an unknown text. 
-Javascript is on the first position because it is ''kind of'' an element and therefore must be ordered before element. 
+Javascript is on the first position because it is ''kind of'' an element${footnote: any javascript code can be recognized as an html element}$ and therefore must be ordered before element. 
 The same holds for an element, it is also ''kind of'' text. 
 
 [[[eval=true
@@ -89,7 +88,7 @@ stream
 
 
 Text can be anything.
-Therefore, we define it as with the help of bounded seas:
+Therefore, we define it as with the help of bounded seas, concretely using the ==starLazy== operator:
 
 [[[
 WebGrammar>>text
@@ -98,10 +97,16 @@ WebGrammar>>text
 
 
 !!!Epsilon in Repetitions
-Note, we mark text as ==nonEpsilon==.
+Note, we mark the ==text== rule with ==nonEpsilon==.
 ==nonEpsilon== operator is an extension of PEGs that allows only for non-empty parses. 
-The reason for this is that ==#any asPParser starLazy== can consume anything, even the empty string. 
+The reason for this is that ==#any asPParser starLazy== can consume anything, even the empty string, because star allows for zero repetitions. 
 The star repetition of ==elContent== would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+You can easily freeze your image by running (we recommend saving your image now):
+
+[[[
+"Tip: save the image before running"
+#any asPParser optional star parse: 'endless loop'
+]]] 
 
 !!Testing the Code
 We have written a new code, let us try if it works. 
@@ -165,3 +170,5 @@ We should assert that the proper element names and the right content is extracte
 
 It is the time to return a more convenient representation of the input: ''an abstract syntax tree''.
 We will do this in the *following chapter>AST.pillar*.
+
+${inputFile:Chapters/toc.pillar}$

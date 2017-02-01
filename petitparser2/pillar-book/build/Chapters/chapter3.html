@@ -46,8 +46,7 @@ In the previous chapters we created a parser to extract javascript from HTML sou
 Yet our parser is rather simple.
 It sees an input as a list of javascripts.
 In this part we extend the parser and we extract the HTML structure. 
-To ease our task we use bounded seas, which help us to skip an uninteresting parts of the html document and to recover from unclosed or malformed elements.
-</p><p class="todo">where are the seas here?</p>
+</p>
 
 
 
@@ -70,7 +69,9 @@ It can store a result of a rule (e.g. opening an html tag) onto a stack using th
 Here is the concrete example:
 First we define an element name as a repetition of letters and digits:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elementName
+	^ #word asPParser plus flatten</code></pre><figcaption></figcaption></figure>
+
 <p>
 Than we define element as a sequence of <code>elOpen</code>, <code>elContent</code> and <code>elClose</code>:
 </p>
@@ -81,11 +82,15 @@ Than we define element as a sequence of <code>elOpen</code>, <code>elContent</co
 <p>
 In <code>elOpen</code>, we push the element name as well as we consume water in case an element contains arguments:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elOpen
+	^ $&lt; asPParser, elementName push, #any asPParser starLazy, $&gt; asPParser ==&gt; #second</code></pre><figcaption></figcaption></figure>
+
 <p>
 In <code>elClose</code>, we first match the element name against the top of a stack and we pop the stack in case of success:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elClose
+	^ '&lt;/' asPParser, elementName match pop, $&gt; asPParser</code></pre><figcaption></figcaption></figure>
+
 </section><section>
 <h2>2. Element Content</h2>
 <p>
@@ -96,14 +101,16 @@ Now we need to define <code>elContent</code> rule, which represents the content 
 <li>an unknown text. </li>
 </ol>
 <p>
-Javascript is on the first position because it is <em>kind of</em> an element and therefore must be ordered before element. 
+Javascript is on the first position because it is <em>kind of</em> an element<sup><a href="#footnote1">[1]</a></sup>and therefore must be ordered before element. 
 The same holds for an element, it is also <em>kind of</em> text. 
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elContent
+	^ (javascript / element / text nonEpsilon) star</code></pre><figcaption></figcaption></figure>
+
 
 <p>
 Text can be anything.
-Therefore, we define it as with the help of bounded seas:
+Therefore, we define it as with the help of bounded seas, concretely using the <code>starLazy</code> operator:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
 	^ #any starLazy</code></pre><figcaption></figcaption></figure>
@@ -112,11 +119,15 @@ Therefore, we define it as with the help of bounded seas:
 <section>
 <h3>Epsilon in Repetitions</h3>
 <p>
-Note, we mark text as <code>nonEpsilon</code>.
+Note, we mark the <code>text</code> rule with <code>nonEpsilon</code>.
 <code>nonEpsilon</code> operator is an extension of PEGs that allows only for non-empty parses. 
-The reason for this is that <code>#any asPParser starLazy</code> can consume anything, even the empty string. 
+The reason for this is that <code>#any asPParser starLazy</code> can consume anything, even the empty string, because star allows for zero repetitions. 
 The star repetition of <code>elContent</code> would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+You can easily freeze your image by running (we recommend saving your image now):
 </p>
+<figure><pre><code class="smalltalk">&quot;Tip: save the image before running&quot;
+#any asPParser optional star parse: 'endless loop'</code></pre><figcaption></figcaption></figure>
+
 </section></section><section>
 <h2>3. Testing the Code</h2>
 <p>
@@ -124,17 +135,42 @@ We have written a new code, let us try if it works.
 We start with <code>text</code>:
 </p>
 
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testText
+	self parse: 'foobar' rule: #text
+[PASS]</code></pre><figcaption></figcaption></figure>
+
 
 <p>
 And <code>element</code> follows:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testElementEmpty
+	self parse: '&lt;foo&gt;&lt;/foo&gt;' rule: #element
+[PASS]
+
+WebGrammarTest&gt;&gt;testElement
+	self parse: '&lt;p&gt;lorem ipsum&lt;/p&gt;' rule: #element
+[PASS]
+
+WebGrammarTest&gt;&gt;testElementNested
+	self parse: '&lt;p&gt;lorem &lt;i&gt;ipsum&lt;/i&gt;&lt;/p&gt;' rule: #element
+[PASS]</code></pre><figcaption></figcaption></figure>
+
 <p>
 We should be able to parse malformed elements as well. 
 Lets see if the <code>push</code>, <code>match</code>, <code>pop</code> magic works, as expected:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testElementMalformedWrongClose
+	self parse: '&lt;foo&gt;&lt;bar&gt;meh&lt;/baz&gt;&lt;/foo&gt;' rule: #element.
+[PASS]
+
+WebGrammarTest&gt;&gt;testElementMalformedExtraClose
+	self parse: '&lt;foo&gt;&lt;bar&gt;meh&lt;/bar&gt;&lt;/fii&gt;&lt;/foo&gt;' rule: #element
+[PASS]
+
+WebGrammarTest&gt;&gt;testElementMalformedUnclosed
+	self parse: '&lt;head&gt;&lt;meta content=&quot;mess&quot;&gt;&lt;/head&gt;' rule: #element.
+[PASS]</code></pre><figcaption></figcaption></figure>
+
 </section><section>
 <h2>4. Conclusion</h2>
 
@@ -147,8 +183,38 @@ We should assert that the proper element names and the right content is extracte
 <p>
 It is the time to return a more convenient representation of the input: <em>an abstract syntax tree</em>.
 We will do this in the <a href="AST.html">following chapter</a>.
+</p>
+<a id="toc"></a><section>
+<h1>Table of Contents</h1>
+<p>
+This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
+</p>
+<p>
+Part I, Basics:
+</p><ul>
+<li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
+<li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
+<li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
+<li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
+<li><a href="Chapters/../optimizations.html">Optimizations</a></li>
+<li><a href="Chapters/../memoization.html">Memoization</a></li>
+</ul>
 
-</p></section></section>
+<p>
+Part II, Advanced Topics:
+</p><ul>
+<li><a href="Chapters/../starLazy.html">The <code>starLazy</code> Operator</a></li>
+<li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
+<li><a href="Chapters/../smalltalkOptimization.html">Specializations in Detail</a></li>
+<li><a href="Chapters/../caches.html">Caches in Detail</a></li>
+</ul>
+
+<p>
+Go to <a href="#top">top</a>.
+</p></section></section></section>
+<hr></hr>
+<sup id="footnote1">[1]  any javascript code can be recognized as an html element</sup><br/>
+
       </section>
     </div>
 
