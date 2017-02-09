@@ -6,11 +6,18 @@ In this series we describe *PetitParser2>https://github.com/kursjan/petitparser2
 
 
 !!Structure
- 
-The text is organized into two parts, the first part covers basics of PetitParser and is suitable for anyone who would like to start with PetitParser.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to better understand its internals or extend PetitParser to better fit their needs:
 
-!!!Part I, Basics
+The text is organized into two parts, the first part covers basic developer's workflow with PetitParser and is suitable for anyone who has elementary experience with PetitParser and would like to learn more about PetitParser.
+The second part covers advanced topics and is for those who already use PetitParser and who would like to customize PetitParser to better fit their needs.
+
+!!!Prerequsities
+This text expects a basic knowledge of parsing with PetitParser.
+If you are not sure, if you have the required level of knoledge, we recommend the *Writing Parser with PetitParser>https://www.lukas-renggli.ch/blog/petitparser-1* from Lukas Renggli and *Introduction to PetitParser2>http://www.humane-assessment.com/blog/introducing-petitparser2/* by Tudor Girba.
+Optionally, there is a dedicated *PetitParser chapter>http://scg.unibe.ch/archive/papers/Kurs13a-PetitParser.pdf* in the *Deep into Pharo>http://www.deepintopharo.com/* book.
+
+ 
+
+!!!Part I, Developer's Workflow
 In the first part, basics, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
 
 We start by prototyping in a playground and throughout several steps we reach a full-fledged and tested parser that effectively builds a structured representation of the parsed source. 
@@ -29,6 +36,7 @@ and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitPa
 
 
 !!!Part II, Advanced Topics
+@@note under construction
 In the second part we describe advanced topics or get into the details of the topics we mentioned in the first part.
 For example, we provide more details to context-sensitive parsing, optimizations with caches and specializations, we show how to parse streams or how to efficiently highlight text.${footnote: useful especially for text editors}$
 

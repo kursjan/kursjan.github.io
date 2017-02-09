@@ -177,7 +177,7 @@ Great, everything works as expected!
 
 !Conclusion
 In this part, we have quickly prototyped a parser to extract javascript from html files.
-Contrary to the first version of PetitParser, we could utilize bounded seas and ==starLazy== operator, which skip an uninteresting input without us specifying how to skip it. 
+Contrary to the first version of PetitParser, we could utilize bounded seas and ==starLazy== operator, which skip an uninteresting input without us specifying how to skip it, more details are provided in *The ==starLazy== Operator>starLazy.pillar* chapter. 
 
 If you think that such a task could be done using regular expression you are right.
 But contrary to regular expressions, this is just a first step for PetitParser, which will boldly go where no regular expression has gone before.

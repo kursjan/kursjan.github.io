@@ -464,21 +464,20 @@ First, we should fix the <code>testStructuredDocument</code> to cover this case:
 So where does the problem come from?
 The cause is the same as in the case of prematurely ended javascript.
 <code>WebGrammar</code> has no notion of a comment and handles a content of a comment as an ordinary html code. 
-Therefore we have to define what is an html comment:
+In order to teach it what is an html comment, we have to define it:
 </p>
 
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;comment
 	^ '&lt;!--' asPParser, #any asPParser starLazy, '--&gt;' asPParser</code></pre><figcaption></figcaption></figure>
 
 <p>
-And now we can redefine <code>text</code> so that it knows what is a comment:
+And now we can redefine <code>text</code> so that it takes comments into an account:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
 	^ (comment / #any asPParser) starLazy</code></pre><figcaption></figcaption></figure>
 
-
 <p>
-We already mentioned in the previous text that <code>starLazy</code> utilizes bounded seas and the above code is equivalent to:
+If you are interested in the details of the <code>starLazy</code> operator, check out the <a href="starLazy.html">The <code>starLazy</code> Operator</a> chapter. 
 </p>
 <figure><pre><code class="smalltalk">(#epsilon asPParser)
   waterToken: (comment / #any asPParser);
@@ -496,7 +495,7 @@ This is it, we can parse all of it!
 <h2>6. Conclusion </h2>
 <p>
 In this chapter we have applied the test-driven approach to define our AST nodes.
-We defined <code>WebParser</code>, wchid extends the <code>WebGrammar</code> and builds the AST nodes.
+We defined <code>WebParser</code>, which extends the <code>WebGrammar</code> and builds the AST nodes.
 Last but not least, we had a look how to avoid false positives caused by comments.
 </p>
 
@@ -517,7 +516,7 @@ You can download the sources here:
 </ul>
 
 <p>
-The source for this tutorial is also part of the PetitParser2 package.
+The sources of this tutorial is also part of the PetitParser2 package, so you just need to install PetitParser or use Moose as described in the <a href="../book.html">Introduction</a>.
 </p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>

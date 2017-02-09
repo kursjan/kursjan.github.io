@@ -40,13 +40,23 @@ In this series we describe <a href="https://github.com/kursjan/petitparser2">Pet
 
 <section>
 <h2>1. Structure</h2>
+
 <p>
- 
-The text is organized into two parts, the first part covers basics of PetitParser and is suitable for anyone who would like to start with PetitParser.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to better understand its internals or extend PetitParser to better fit their needs:
+The text is organized into two parts, the first part covers basic developer's workflow with PetitParser and is suitable for anyone who has elementary experience with PetitParser and would like to learn more about PetitParser.
+The second part covers advanced topics and is for those who already use PetitParser and who would like to customize PetitParser to better fit their needs.
 </p>
 <section>
-<h3>Part I, Basics</h3>
+<h3>Prerequsities</h3>
+<p>
+This text expects a basic knowledge of parsing with PetitParser.
+If you are not sure, if you have the required level of knoledge, we recommend the <a href="https://www.lukas-renggli.ch/blog/petitparser-1">Writing Parser with PetitParser</a> from Lukas Renggli and <a href="http://www.humane-assessment.com/blog/introducing-petitparser2/">Introduction to PetitParser2</a> by Tudor Girba.
+Optionally, there is a dedicated <a href="http://scg.unibe.ch/archive/papers/Kurs13a-PetitParser.pdf">PetitParser chapter</a> in the <a href="http://www.deepintopharo.com/">Deep into Pharo</a> book.
+</p>
+<p>
+ 
+</p>
+</section><section>
+<h3>Part I, Developer's Workflow</h3>
 <p>
 In the first part, basics, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
 </p>
@@ -71,7 +81,7 @@ and in <a href="Chapters/memoization.html">Memoizations</a> we describe tooling 
 
 </section><section>
 <h3>Part II, Advanced Topics</h3>
-<p>
+<p class="note">under construction</p><p>
 In the second part we describe advanced topics or get into the details of the topics we mentioned in the first part.
 For example, we provide more details to context-sensitive parsing, optimizations with caches and specializations, we show how to parse streams or how to efficiently highlight text.<sup><a href="#footnote1">[1]</a></sup>
 </p>

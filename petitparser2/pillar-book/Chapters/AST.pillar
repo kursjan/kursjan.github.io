@@ -354,7 +354,7 @@ stream
 So where does the problem come from?
 The cause is the same as in the case of prematurely ended javascript.
 ==WebGrammar== has no notion of a comment and handles a content of a comment as an ordinary html code. 
-Therefore we have to define what is an html comment:
+In order to teach it what is an html comment, we have to define it:
 
 
 [[[eval=true
@@ -363,7 +363,7 @@ t := PP2Tutorial new.
 t printAsCode: (t sourceFor: #comment in: WebGrammar) stream: stream.
 ]]]
 
-And now we can redefine ==text== so that it knows what is a comment:
+And now we can redefine ==text== so that it takes comments into an account:
 
 [[[eval=true
 | t |
@@ -371,8 +371,7 @@ t := PP2Tutorial new.
 t printAsCode: (t sourceFor: #text in: WebGrammar) stream: stream.
 ]]]
 
-
-We already mentioned in the previous text that ==starLazy== utilizes bounded seas and the above code is equivalent to:
+If you are interested in the details of the ==starLazy== operator, check out the *The ==starLazy== Operator>starLazy.pillar* chapter. 
 
 [[[
 (#epsilon asPParser)
@@ -388,7 +387,7 @@ This is it, we can parse all of it!
 
 !!Conclusion 
 In this chapter we have applied the test-driven approach to define our AST nodes.
-We defined ==WebParser==, wchid extends the ==WebGrammar== and builds the AST nodes.
+We defined ==WebParser==, which extends the ==WebGrammar== and builds the AST nodes.
 Last but not least, we had a look how to avoid false positives caused by comments.
 
 
@@ -414,6 +413,6 @@ You can download the sources here:
 - *==HtmlElement==>../HtmlElement.st*
 - *==UnknownText==>../UnknownText.st*
 
-The source for this tutorial is also part of the PetitParser2 package.
+The sources of this tutorial is also part of the PetitParser2 package, so you just need to install PetitParser or use Moose as described in the *Introduction>../book.pillar*.
 
 ${inputFile:Chapters/toc.pillar}$

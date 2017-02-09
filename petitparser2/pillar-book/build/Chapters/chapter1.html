@@ -74,9 +74,30 @@ First of all, we define what we want to parse:
 
 <p>
 The source very simplified (and slightly modified) version of <a href="wikipedia.org">Wikipedia</a> and contains the following text:
-</p><p>
-[[[language=xml
-</p><pre>MessageNotUnderstood: receiver of &quot;current&quot; is nil</pre>
+</p><figure><pre><code class="smalltalk">&lt;!DOCTYPE html&gt;
+&lt;!-- saved from url=(0026)https://www.wikipedia.org/ --&gt;
+&lt;html lang=&quot;mul&quot; dir=&quot;ltr&quot; class=&quot;js-enabled&quot;&gt;
+&lt;head&gt;
+	&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+	&lt;title&gt;Wikipedia&lt;/title&gt;
+	&lt;meta name=&quot;description&quot; content=&quot;Wikipedia is a free online encyclopedia, created and edited by volunteers around the world and hosted by the Wikimedia Foundation.&quot;&gt;
+	&lt;!--[if gt IE 7]--&gt;
+	&lt;script&gt;document.documentElement.className = document.documentElement.className.replace( /(^|\s)no-js(\s|$)/, &quot;$1js-enabled$2&quot; );&lt;/script&gt;
+	&lt;!--[endif]--&gt;
+&lt;/head&gt;
+&lt;body id=&quot;www-wikipedia-org&quot;&gt;
+	&lt;h1 class=&quot;central-textlogo&quot; style=&quot;font-variant: small-caps&quot; alt=&quot;WikipediA&quot; title=&quot;Wikipedia&quot;&gt;
+		&lt;img src=&quot;./Wikipedia_files/Wikipedia_wordmark.png&quot; srcset=&quot;portal/wikipedia.org/assets/img/Wikipedia_wordmark@1.5x.png 1.5x&quot; width=&quot;174&quot; height=&quot;30&quot; alt=&quot;WikipediA&quot; title=&quot;Wikipedia&quot;&gt;
+		&lt;strong id=&quot;js-localized-slogan&quot; class=&quot;localized-slogan&quot; style=&quot;visibility: visible;&quot;&gt;The Free Encyclopedia&lt;/strong&gt;
+	&lt;/h1&gt;
+	&lt;div id=&quot;mydiv&quot;&gt;
+		Hi there!
+	&lt;/div&gt;
+	&lt;script&gt;alert(&quot;All scripts ends with: '&lt;/script&gt;'...&quot;)&lt;/script&gt;
+	&lt;!-- &lt;p&gt;obsolete conentent&lt;/p&gt; --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre><figcaption></figcaption></figure>
+
 <p>
 Second, we define javascript as a <code>js</code> rule:
 </p>
@@ -135,30 +156,45 @@ We can easily add more <code>jsSea</code> rules by defining a <code>document</co
 
 <p>
 The whole script looks like: 
-</p><p>
-[[[
-</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+</p><figure><pre><code class="smalltalk">source := PP2Sources current htmlSample.
+js := '&lt;script&gt;' asPParser, #any asPParser starLazy flatten, '&lt;/script&gt;' asPParser
+	==&gt; #second.
+jsSea := js sea ==&gt; #second.
+document := jsSea star.</code></pre><figcaption></figcaption></figure>
+
 <p>
 Now by calling <code>document parse: source</code> we extract both javascripts from the source, the result should look like: 
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="javascript">document.documentElement.className = document.documentElement.className.replace( /(^|\s)no-js(\s|$)/, &quot;$1js-enabled$2&quot; );
+
+alert(&quot;All scripts ends with: '</code></pre><figcaption></figcaption></figure>
+
 <p>
 Yet, there is something fishy about the second result. 
 The second javascript ended prematurely!
 It should look like this:
-</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+</p><figure><pre><code class="javascript">alert(&quot;All scripts ends with: '&lt;/script&gt;'...&quot;)</code></pre><figcaption></figcaption></figure>
+
 <p>
 It is prematurely ended, because the javascript rule as we defined it does not know about strings. 
 Therefore, the javascript rule thinks that there is a closing of the script tag even though it is a part of the alert message string. 
 We fix it by defining javascript strings and redefining the <code>js</code> rule:
 </p>
-<p>
-[[[
-</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">jsString := $' asPParser, #any asPParser starLazy, $' asPParser.
+any := #any asPParser.
+js := '&lt;script&gt;' asPParser, ((jsString / any) starLazy) flatten, '&lt;/script&gt;' asPParser
+	 ==&gt; #second.
+
+jsSea := js sea ==&gt; #second.
+document := jsSea star.</code></pre><figcaption></figcaption></figure>
+
 <p>
 The result looks better now:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="javascript">document.documentElement.className = document.documentElement.className.replace( /(^|\s)no-js(\s|$)/, &quot;$1js-enabled$2&quot; );
+
+alert(&quot;All scripts ends with: '&lt;/script&gt;'...&quot;)</code></pre><figcaption></figcaption></figure>
+
 <p>
 Great, everything works as expected!
 </p>
@@ -166,7 +202,7 @@ Great, everything works as expected!
 <h1>Conclusion</h1>
 <p>
 In this part, we have quickly prototyped a parser to extract javascript from html files.
-Contrary to the first version of PetitParser, we could utilize bounded seas and <code>starLazy</code> operator, which skip an uninteresting input without us specifying how to skip it. 
+Contrary to the first version of PetitParser, we could utilize bounded seas and <code>starLazy</code> operator, which skip an uninteresting input without us specifying how to skip it, more details are provided in <a href="starLazy.html">The <code>starLazy</code> Operator</a> chapter. 
 </p>
 <p>
 If you think that such a task could be done using regular expression you are right.
