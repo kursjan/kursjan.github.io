@@ -2,7 +2,7 @@ ${inputFile:Chapters/navigation.pillar}$
 
 !Optimizations Overview
 
-@@note Please note that the ==WebGrammar== offered to download in the *Abstract Syntax Tree>AST.pillar* chapter contains already optimized version of an ==element== rule. In this chapter we suppose that ==element== definition looks like defined in *Extracting the Structure>chapter3.pillar* chapter, i.e. it looks like this:b
+@@note Please note that the ==WebGrammar== you could download in the *Abstract Syntax Tree>AST.pillar* chapter contains already optimized version of an ==element== rule. In this chapter we suppose that ==element== definition looks like defined in *Extracting the Structure>chapter3.pillar* chapter, i.e. it looks like this:
 [[[
 WebGrammar>>element
 	^ (elOpen, elContent, elClose)
@@ -18,7 +18,7 @@ WebParser new debug: input.
 ]]]
 
 !!!Report View
-This will run the parser in a debug mode, which collects lots of useful information. Unfortunately, it also takes considerable amount of time so be patient. Once you get the result, inspect the Report tab (note that numbers might slightly differ in your case):
+This will run the parser in a debug mode and collect a lot of useful information. Unfortunately, it also takes considerable amount of time so be patient. Once you get the result, inspect the ''Report tab'' (note that numbers might slightly differ in your case):
 
 +>figures/unoptimized-report.png|width=100%+
 
@@ -40,32 +40,34 @@ Full remember and restore is very expensive.
 Very often only lightweight remember and restore happens, since many grammars are context-free, i.e. they do not use ==push==, ==match== and ==pop== operators. 
 
 Regarding the lightweight backtracking, the average of lightweight backtracks per character should be below 1 (in ideal case). 
-This can happen in rase of deterministic grammars, which do not do any (or only a little) speculations and know exactly which alternative of a choice is the correct one. 
+This is also not so unusual case when dealing with deterministic grammars, which do not do any (or only a little) speculations and know exactly which alternative of a choice is the correct one. 
 
 !!!Debug View
-So why are the numbers so bad in our case? Let us inspect in more detail how this was happening, using the Debug view:
+But our grammar is obviously not deterministic it does lots of speculations.
+Why are the numbers so bad in our case? 
+Let us inspect in more detail how this was happening, using the ''Debug view'':
 
-+>figures/unoptimized-debug.png|width=100%+
++Debug View of ==WebParser== invocation.>figures/unoptimized-debug.png|width=100%+
 
 The view shows us that 1502165 parsers were invoked to consume the input. 
-Most of it (751559 invocations) happened when parsing first two lines of the input - the before water of the sea.
+Most of it (751559 invocations) happened when parsing first two lines of the input --- the before water of the sea.
 
-This is too much for such a short input. 
-Such a bad performance is caused by the fact that bounded seas have to verify at every position if the next parser can be parsed. 
+This is too much for a short input. 
+Such a bad performance is caused by the fact that bounded seas have to verify at every position if the next parser (i.e. the parser that will be invoked after the sea) will succeed. 
 If the next parser happens to be another sea (as in the case of ==WebGrammar==), the number of invocations grows really fast (exponentially in fact). 
 
 
 We see that the element rule took approximately one half of the invocations (750598). 
 Majority of 751559 invocations of before water were spent by testing for element. 
 
-Another glimpse of ineffectivness can be seen in the ==elOpen== rule.
+Another glimpse of ineffectiveness can be seen in the ==elOpen== rule.
 
-+>figures/unoptimized-elOpen.png|width=100%|label=elOpenUnoptimized+
++Debug view of the ==elOpen== rule invocation>figures/unoptimized-elOpen.png|width=100%|label=elOpenUnoptimized+
 
 You can see that the whole ''<html lang="html" dir="ltr" class="js-enabled">'' is parsed by invoking 272 parsers.
-This is rather too much for a line with 55 characters.
-One of the reasons is how are the identifiers parsed.
-You can see that when recognizing the ''html'' text, 6 different parsers are invoked; for each letter one and two extra parsers.
+This is quite a lot for a line with 55 characters.
+One of the reasons is how are the identifiers (==elementName==) parsed.
+You can see that when recognizing the ''html'' text, 8 different parsers are invoked; for each letter one and some extra boilerplate parsers (flattening, possessive repeating,...).
 
 !!Using the ==optimize== method
 Luckily, PetitParser2 comes with an automated optimizations that are able to reduce most of the unnecessary overhead. 
@@ -76,36 +78,38 @@ WebParser new optimize debug: input.
 ]]]
 
 The report looks much better now:
-+>figures/optimized-report.png|width=100%+
++Report view of the optimized parse.>figures/optimized-report.png|width=100%+
 
 
 
 Only one full remember, and only 7 lightweight backtracks per character. 
 This is reasonably good for a grammar with bounded seas. 
 
-@@note Because of the nature of bounded seas and implementation of PetitParser2, we do not recommend to parse grammars with more complicated bounded seas without optimizations.
+@@note Because of the nature of bounded seas and nature of PetitParser2, we do not recommend to parse grammars with more complicated bounded seas without optimizations.
 
 !!!Optimization in Detail
 Let us inspect some of the optimizations that happened. 
-Let us try the Debug view:
+We switch to ''Debug view'':
 
 +>figures/optimized-debug.png|width=100%+
 
 We see that the total number of invoked parsers is 55144, roughly 30x less. 
-We also see that, as in the previous case, most of the parsers were invoked in the before-water of the initial sea, even though roughly 10x less. 
-But we can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively! 
+We also see that, as in the previous case, most of the parsers are invoked in the before-water of the initial sea, but it is roughly 10x better now. 
+We can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively.
+This is great, it was half of the total invocations in the case of unoptimized parse!
 
 !!!Caches
 
 The main reason of reduced invocations is caching. 
 Under the ==element== rule, there is a mapping node. 
 The mapping node returns the complete HTML element just in two invocations. 
-The fact that the result has been cached is visualized via the result reference. 
+The fact that the result has been cached is visualized via the result reference (see ==DebugResultLink: reference==). 
 
 
-The reference indicates that at the time of that invocation the result has already been computed during some previous invocation. 
-The parser remembered it and it returned the result without invoking the parser again. 
-This is done by the ==PP2Cache== strategy (you can see its profiling version in the screenshot). The cache has been added to the element during the optimization phase. 
+The reference indicates that at the time of the invocation the result has already been computed during some previous invocation. 
+The parser remembered the result and returned the remembered without invoking the parser again. 
+This work is done by the ==PP2Cache== strategy (you can see its profiling version ==PP2ProfilingCache== in the screenshot). 
+The cache has been added to the element during the optimization phase. 
 
 More about caches can be found in the *Caching chapter>caches.pillar*.
 
@@ -116,9 +120,9 @@ The way specializations work can be demonstrated on the opening of an html eleme
 
 +Optimized parse of ==elOpen==>figures/optimized-elOpen.png|width=100%|label=elOpenOptimized+
 
-One can see that the ''html'' text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
+One can see that the ''html'' text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
 In the unoptimized case the ''html'' text was parsed using the ''PossessiveRepeating'' strategy.
-In the optimized case (see Figure *@elOpenOptimized*) the used strategy is ''PlusPredicateObject'', which is implemented as a while loop without underlying parser invocations hence is more efficient.
+In the optimized case (see Figure *@elOpenOptimized*) the used strategy is ''PlusPredicateObject'', which is implemented as a while loop without superfluous parser invocations hence is more efficient.
 
 The same thing happened with the mapping node. 
 The specializations recognized an ''any-star-lazy'' pattern, which, in this case, means to consume any character until end of the tag ==>== appears.
@@ -127,7 +131,8 @@ This can be implemented as a single while loop saving 252 parser invocations.
 @@todo More details about specializations are provided in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter.
 
 !!Conclusion
-In this text we briefly described how inefficiencies of PEG-based parser combinators and we showed how can the ==optimize== method fix most of these.
+@@todo tell why are PEG top-down combinators cool
+In this text we briefly described inefficiencies of top-down PEG-based parser combinators and we showed how can the ==optimize== method fix most of these.
 
 Unfortunatelly, not all the optimizations can be done automatically.
 You might have noticed that we described only three out of four different caches used in the PetitParser. 

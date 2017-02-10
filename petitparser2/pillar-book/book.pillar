@@ -2,13 +2,11 @@
 
 In this series we describe *PetitParser2>https://github.com/kursjan/petitparser2* \-\-\- a modular and flexible high-performance top-down parsing framework.
 
-@@note Please note the text is not yet complete. See the *changelog>@changelog*.
-
-
 !!Structure
 
-The text is organized into two parts, the first part covers basic developer's workflow with PetitParser and is suitable for anyone who has elementary experience with PetitParser and would like to learn more about PetitParser.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to customize PetitParser to better fit their needs.
+The text is organized into two parts, the first part covers the basic developer's workflow with PetitParser.
+It is suitable for anyone who has a bit of experience with PetitParser and would like to learn more.
+The second part covers advanced topics and is for those who already use PetitParser and who would like to understand PetitParser more or would like to extend PetitParser to better fit their needs.
 
 !!!Prerequsities
 This text expects a basic knowledge of parsing with PetitParser.
@@ -36,7 +34,6 @@ and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitPa
 
 
 !!!Part II, Advanced Topics
-@@note under construction
 In the second part we describe advanced topics or get into the details of the topics we mentioned in the first part.
 For example, we provide more details to context-sensitive parsing, optimizations with caches and specializations, we show how to parse streams or how to efficiently highlight text.${footnote: useful especially for text editors}$
 
@@ -52,16 +49,16 @@ On a concrete example of a Smalltalk grammar, we describe how to develop a parse
 @@todo create a chapter about specializations 
 - *Specializations in Detail>../smalltalkOptimization.pillar*
 
-!!Get Started
-Lets get started with one of the chapters:
-- *Extracting Javascript>Chapters/chapter1.pillar*.
-- *From a Script to a Parser>Chapters/chapter2.pillar*.
-- *Extracting the Structure>Chapters/chapter3.pillar*.
-- *Abstract Syntax Tree>Chapters/AST.pillar*.
-- *Optimizations>Chapters/optimization.pillar*.
-- *Memoization>Chapters/memoization.pillar*.
+!!Getting Started
+The list of available chapters:
+- *Extracting Javascript>Chapters/chapter1.pillar*
+- *From a Script to a Parser>Chapters/chapter2.pillar*
+- *Extracting the Structure>Chapters/chapter3.pillar*
+- *Abstract Syntax Tree>Chapters/AST.pillar*
+- *Optimizations>Chapters/optimization.pillar*
+- *Memoization>Chapters/memoization.pillar*
 
-Interested in some details?
+If you are interested in more details:
 - *The ==starLazy== operator>Chapters/starLazy.pillar*
 - *Matching Tags>Chapters>matchingTags.pillar* (context-sensitive parsing)
 - *Specializations in Detail>specializations.pillar*
