@@ -62,7 +62,7 @@ This will run the parser in a debug mode and collect a lot of useful information
 
 <figure>
 	<img src="figures/unoptimized-report.png" width="100%%"/>
-	<figcaption></figcaption>
+	<figcaption>Report view of non-optimized parse</figcaption>
 </figure>
 </p>
 <p>
@@ -100,7 +100,7 @@ Let us inspect in more detail how this was happening, using the <em>Debug view</
 
 <figure>
 	<img src="figures/unoptimized-debug.png" width="100%%"/>
-	<figcaption>Debug View of <code>WebParser</code> invocation.</figcaption>
+	<figcaption>Debug View of non-optimized parse.</figcaption>
 </figure>
 </p>
 <p>
@@ -124,7 +124,7 @@ Another glimpse of ineffectiveness can be seen in the <code>elOpen</code> rule.
 <a id="elOpenUnoptimized"></a>
 <figure>
 	<img src="figures/unoptimized-elOpen.png" width="100%%"/>
-	<figcaption>0.1. Debug view of the <code>elOpen</code> rule invocation</figcaption>
+	<figcaption>0.1. Debug view of the <code>elOpen</code> rule non-optimized parse.</figcaption>
 </figure>
 </p>
 <p>
@@ -143,10 +143,10 @@ Let it give a try:
 
 <p>
 The report looks much better now:
-
+<a id=""></a>
 <figure>
 	<img src="figures/optimized-report.png" width="100%%"/>
-	<figcaption>Report view of the optimized parse.</figcaption>
+	<figcaption>0.2. Report view of the optimized parse.</figcaption>
 </figure>
 </p>
 
@@ -205,13 +205,13 @@ The way specializations work can be demonstrated on the opening of an html eleme
 <a id="elOpenOptimized"></a>
 <figure>
 	<img src="figures/optimized-elOpen.png" width="100%%"/>
-	<figcaption>0.2. Optimized parse of <code>elOpen</code></figcaption>
+	<figcaption>0.3. Optimized parse of <code>elOpen</code></figcaption>
 </figure>
 </p>
 <p>
 One can see that the <em>html</em> text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.1</a>).
 In the unoptimized case the <em>html</em> text was parsed using the <em>PossessiveRepeating</em> strategy.
-In the optimized case (see Figure <a href="#elOpenOptimized">0.2</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without superfluous parser invocations hence is more efficient.
+In the optimized case (see Figure <a href="#elOpenOptimized">0.3</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without superfluous parser invocations hence is more efficient.
 </p>
 <p>
 The same thing happened with the mapping node. 
@@ -221,13 +221,14 @@ This can be implemented as a single while loop saving 252 parser invocations.
 <p class="todo">More details about specializations are provided in the <a href="smalltalkOptimizations.html">Smalltalk Parser</a> chapter.</p>
 </section></section><section>
 <h2>3. Conclusion</h2>
-<p class="todo">tell why are PEG top-down combinators cool</p><p>
-In this text we briefly described inefficiencies of top-down PEG-based parser combinators and we showed how can the <code>optimize</code> method fix most of these.
+<p>
+Overall, PEG-based parser combinator parsers are great, they are easy to understand, easy to extend and easy to debug.
+But this all comes at the price of inefficiency. 
+Yet, the optimization capabilities of PetitParser can dramatically improve the performance while preserving all the other advantages.
 </p>
 <p>
-Unfortunatelly, not all the optimizations can be done automatically.
-You might have noticed that we described only three out of four different caches used in the PetitParser. 
-The last fourth cache is a bit special and we will dedicate a whole <a href="memoization.html">Memoization</a> chapter to it.
+Unfortunately, not all the optimizations can be done automatically.
+There is one kind of optimizations that has to be done manually and we dedicate a whole <a href="memoization.html">Memoization</a> chapter to it.
 </p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>

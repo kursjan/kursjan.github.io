@@ -20,7 +20,7 @@ WebParser new debug: input.
 !!!Report View
 This will run the parser in a debug mode and collect a lot of useful information. Unfortunately, it also takes considerable amount of time so be patient. Once you get the result, inspect the ''Report tab'' (note that numbers might slightly differ in your case):
 
-+>figures/unoptimized-report.png|width=100%+
++Report view of non-optimized parse>figures/unoptimized-report.png|width=100%+
 
 The total stream size is 1171 characters. 
 The parser has remembered the full context 510197 times and restored 387667 times. 
@@ -47,7 +47,7 @@ But our grammar is obviously not deterministic it does lots of speculations.
 Why are the numbers so bad in our case? 
 Let us inspect in more detail how this was happening, using the ''Debug view'':
 
-+Debug View of ==WebParser== invocation.>figures/unoptimized-debug.png|width=100%+
++Debug View of non-optimized parse.>figures/unoptimized-debug.png|width=100%+
 
 The view shows us that 1502165 parsers were invoked to consume the input. 
 Most of it (751559 invocations) happened when parsing first two lines of the input --- the before water of the sea.
@@ -62,7 +62,7 @@ Majority of 751559 invocations of before water were spent by testing for element
 
 Another glimpse of ineffectiveness can be seen in the ==elOpen== rule.
 
-+Debug view of the ==elOpen== rule invocation>figures/unoptimized-elOpen.png|width=100%|label=elOpenUnoptimized+
++Debug view of the ==elOpen== rule non-optimized parse.>figures/unoptimized-elOpen.png|width=100%|label=elOpenUnoptimized+
 
 You can see that the whole ''<html lang="html" dir="ltr" class="js-enabled">'' is parsed by invoking 272 parsers.
 This is quite a lot for a line with 55 characters.
@@ -78,7 +78,7 @@ WebParser new optimize debug: input.
 ]]]
 
 The report looks much better now:
-+Report view of the optimized parse.>figures/optimized-report.png|width=100%+
++Report view of the optimized parse.>figures/optimized-report.png|width=100%|label=+
 
 
 
@@ -91,7 +91,7 @@ This is reasonably good for a grammar with bounded seas.
 Let us inspect some of the optimizations that happened. 
 We switch to ''Debug view'':
 
-+>figures/optimized-debug.png|width=100%+
++Debug view of optimized parse>figures/optimized-debug.png|width=100%+
 
 We see that the total number of invoked parsers is 55144, roughly 30x less. 
 We also see that, as in the previous case, most of the parsers are invoked in the before-water of the initial sea, but it is roughly 10x better now. 
@@ -118,7 +118,7 @@ More about caches can be found in the *Caching chapter>caches.pillar*.
 Another optimizations applied by PetitParser two are specializations.
 The way specializations work can be demonstrated on the opening of an html element: ''<html lang="mul" dir="ltr" class="js-enabled">''.
 
-+Optimized parse of ==elOpen==>figures/optimized-elOpen.png|width=100%|label=elOpenOptimized+
++Debug view of the ==elOpen== rule optimized parse>figures/optimized-elOpen.png|width=100%|label=elOpenOptimized+
 
 One can see that the ''html'' text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
 In the unoptimized case the ''html'' text was parsed using the ''PossessiveRepeating'' strategy.
@@ -131,11 +131,11 @@ This can be implemented as a single while loop saving 252 parser invocations.
 @@todo More details about specializations are provided in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter.
 
 !!Conclusion
-@@todo tell why are PEG top-down combinators cool
-In this text we briefly described inefficiencies of top-down PEG-based parser combinators and we showed how can the ==optimize== method fix most of these.
+Overall, PEG-based parser combinator parsers are great, they are easy to understand, easy to extend and easy to debug.
+But this all comes at the price of inefficiency. 
+Yet, the optimization capabilities of PetitParser can dramatically improve the performance while preserving all the other advantages.
 
-Unfortunatelly, not all the optimizations can be done automatically.
-You might have noticed that we described only three out of four different caches used in the PetitParser. 
-The last fourth cache is a bit special and we will dedicate a whole *Memoization>memoization.pillar* chapter to it.
+Unfortunately, not all the optimizations can be done automatically.
+There is one kind of optimizations that has to be done manually and we dedicate a whole *Memoization>memoization.pillar* chapter to it.
 
 ${inputFile:Chapters/toc.pillar}$
