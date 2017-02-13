@@ -42,7 +42,7 @@ The <a href="#toc">table of content</a> can be found at the end of the chapter.
 <h1>Turning the script into a real parser</h1>
 <a id="sec:grammar"></a>
 <p>
-If we are happy with the prototype and we decide to extend the grammar, it is inconvenient to keep it in a playground script. 
+Once we are satisified with the functionality of a prototype and we decide to continue further, it will become inconvenient to keep code in a form of playground script. 
 It is a good practice to define a proper parser, it allows us to:
 </p><ul>
 <li>manage cyclic dependencies, </li>
@@ -55,30 +55,61 @@ It is a good practice to define a proper parser, it allows us to:
 <p>
 We create a parser by subclassing <code>PP2CompositeNode</code>:
 </p>
-<p>
-[[[
-</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">PP2CompositeNode subclass: #WebGrammar
+	instanceVariableNames: 'document javascript elOpen elContent elClose elementName element text jsOpen jsContent jsClose jsString structuredDocument comment any'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PetitParser2-Tutorial'</code></pre><figcaption></figcaption></figure>
+
 <section>
 <h3>Javascript rule</h3>
 
 <p>
 We define a <code>javascipt</code> rule as follows:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;javascript
+	^ jsOpen, jsContent, jsClose ==&gt; #second</code></pre><figcaption></figcaption></figure>
+
 <p>
 The rules of <code>javascript</code> are defined as follows:
-</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;jsOpen
+	^ '&lt;script&gt;' asPParser
+
+WebGrammar&gt;&gt;jsClose
+	^ '&lt;/script&gt;' asPParser
+
+WebGrammar&gt;&gt;jsContent
+	^ (jsString / #any asPParser) starLazy
+
+WebGrammar&gt;&gt;jsString
+	^ $' asPParser, any starLazy, $' asPParser
+WebGrammar&gt;&gt;any
+	^ #any asPParser</code></pre><figcaption></figcaption></figure>
+
 <p>
 First, we would like to cover <code>javascript</code> rule with a test to make sure the rule works as expected. 
 We do this by subclassing <code>PP2CompositeParserTest</code> and adding the test method;
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">PP2CompositeNodeTest subclass: #WebGrammarTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PetitParser2-Tutorial'
+
+WebGrammarTest&gt;&gt;parserClass
+	^ WebGrammar
+
+WebGrammarTest&gt;&gt;testJavascript
+	self parse: '&lt;script&gt;alert(&quot;hi there!&quot;)&lt;/script&gt;' rule: #javascript	</code></pre><figcaption></figcaption></figure>
+
 </section><section>
 <h3>Document rule</h3>
 <p>
 To extract javascript from an html document, we first define the <code>document</code> rule simply as <code>javascript</code> because we are interested only in javascript:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammar&gt;&gt;document
+	^ (javascript sea ==&gt; #second) star</code></pre><figcaption></figcaption></figure>
+
 <p>
 Or alternatively:
 </p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;document
@@ -90,12 +121,20 @@ The <code>islandInSea</code> operator is a shorthand for:
 
 <p>
 We should not forget the <code>start</code> rule:
-</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;start
+	^ structuredDocument </code></pre><figcaption></figcaption></figure>
+
 <p>
 And finally, we write a test for <code>document</code>:
 </p>
-<pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
-<pre>MessageNotUnderstood: receiver of &quot;fileOut&quot; is nil</pre>
+<figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testDocument
+	| input |
+	input := PP2Sources current htmlSample.
+	
+	self parse: input rule: #document.
+	self assert: result size equals: 2.</code></pre><figcaption></figcaption></figure>
+
+
 </section></section><section>
 <h2>2. Complete Sources</h2>
 <p>
@@ -119,7 +158,7 @@ This step allows us to add a new functionality as we will do in the next chapter
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
 </p>
 <p>
-Part I, Basics:
+Part I, Developer's Workflow:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
 <li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
@@ -140,6 +179,7 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
+
 </p></section></section></section>
       </section>
     </div>

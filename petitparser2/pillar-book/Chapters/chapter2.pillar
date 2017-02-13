@@ -3,7 +3,7 @@ ${inputFile:Chapters/navigation.pillar}$
 !Turning the script into a real parser
 @sec:grammar
 
-If we are happy with the prototype and we decide to extend the grammar, it is inconvenient to keep it in a playground script. 
+Once we are satisified with the functionality of a prototype and we decide to continue further, it will become inconvenient to keep code in a form of playground script. 
 It is a good practice to define a proper parser, it allows us to:
 -manage cyclic dependencies, 
 -simplify testing and 

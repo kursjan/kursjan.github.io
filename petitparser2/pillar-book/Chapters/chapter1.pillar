@@ -3,8 +3,7 @@ ${inputFile:Chapters/navigation.pillar}$
 !Extracting Javascript
 @sec:scripting
 
-In this chapter we extract javascript from html files.
-The solution provided in this chapter is a simple script.
+In this chapter we extract javascript from html files using a simple script.
 We create the real parser *later>chapter2.pillar*.
 
 !!!Installation
@@ -50,11 +49,11 @@ js := '<script>' asPParser, #any asPParser starLazy flatten, '</script>' asPPars
 	==> #second.
 ]]]
 
-The ==starLazy== operator is a new feature of PetitParser2.${footnote: It is build on top of bounded seas, but we will talk about this in more detail later.}$
+The ==starLazy== operator is a new feature of PetitParser2${footnote: The operator builds on top of bounded seas and we will talk about this in more detail later.}$.
 It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser appears. 
-What makes ==starLazy== useful is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
+What makes ==starLazy== unique and useful is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
 Of course, with any change in the grammar, the ==starLazy== updates itself.
-If you want to define the same rule in PetitParser, it would be:
+If you want to define the same rule in previous version of PetitParser, it would be:
 
 [[[
 #any asParser starLazy: '<script>' asParser.
@@ -74,20 +73,22 @@ js parse: source.
 
 The result is failure. 
 If we inspect the failure object and switch to ''Debug View'' we notice that ''<script>'' is expected at the beginning of a file, yet our input starts with ''<!DOCTYPE html>''. 
-The fix to this is simple: we create a new rule ==jsSea== as a javascript island in a sea of an uninteresting water:
+The fix to this is simple with PetitParser2: we create a new rule ==jsSea== as a javascript island in a sea of an uninteresting water, using the ==sea== operator:
 
 [[[
 jsSea := js sea.
 jsSea parse: source.
 ]]]
 
-Good, the result is not failure! 
+Looks like ==sea== is doing lots of magic and the result is not failure! 
 But it is not exactly what we want neither. 
 Sea returns an array of three elements: 
 # before-water 
 # island and 
 # after-water
-Island is the result of the javascript rule, before and after water contain the rest of an input. We are interested only in the the javascript, so we redefine the document rule as follows:
+Island is the result of the javascript rule. 
+Before and after water contain the rest of an input (the one we did not specified and we are not interested in). 
+We are interested only in the javascript, so we redefine the document rule as follows:
 
 
 [[[
@@ -144,12 +145,12 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-It is prematurely ended, because the javascript rule as we defined it does not know about strings. 
+It is ended prematurely, because the javascript rule ==js== as we defined it does not know about strings. 
 Therefore, the javascript rule thinks that there is a closing of the script tag even though it is a part of the alert message string. 
 We fix it by defining javascript strings and redefining the ==js== rule:
 
 [[[eval=true
-stream 
+stream
 	nextPutAll: '[[[';
 	lf;
 	nextPutAll: (PP2Tutorial new sourceForScript: #script);
@@ -177,10 +178,13 @@ Great, everything works as expected!
 
 !Conclusion
 In this part, we have quickly prototyped a parser to extract javascript from html files.
-Contrary to the first version of PetitParser, we could utilize bounded seas and ==starLazy== operator, which skip an uninteresting input without us specifying how to skip it, more details are provided in *The ==starLazy== Operator>starLazy.pillar* chapter. 
+In the new version of PetitParser, we can utilize seas and ==starLazy== operator.
+Both operators can skip over an uninteresting input without us specifying how to skip it thus saving your time.
+More details are provided in *The ==starLazy== Operator>starLazy.pillar* chapter. 
 
-If you think that such a task could be done using regular expression you are right.
-But contrary to regular expressions, this is just a first step for PetitParser, which will boldly go where no regular expression has gone before.
+If you think that the task from this chapter could be done using a simple regular expression, you are right absolutely right.
+Nevertheless, contrary to regular expressions, this is just a first step.
+PetitParser will boldly go where no regular expression has gone before.
 
 
 ${inputFile:Chapters/toc.pillar}$
