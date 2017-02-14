@@ -42,12 +42,12 @@ The <a href="#toc">table of content</a> can be found at the end of the chapter.
 <h1>Turning the script into a real parser</h1>
 <a id="sec:grammar"></a>
 <p>
-Once we are satisified with the functionality of a prototype and we decide to continue further, it will become inconvenient to keep code in a form of playground script. 
-It is a good practice to define a proper parser, it allows us to:
+Once we are satisified with the functionality of a prototype and we decide to continue further, it will become more and more inconvenient to keep code in a form of a playground script. 
+It is a good practice to define a parser as a class, it allows us to:
 </p><ul>
 <li>manage cyclic dependencies, </li>
 <li>simplify testing and </li>
-<li>extend with new functionality. </li>
+<li>easily extend with new functionality. </li>
 </ul>
 
 <section>
@@ -79,10 +79,11 @@ WebGrammar&gt;&gt;jsClose
 	^ '&lt;/script&gt;' asPParser
 
 WebGrammar&gt;&gt;jsContent
-	^ (jsString / #any asPParser) starLazy
+	^ (jsString / any) starLazy
 
 WebGrammar&gt;&gt;jsString
 	^ $' asPParser, any starLazy, $' asPParser
+
 WebGrammar&gt;&gt;any
 	^ #any asPParser</code></pre><figcaption></figcaption></figure>
 
@@ -105,7 +106,7 @@ WebGrammarTest&gt;&gt;testJavascript
 </section><section>
 <h3>Document rule</h3>
 <p>
-To extract javascript from an html document, we first define the <code>document</code> rule simply as <code>javascript</code> because we are interested only in javascript:
+To extract javascript from an html document, we first define the <code>document</code> rule simply as a repetition of <code>javascript</code> seas as we are interested only in javascript:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;document
 	^ (javascript sea ==&gt; #second) star</code></pre><figcaption></figcaption></figure>
@@ -122,7 +123,7 @@ The <code>islandInSea</code> operator is a shorthand for:
 <p>
 We should not forget the <code>start</code> rule:
 </p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;start
-	^ structuredDocument </code></pre><figcaption></figcaption></figure>
+	^ document </code></pre><figcaption></figcaption></figure>
 
 <p>
 And finally, we write a test for <code>document</code>:
@@ -133,6 +134,12 @@ And finally, we write a test for <code>document</code>:
 	
 	self parse: input rule: #document.
 	self assert: result size equals: 2.</code></pre><figcaption></figcaption></figure>
+
+
+<p>
+Both tests should pass now:
+</p><figure><pre><code class="smalltalk">(WebGrammarTest buildSuiteFromMethods: #(#testDocument #testJavascript)) run</code></pre><figcaption></figcaption></figure>
+<figure><pre><code class="smalltalk">2 run, 2 passes, 0 skipped, 0 expected failures, 0 failures, 0 errors, 0 unexpected passes</code></pre><figcaption></figcaption></figure>
 
 
 </section></section><section>

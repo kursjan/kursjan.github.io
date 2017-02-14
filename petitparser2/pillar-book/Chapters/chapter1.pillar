@@ -50,7 +50,7 @@ js := '<script>' asPParser, #any asPParser starLazy flatten, '</script>' asPPars
 ]]]
 
 The ==starLazy== operator is a new feature of PetitParser2${footnote: The operator builds on top of bounded seas and we will talk about this in more detail later.}$.
-It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser appears. 
+It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser (''</script>'' in this case) appears. 
 What makes ==starLazy== unique and useful is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
 Of course, with any change in the grammar, the ==starLazy== updates itself.
 If you want to define the same rule in previous version of PetitParser, it would be:

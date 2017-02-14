@@ -3,11 +3,11 @@ ${inputFile:Chapters/navigation.pillar}$
 !Turning the script into a real parser
 @sec:grammar
 
-Once we are satisified with the functionality of a prototype and we decide to continue further, it will become inconvenient to keep code in a form of playground script. 
-It is a good practice to define a proper parser, it allows us to:
+Once we are satisified with the functionality of a prototype and we decide to continue further, it will become more and more inconvenient to keep code in a form of a playground script. 
+It is a good practice to define a parser as a class, it allows us to:
 -manage cyclic dependencies, 
 -simplify testing and 
--extend with new functionality. 
+-easily extend with new functionality. 
 
 !!Hands On
 We create a parser by subclassing ==PP2CompositeNode==:
@@ -49,6 +49,7 @@ stream
 	lf;
 	nextPutAll: (t sourceFor: #jsString in: WebGrammar);
 	lf;
+	lf;
 	nextPutAll: (t sourceFor: #any in: WebGrammar);
 	lf;
 	nextPutAll: ']]]'
@@ -75,7 +76,7 @@ stream
 ]]]
 
 !!!Document rule
-To extract javascript from an html document, we first define the ==document== rule simply as ==javascript== because we are interested only in javascript:
+To extract javascript from an html document, we first define the ==document== rule simply as a repetition of ==javascript== seas as we are interested only in javascript:
 
 [[[eval=true
 | t |
@@ -95,10 +96,9 @@ sea ==> #second
 ]]]
 
 We should not forget the ==start== rule:
-[[[eval=true
-| t |
-t := PP2Tutorial new.
-t printAsCode: (t sourceFor: #start in: WebGrammar) stream: stream.
+[[[eval=false
+WebGrammar>>start
+	^ document 
 ]]]
 
 And finally, we write a test for ==document==:
@@ -117,6 +117,24 @@ WebGrammarTest fileOut.
 'WebGrammar.st' asFileReference moveTo: ('build/WebGrammar.st' asFileReference).
 'WebGrammarTest.st' asFileReference moveTo: ('build/WebGrammarTest.st' asFileReference).
 ]]]
+
+Both tests should pass now:
+[[[
+(WebGrammarTest buildSuiteFromMethods: #(#testDocument #testJavascript)) run
+]]]
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t testResultsFor: #(
+		#testJavascript
+		#testDocument
+		) in: WebGrammarTest); lf;
+	lf;
+	nextPutAll: ']]]'
+]]]
+
 
 !!Complete Sources
 You can download the sources here:

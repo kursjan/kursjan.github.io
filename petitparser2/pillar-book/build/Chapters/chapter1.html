@@ -105,7 +105,7 @@ Second, we define javascript as a <code>js</code> rule:
 
 <p>
 The <code>starLazy</code> operator is a new feature of PetitParser2<sup><a href="#footnote1">[1]</a></sup>.
-It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser appears. 
+It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser (<em>&lt;/script&gt;</em> in this case) appears. 
 What makes <code>starLazy</code> unique and useful is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
 Of course, with any change in the grammar, the <code>starLazy</code> updates itself.
 If you want to define the same rule in previous version of PetitParser, it would be:
