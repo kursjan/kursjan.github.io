@@ -3,7 +3,7 @@ ${inputFile:Chapters/navigation.pillar}$
 !Turning the script into a real parser
 @sec:grammar
 
-Once we are satisified with the functionality of a prototype and we decide to continue further, it will become more and more inconvenient to keep code in a form of a playground script. 
+Once we are satisified with the functionality of a prototype (see the *previous chapter>chapter1.pillar*) and we decide to continue further, it will become more and more inconvenient to keep code in a form of a playground script. 
 It is a good practice to define a parser as a class, it allows us to:
 -manage cyclic dependencies, 
 -simplify testing and 

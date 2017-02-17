@@ -80,8 +80,8 @@ jsSea := js sea.
 jsSea parse: source.
 ]]]
 
-Looks like ==sea== is doing lots of magic and the result is not failure! 
-But it is not exactly what we want neither. 
+Looks like ==sea== is doing a lot of magic and the result is not failure! 
+But it is not exactly what we want. 
 Sea returns an array of three elements: 
 # before-water 
 # island and 
@@ -147,7 +147,7 @@ stream
 
 It is ended prematurely, because the javascript rule ==js== as we defined it does not know about strings. 
 Therefore, the javascript rule thinks that there is a closing of the script tag even though it is a part of the alert message string. 
-We fix it by defining javascript strings and redefining the ==js== rule:
+We can fix it by defining javascript strings and redefining the ==js== rule:
 
 [[[eval=true
 stream
@@ -178,12 +178,11 @@ Great, everything works as expected!
 
 !Conclusion
 In this part, we have quickly prototyped a parser to extract javascript from html files.
-In the new version of PetitParser, we can utilize seas and ==starLazy== operator.
-Both operators can skip over an uninteresting input without us specifying how to skip it thus saving your time.
-More details are provided in *The ==starLazy== Operator>starLazy.pillar* chapter. 
+In the new version of PetitParser, we have a ==sea== and ==starLazy== operators at hand to help us skip the uninteresting input.
+More details are provided in *this chapter>starLazy.pillar*. 
 
 If you think that the task from this chapter could be done using a simple regular expression, you are right absolutely right.
-Nevertheless, contrary to regular expressions, this is just a first step.
+Nevertheless, contrary to regular expressions, this is just a first step for PetitParser.
 PetitParser will boldly go where no regular expression has gone before.
 
 

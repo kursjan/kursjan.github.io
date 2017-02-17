@@ -3,10 +3,10 @@ ${inputFile:Chapters/navigation.pillar}$
 !Extracting the Structure
 @sec:structure
 
-In the previous chapters we created a parser to extract javascript from HTML source.
+In the *previous chapter>chapter2.pillar* we created a parser to extract javascript from HTML source.
 Yet our parser is rather simple.
 It sees an input as a list of javascripts.
-In this part we extend the parser and we extract the HTML structure. 
+In this part we extend the parser and we extract the HTML structure as well, thus we will obtain a tree of html elements and javascript.
 %To ease our task we use bounded seas, which help us to skip an uninteresting parts of the html document and to recover from unclosed or malformed elements.
 
 %analyzed the anatomy of bounded seas%.
@@ -72,8 +72,8 @@ Now we need to define ==elContent== rule, which represents the content of an ele
 # a javascript code; 
 # another element; or 
 # an unknown text. 
-Javascript is on the first position because it is ''kind of'' an element${footnote: any javascript code can be recognized as an html element}$ and therefore must be ordered before element. 
-The same holds for an element, it is also ''kind of'' text. 
+Javascript is on the first position because it is ''kind of'' element${footnote: any javascript code can be recognized as an html element}$  and therefore must be ordered before an element rule. 
+The same holds for the element rule, it is also ''kind of'' text. 
 
 [[[eval=true
 | t |
@@ -98,10 +98,13 @@ WebGrammar>>text
 
 !!!Epsilon in Repetitions
 Note, we mark the ==text== rule with ==nonEpsilon==.
-==nonEpsilon== operator is an extension of PEGs that allows only for non-empty parses. 
-The reason for this is that ==#any asPParser starLazy== can consume anything, even the empty string, because star allows for zero repetitions. 
-The star repetition of ==elContent== would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
-You can easily freeze your image by running (we recommend saving your image now):
+The ==nonEpsilon== operator is an extension of PEGs that forbids epsilon parses (in other words if the underlying parser does not consume any input, it fails).
+The reason for this is that ==#any asPParser starLazy== can consume anything, even the empty string, because the ==starLazy== operator allows for zero repetitions. 
+
+@@todo there might be possibility to define ==plusLazy== as well.
+
+Without ==nonEpsilon==, the star repetition of ==elContent== would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+You can easily freeze your image by running the following code (we recommend saving your image now):
 
 [[[
 "Tip: save the image before running"
@@ -164,7 +167,7 @@ stream
 !!Conclusion
 
 So far it looks good. 
-But our tests are telling us only that element can parse the given input, it does not tell us how it parses the input. 
+But our tests are telling us only that element can parse the given input, it does not tell us ''how'' it parses the input. 
 We should assert that the proper element names and the right content is extracted. 
 
 

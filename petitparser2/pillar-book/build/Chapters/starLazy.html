@@ -34,6 +34,9 @@
 
         <section>
 <h1>StarLazy </h1>
+
+<p class="todo">say more about sea as well.</p>
+<p class="todo">compare to lazy repetitions.</p>
 <p>
 In this section, we shortly inspect how does the <code>startLazy</code> operator works. 
 The code  <code>parser starLazy</code> is a shorthand for the following:
@@ -63,7 +66,14 @@ In our case the tokens are either <code>jsString</code> or any character:
 <p>
 We have missed one detail.
 The actual implementation of <code>starLazy</code> actually extracts only before water:
-</p><pre>MessageNotUnderstood: receiver of &quot;new&quot; is nil</pre>
+</p><figure><pre><code class="smalltalk">PP2Node&gt;&gt;starLazy
+	^ ((#epsilon asPParser sea)
+		waterToken: self)
+	map: [:_before :_epsilon :_after | 
+		&quot;return just before water, because island is nil and after water is empty&quot;
+		_before
+	] </code></pre><figcaption></figcaption></figure>
+
 <p>
 If your island is parse an empty string (e.g. island is optional, zero or more repetitions or simply epsilon), seas postpone the epsilon parse as far as possible, until the boundary is found.
 Therefore, in case of <code>starLazy</code>, all the consumed input is in the before water and after water is empty.

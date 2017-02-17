@@ -42,10 +42,10 @@ The <a href="#toc">table of content</a> can be found at the end of the chapter.
 <h1>Extracting the Structure</h1>
 <a id="sec:structure"></a>
 <p>
-In the previous chapters we created a parser to extract javascript from HTML source.
+In the <a href="chapter2.html">previous chapter</a> we created a parser to extract javascript from HTML source.
 Yet our parser is rather simple.
 It sees an input as a list of javascripts.
-In this part we extend the parser and we extract the HTML structure. 
+In this part we extend the parser and we extract the HTML structure as well, thus we will obtain a tree of html elements and javascript.
 </p>
 
 
@@ -101,8 +101,8 @@ Now we need to define <code>elContent</code> rule, which represents the content 
 <li>an unknown text. </li>
 </ol>
 <p>
-Javascript is on the first position because it is <em>kind of</em> an element<sup><a href="#footnote1">[1]</a></sup>and therefore must be ordered before element. 
-The same holds for an element, it is also <em>kind of</em> text. 
+Javascript is on the first position because it is <em>kind of</em> element<sup><a href="#footnote1">[1]</a></sup>and therefore must be ordered before an element rule. 
+The same holds for the element rule, it is also <em>kind of</em> text. 
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elContent
 	^ (javascript / element / text nonEpsilon) star</code></pre><figcaption></figcaption></figure>
@@ -120,10 +120,13 @@ Therefore, we define it as with the help of bounded seas, concretely using the <
 <h3>Epsilon in Repetitions</h3>
 <p>
 Note, we mark the <code>text</code> rule with <code>nonEpsilon</code>.
-<code>nonEpsilon</code> operator is an extension of PEGs that allows only for non-empty parses. 
-The reason for this is that <code>#any asPParser starLazy</code> can consume anything, even the empty string, because star allows for zero repetitions. 
-The star repetition of <code>elContent</code> would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
-You can easily freeze your image by running (we recommend saving your image now):
+The <code>nonEpsilon</code> operator is an extension of PEGs that forbids epsilon parses (in other words if the underlying parser does not consume any input, it fails).
+The reason for this is that <code>#any asPParser starLazy</code> can consume anything, even the empty string, because the <code>starLazy</code> operator allows for zero repetitions. 
+</p>
+<p class="todo">there might be possibility to define <code>plusLazy</code> as well.</p>
+<p>
+Without <code>nonEpsilon</code>, the star repetition of <code>elContent</code> would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+You can easily freeze your image by running the following code (we recommend saving your image now):
 </p>
 <figure><pre><code class="smalltalk">&quot;Tip: save the image before running&quot;
 #any asPParser optional star parse: 'endless loop'</code></pre><figcaption></figcaption></figure>
@@ -176,7 +179,7 @@ WebGrammarTest&gt;&gt;testElementMalformedUnclosed
 
 <p>
 So far it looks good. 
-But our tests are telling us only that element can parse the given input, it does not tell us how it parses the input. 
+But our tests are telling us only that element can parse the given input, it does not tell us <em>how</em> it parses the input. 
 We should assert that the proper element names and the right content is extracted. 
 </p>
 
@@ -190,7 +193,7 @@ We will do this in the <a href="AST.html">following chapter</a>.
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
 </p>
 <p>
-Part I, Basics:
+Part I, Developer's Workflow:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
 <li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
@@ -211,6 +214,7 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
+
 </p></section></section></section>
 <hr></hr>
 <sup id="footnote1">[1]  any javascript code can be recognized as an html element</sup><br/>
