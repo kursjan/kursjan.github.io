@@ -1,16 +1,17 @@
 ${inputFile:Chapters/navigation.pillar}$
 
 !Create an Abstract Syntax Tree
+In the *previous chapter>chapter3.pillar* we tested that our grammar parses the nested elements,
+but we have very limited knowledge about how does the extracted structure look like.
+So let us improve improve the output from the parser and add some information.
 
-In the previous chapter we tested that our grammar parses the nested elements,
-but we have wery bad idea how does the extracted structure looks like.
-The output of a parser is typically very detailed and not well readable concrete syntax tree, which is (in the case of PetitParser) array of arrays of arrays with characters and strings as terminals.
+The direct output of a parser is typically very detailed and not well-readable. 
+It is called concrete syntax tree (CST), which is (in the case of PetitParser) array of arrays of arrays of ... with characters and strings as terminals.
 
 It is the time to return a more convenient representation of the input: ''an abstract syntax tree'', in short AST. 
-Abstract syntax tree, contrary to the very low-level and detailed array of arrays, so called concrete syntax tree (CST), contains information closer to the target domain. 
-In our case the domain should be some kind of a javascript and html representation.
+Abstract syntax tree, contrary to the very low-level and detailed concrete syntax tree, is conceptually closer to the target domain. 
+In our case the domain should be some kind of a tree with html elements and javascript.
 
-!!Testing First
 
 It is considered to be a good practice in PetitParser to split grammar, which returns concrete syntax tree, from parser, which returns abstract syntax tree. 
 We do this by subclassing ==WebGrammar==:
@@ -26,12 +27,11 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-Parsing is great use case for test driven development. 
-If you made it so far, you probably mean it with parsing.
-So let us abandon on a totorial-friendly mode and do the development the recommended way:
-''start with tests''. 
+!!Testing First
 
-Tests give us a clear idea what kind of interface do we expect from our abstract syntax tree:
+Parsing is great use case for test driven development. 
+So let us start with tests first. 
+Tests give us a clear idea what kind of interface we expect from abstract syntax tree:
 
 [[[eval=true
 | t |
@@ -39,6 +39,7 @@ t := PP2Tutorial new.
 stream 
 	nextPutAll: '[[['; lf;
 	nextPutAll: (t definitionFor: WebParserTest); lf;
+	lf;
 	nextPutAll: (t sourceFor: #parserClass in: WebParserTest); lf;
 	lf;
 	nextPutAll: (t sourceFor: #testElement in: WebParserTest); lf;
@@ -84,11 +85,11 @@ stream
 
 !!AST Nodes
 If we want to pass these test, the result of a parse should be a tree consisting of three different nodes: 
-# an html element 
-# a javascript code and 
-# a text
+# a javascript code; 
+# an html element; and
+# a text.
 
-We define these nodes as follows, starting with its abstract predecessor ==WebElement==, which contains only convinience methods.
+We define these nodes as follows, starting with its abstract predecessor ==WebElement==, which contains methods that ease our testing.
 
 [[[eval=true
 | t |
@@ -108,7 +109,27 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-==HtmlElement== follows:
+==JavascriptElement== follows:
+
+[[[eval=true
+| t |
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t definitionFor: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #code in: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #code: in: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #displayText in: JavascriptElement); lf;
+	lf;
+	nextPutAll: (t sourceFor: #gtText: in: JavascriptElement); lf;
+	lf;
+	nextPutAll: ']]]'
+]]]
+
+As well as ==HtmlElement==:
 
 [[[eval=true
 | t |
@@ -129,7 +150,7 @@ stream
 ]]]
 
 
-As well as ==UnknownText==:
+Last but not least ==UnknownText==:
 
 [[[eval=true
 | t |
@@ -148,29 +169,10 @@ stream
 ]]]
 
 
-Last but not least there is ==JavascriptElement==:
 
-[[[eval=true
-| t |
-t := PP2Tutorial new.
-stream 
-	nextPutAll: '[[['; lf;
-	nextPutAll: (t definitionFor: JavascriptElement); lf;
-	lf;
-	nextPutAll: (t sourceFor: #code in: JavascriptElement); lf;
-	lf;
-	nextPutAll: (t sourceFor: #code: in: JavascriptElement); lf;
-	lf;
-	nextPutAll: (t sourceFor: #displayText in: JavascriptElement); lf;
-	lf;
-	nextPutAll: (t sourceFor: #gtText: in: JavascriptElement); lf;
-	lf;
-	nextPutAll: ']]]'
-]]]
+!!From a Grammar to a Parser
 
-!!From Grammar to Parser
-
-Now we override the rules in ==WebParser==, so that the ==javascript== rule returns ==JavascriptElement==, the ==element== rule returns ==HtmlElement== and the ==text== rule returns ==UnknownText==:
+Now we override the rules of ==WebGrammar== in ==WebParser== so that the ==javascript== rule returns ==JavascriptElement==, the ==element== rule returns ==HtmlElement== and the ==text== rule returns ==UnknownText==:
 
 
 [[[eval=true
@@ -201,7 +203,7 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-@@todo explain there is ==trimRight== so that the caching is more efficient
+@@note There is ==trimRight== in ==elOpen==, which means that only the whitespace on the right is trimmed. This makes caching of PetitParser slightly more efficient, because element always starts at the first non-whitespace character. If there is a trimming from left and right (using the ==trim==), it might start at any preceding whitespace or the first non-whitespace character and this would lead into lower cache-hit ratio.
 
 By this time all the tests should pass:
 
@@ -225,10 +227,12 @@ stream
 
 !!Structured Document
 
-Now the whole HTML document.
-The pieces should be there, we need to connect them.
-Of course, we write tests first:
+Now let us construct the whole HTML document.
+The pieces are already there, we just need to connect them.
 
+In the previous chapters, we defined document (represented by the ==document== rule) in ==WebGrammar== as a repetition of javascript seas. 
+Now we define a structured document (==structuredDocument==), i.e. a document with an html structure. 
+Of course, we write tests first and we start with ==WebGrammarTest==:
 
 [[[eval=true
 | t |
@@ -244,9 +248,7 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-In the previous chapters, we defined document (represented by the ==document== rule) in ==WebGrammar== as a repetition of javascript seas. 
-Now we define a structured document, i.e. a document with an html structure. 
-The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
+From the tests we see that the root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define structured document as an element surrounded by a sea:
 
 [[[eval=true
 | t |
@@ -257,8 +259,8 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-
-In order to verify the structure we extract from a document, we write the tests for parser:
+Furthermore, we verify that we extract the correct structure of the document. 
+This can be done in the ==WebParserTest==:
 
 [[[eval=true
 | t |
@@ -271,47 +273,33 @@ stream
 	lf;
 	nextPutAll: '
 WebParserTest>>testStructuredDocument
-	| html |
+	| html body |
 	super testStructuredDocument.
 	
 	self assert: result name equals: ''DOCUMENT''.
 
-
 	html := result secondChild.
 	self assert: html name equals: ''html''.
 
-
 	self assert: html firstChild name equals: ''head''.	
 	self assert: html secondChild name equals: ''body''.
-';
+
+'; lf;
+	lf;
 	nextPutAll: ']]]'
 ]]]
 
 
-In order to pass these tests, we create a root element from the structured document:
+In order to pass these tests, we create a root element called ''DOCUMENT'' in ==structuredDocument==.
+Furthermore we add to it the html element as well a its surroundings:
 
-[[[
-WebParser>>structuredDocument
-	^ super structuredDocument
-	
-	map: [ :_bw :_document :_aw |
-		| beforeWater afterWater |
-		beforeWater := UnknownText new
-			text: _bw;
-			yourself.
-			
-		afterWater := UnknownText new
-			text: _aw;
-			yourself.
-			
-		HtmlElement new
-			name: 'DOCUMENT';
-			children: (Array with: beforeWater 
-					 with: _document 
-					 with: afterWater);
-			yourself
-	
-	]
+[[[eval=true
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #structuredDocument in: WebParser); lf;
+	lf;
+	nextPutAll: ']]]'
 ]]]
 
 By this time all the tests should pass:
@@ -338,17 +326,22 @@ stream
 
 !!Comments
 
-In this section we focus a bit more how to handle comments. They may contain scripts or other elements and they may confuse the parser. 
+In this section we focus on HTML comments. 
+Comments can contain scripts or other elements that are not part of the html document (they are just comments that look the same). 
+And they may confuse the parser. 
 
-Actually we have been cheating a bit and there is an error in ==WebParser==, which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:
+Actually they do and they do so in our tests as well!
+There is an error in ==WebParser== that we have not found. 
+It extracts one extra HTML element, which is not part of the HTML document.
+Inspect the following and switch to the tree view:
 
 [[[
 WebParser new parse: input.
 ]]]
 
 There is a ''<p>'' element in the ''<body>''. 
-But ''<p>'' is a part of comment, it should not be included in the document structure. 
-We fix the ==testStructuredDocument== to cover this:
+But ''<p>'' is a part of a comment, it should not be included in the document structure. 
+First, we should fix the ==testStructuredDocument== to cover this case:
 
 [[[eval=true
 | t |
@@ -359,9 +352,10 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-The problem is tha same as in the case of prematurely ended javascript.
-==WebGrammar== has no notion of a comment and handles a content of comment as an ordinary html code. 
-Therefore we define what is an html comment:
+So where does the problem come from?
+The cause is the same as in the case of prematurely ended javascript.
+==WebGrammar== has no notion of a comment and handles a content of a comment as an ordinary html code. 
+In order to teach it what is an html comment, we have to define it:
 
 
 [[[eval=true
@@ -370,7 +364,7 @@ t := PP2Tutorial new.
 t printAsCode: (t sourceFor: #comment in: WebGrammar) stream: stream.
 ]]]
 
-And now we can redefine ==text== so that it knows what is a comment:
+And now we can redefine ==text== so that it takes comments into an account:
 
 [[[eval=true
 | t |
@@ -378,8 +372,7 @@ t := PP2Tutorial new.
 t printAsCode: (t sourceFor: #text in: WebGrammar) stream: stream.
 ]]]
 
-
-We already mentioned in the previous text that ==starLazy== utilizes bounded seas and the above code is equivalent to:
+If you are interested in the details of the ==starLazy== operator, check out the *The ==starLazy== Operator>starLazy.pillar* chapter. 
 
 [[[
 (#epsilon asPParser)
@@ -395,7 +388,7 @@ This is it, we can parse all of it!
 
 !!Conclusion 
 In this chapter we have applied the test-driven approach to define our AST nodes.
-We defined ==WebParser==, wchid extends the ==WebGrammar== and builds the AST nodes.
+We defined ==WebParser==, which extends the ==WebGrammar== and builds the AST nodes.
 Last but not least, we had a look how to avoid false positives caused by comments.
 
 
@@ -421,6 +414,6 @@ You can download the sources here:
 - *==HtmlElement==>../HtmlElement.st*
 - *==UnknownText==>../UnknownText.st*
 
-The source for this tutorial is also part of the PetitParser2 package.
+The sources of this tutorial is also part of the PetitParser2 package, so you just need to install PetitParser or use Moose as described in the *Introduction>../book.pillar*.
 
 ${inputFile:Chapters/toc.pillar}$

@@ -2,15 +2,20 @@
 
 In this series we describe *PetitParser2>https://github.com/kursjan/petitparser2* \-\-\- a modular and flexible high-performance top-down parsing framework.
 
-@@note Please note the text is not yet complete. See the *changelog>@changelog*.
-
-
 !!Structure
- 
-The text is organized into two parts, the first part covers basics of PetitParser and is suitable for anyone who would like to start with PetitParser.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to better understand its internals or extend PetitParser to better fit their needs:
 
-!!!Part I, Basics
+The text is organized into two parts, the first part covers the basic developer's workflow with PetitParser.
+It is suitable for anyone who has a bit of experience with PetitParser and would like to learn more.
+The second part covers advanced topics and is for those who already use PetitParser and who would like to understand PetitParser more or would like to extend PetitParser to better fit their needs.
+
+!!!Prerequsities
+This text expects a basic knowledge of parsing with PetitParser.
+If you are not sure, if you have the required level of knoledge, we recommend the *Writing Parser with PetitParser>https://www.lukas-renggli.ch/blog/petitparser-1* from Lukas Renggli and *Introduction to PetitParser2>http://www.humane-assessment.com/blog/introducing-petitparser2/* by Tudor Girba.
+Optionally, there is a dedicated *PetitParser chapter>http://scg.unibe.ch/archive/papers/Kurs13a-PetitParser.pdf* in the *Deep into Pharo>http://www.deepintopharo.com/* book.
+
+ 
+
+!!!Part I, Developer's Workflow
 In the first part, basics, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
 
 We start by prototyping in a playground and throughout several steps we reach a full-fledged and tested parser that effectively builds a structured representation of the parsed source. 
@@ -21,8 +26,8 @@ Nevertheless, the following ones are unique to PetitParser:
 # Last but not least, we use optimizations capabilities of PetitParser to turn our prototype into a an efficient top-down parser. 
 
 In *Extracting Javascript>Chapters/chapter1.pillar* we start with a simple script.
-Later in *Real Grammar>Chapters/chapter2.pillar*, we turn the script into a proper grammar and add tests.
-In *Extracting Structure>Chapters/chapter3.pillar* we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In *Abstract Syntax Tree>Chapters/AST.pillar*, we show how to build a suitable representation of the HTML source.
+Later in *From a Script to a Parser>Chapters/chapter2.pillar*, we turn the script into a proper grammar and add tests.
+In *Extracting the Structure>Chapters/chapter3.pillar* we extend the parser with rules to recognize HTML structure, even if the HTML source is malformed. In *Abstract Syntax Tree>Chapters/AST.pillar*, we show how to build a suitable representation of the HTML source.
 
 In *Optimizations>Chapters/optimizations.pillar* we inspect optimizations capabilities of PetitParser2
 and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitParser2 that will help us to pinpoint the performance bottlenecks and we show techniques how to fix them.
@@ -43,6 +48,21 @@ On a concrete example of a Smalltalk grammar, we describe how to develop a parse
 
 @@todo create a chapter about specializations 
 - *Specializations in Detail>../smalltalkOptimization.pillar*
+
+!!Getting Started
+The list of available chapters:
+- *Extracting Javascript>Chapters/chapter1.pillar*
+- *From a Script to a Parser>Chapters/chapter2.pillar*
+- *Extracting the Structure>Chapters/chapter3.pillar*
+- *Abstract Syntax Tree>Chapters/AST.pillar*
+- *Optimizations>Chapters/optimization.pillar*
+- *Memoization>Chapters/memoization.pillar*
+
+If you are interested in more details:
+- *The ==starLazy== operator>Chapters/starLazy.pillar*
+- *Matching Tags>Chapters>matchingTags.pillar* (context-sensitive parsing)
+- *Specializations in Detail>specializations.pillar*
+- *Caches in Detail>caches.pillar*
 
 !!Changelog
 @changelog

@@ -2,7 +2,7 @@
 !Table of Contents
 This text is part of the *Parsing With PetitParser2>../../book.pillar* series.
 
-Part I, Basics:
+Part I, Developer's Workflow:
 - *Extracting Javascript>../chapter1.pillar*
 - *From a Script to a Parser>../chapter2.pillar*
 - *Extracting the Structure>../chapter3.pillar*

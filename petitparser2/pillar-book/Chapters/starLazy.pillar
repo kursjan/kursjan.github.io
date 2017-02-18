@@ -1,4 +1,9 @@
 !StarLazy 
+
+@@todo say more about sea as well.
+
+@@todo compare to lazy repetitions.
+
 In this section, we shortly inspect how does the ==startLazy== operator works. 
 The code  ==parser starLazy== is a shorthand for the following:
 

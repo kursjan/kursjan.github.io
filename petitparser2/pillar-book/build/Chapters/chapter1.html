@@ -42,8 +42,7 @@ The <a href="#toc">table of content</a> can be found at the end of the chapter.
 <h1>Extracting Javascript</h1>
 <a id="sec:scripting"></a>
 <p>
-In this chapter we extract javascript from html files.
-The solution provided in this chapter is a simple script.
+In this chapter we extract javascript from html files using a simple script.
 We create the real parser <a href="chapter2.html">later</a>.
 </p>
 <section>
@@ -105,11 +104,11 @@ Second, we define javascript as a <code>js</code> rule:
 	==&gt; #second.</code></pre><figcaption></figcaption></figure>
 
 <p>
-The <code>starLazy</code> operator is a new feature of PetitParser2.<sup><a href="#footnote1">[1]</a></sup>
-It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser appears. 
-What makes <code>starLazy</code> useful is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
+The <code>starLazy</code> operator is a new feature of PetitParser2<sup><a href="#footnote1">[1]</a></sup>.
+It repetitively invokes the given parser (any character in this case) until a string recognized by the following parser (<em>&lt;/script&gt;</em> in this case) appears. 
+What makes <code>starLazy</code> unique and useful is that you don’t need to specify what is the following parser, it is inferred automatically based on the grammar specification. 
 Of course, with any change in the grammar, the <code>starLazy</code> updates itself.
-If you want to define the same rule in PetitParser, it would be:
+If you want to define the same rule in previous version of PetitParser, it would be:
 </p>
 <figure><pre><code class="smalltalk">#any asParser starLazy: '&lt;script&gt;' asParser.</code></pre><figcaption></figcaption></figure>
 
@@ -126,21 +125,23 @@ Let us try if the javascript rule can parse our <code>source</code>:
 <p>
 The result is failure. 
 If we inspect the failure object and switch to <em>Debug View</em> we notice that <em>&lt;script&gt;</em> is expected at the beginning of a file, yet our input starts with <em>&lt;!DOCTYPE html&gt;</em>. 
-The fix to this is simple: we create a new rule <code>jsSea</code> as a javascript island in a sea of an uninteresting water:
+The fix to this is simple with PetitParser2: we create a new rule <code>jsSea</code> as a javascript island in a sea of an uninteresting water, using the <code>sea</code> operator:
 </p>
 <figure><pre><code class="smalltalk">jsSea := js sea.
 jsSea parse: source.</code></pre><figcaption></figcaption></figure>
 
 <p>
-Good, the result is not failure! 
-But it is not exactly what we want neither. 
+Looks like <code>sea</code> is doing a lot of magic and the result is not failure! 
+But it is not exactly what we want. 
 Sea returns an array of three elements: 
 </p><ol><li>before-water </li>
 <li>island and </li>
 <li>after-water</li>
 </ol>
 <p>
-Island is the result of the javascript rule, before and after water contain the rest of an input. We are interested only in the the javascript, so we redefine the document rule as follows:
+Island is the result of the javascript rule. 
+Before and after water contain the rest of an input (the one we did not specified and we are not interested in). 
+We are interested only in the javascript, so we redefine the document rule as follows:
 </p>
 
 <figure><pre><code class="smalltalk">jsSea := js sea ==&gt; #second.
@@ -176,9 +177,9 @@ It should look like this:
 </p><figure><pre><code class="javascript">alert(&quot;All scripts ends with: '&lt;/script&gt;'...&quot;)</code></pre><figcaption></figcaption></figure>
 
 <p>
-It is prematurely ended, because the javascript rule as we defined it does not know about strings. 
+It is ended prematurely, because the javascript rule <code>js</code> as we defined it does not know about strings. 
 Therefore, the javascript rule thinks that there is a closing of the script tag even though it is a part of the alert message string. 
-We fix it by defining javascript strings and redefining the <code>js</code> rule:
+We can fix it by defining javascript strings and redefining the <code>js</code> rule:
 </p>
 <figure><pre><code class="smalltalk">any := #any asPParser.
 jsString := $' asPParser, any starLazy, $' asPParser.
@@ -202,11 +203,13 @@ Great, everything works as expected!
 <h1>Conclusion</h1>
 <p>
 In this part, we have quickly prototyped a parser to extract javascript from html files.
-Contrary to the first version of PetitParser, we could utilize bounded seas and <code>starLazy</code> operator, which skip an uninteresting input without us specifying how to skip it. 
+In the new version of PetitParser, we have a <code>sea</code> and <code>starLazy</code> operators at hand to help us skip the uninteresting input.
+More details are provided in <a href="starLazy.html">this chapter</a>. 
 </p>
 <p>
-If you think that such a task could be done using regular expression you are right.
-But contrary to regular expressions, this is just a first step for PetitParser, which will boldly go where no regular expression has gone before.
+If you think that the task from this chapter could be done using a simple regular expression, you are right absolutely right.
+Nevertheless, contrary to regular expressions, this is just a first step for PetitParser.
+PetitParser will boldly go where no regular expression has gone before.
 </p>
 
 <a id="toc"></a><section>
@@ -215,10 +218,10 @@ But contrary to regular expressions, this is just a first step for PetitParser, 
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
 </p>
 <p>
-Part I, Basics:
+Part I, Developer's Workflow:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
-<li><a href="Chapters/../chapter2.html">From Script to Parser</a></li>
+<li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
 <li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
 <li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
 <li><a href="Chapters/../optimizations.html">Optimizations</a></li>
@@ -236,9 +239,10 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
+
 </p></section></section>
 <hr></hr>
-<sup id="footnote1">[1]  It is build on top of bounded seas, but we will talk about this in more detail later.</sup><br/>
+<sup id="footnote1">[1]  The operator builds on top of bounded seas and we will talk about this in more detail later.</sup><br/>
 
       </section>
     </div>

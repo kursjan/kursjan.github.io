@@ -35,24 +35,25 @@
         <a id="top"></a>
 <p>
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
-The table of content can be found <a href="#toc">at the end of the chapter</a>.
+The <a href="#toc">table of content</a> can be found at the end of the chapter.
 
 </p>
 <section>
 <h1>Create an Abstract Syntax Tree</h1>
-
 <p>
-In the previous chapter we tested that our grammar parses the nested elements,
-but we have wery bad idea how does the extracted structure looks like.
-The output of a parser is typically very detailed and not well readable concrete syntax tree, which is (in the case of PetitParser) array of arrays of arrays with characters and strings as terminals.
+In the <a href="chapter3.html">previous chapter</a> we tested that our grammar parses the nested elements,
+but we have very limited knowledge about how does the extracted structure look like.
+So let us improve improve the output from the parser and add some information.
+</p>
+<p>
+The direct output of a parser is typically very detailed and not well-readable. 
+It is called concrete syntax tree (CST), which is (in the case of PetitParser) array of arrays of arrays of ... with characters and strings as terminals.
 </p>
 <p>
 It is the time to return a more convenient representation of the input: <em>an abstract syntax tree</em>, in short AST. 
-Abstract syntax tree, contrary to the very low-level and detailed array of arrays, so called concrete syntax tree (CST), contains information closer to the target domain. 
-In our case the domain should be some kind of a javascript and html representation.
+Abstract syntax tree, contrary to the very low-level and detailed concrete syntax tree, is conceptually closer to the target domain. 
+In our case the domain should be some kind of a tree with html elements and javascript.
 </p>
-<section>
-<h2>1. Testing First</h2>
 
 <p>
 It is considered to be a good practice in PetitParser to split grammar, which returns concrete syntax tree, from parser, which returns abstract syntax tree. 
@@ -64,14 +65,13 @@ We do this by subclassing <code>WebGrammar</code>:
 	poolDictionaries: ''
 	category: 'PetitParser2-Tutorial'</code></pre><figcaption></figcaption></figure>
 
+<section>
+<h2>1. Testing First</h2>
+
 <p>
 Parsing is great use case for test driven development. 
-If you made it so far, you probably mean it with parsing.
-So let us abandon on a totorial-friendly mode and do the development the recommended way:
-<em>start with tests</em>. 
-</p>
-<p>
-Tests give us a clear idea what kind of interface do we expect from our abstract syntax tree:
+So let us start with tests first. 
+Tests give us a clear idea what kind of interface we expect from abstract syntax tree:
 </p>
 <figure><pre><code class="smalltalk">WebGrammarTest subclass: #WebParserTest
 	uses: TPP2TypeAssertions
@@ -79,6 +79,7 @@ Tests give us a clear idea what kind of interface do we expect from our abstract
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PetitParser2-Tutorial'
+
 WebParserTest&gt;&gt;parserClass
 	^ WebParser
 
@@ -141,13 +142,13 @@ WebParserTest&gt;&gt;testJavascriptWithString
 <h2>2. AST Nodes</h2>
 <p>
 If we want to pass these test, the result of a parse should be a tree consisting of three different nodes: 
-</p><ol><li>an html element </li>
-<li>a javascript code and </li>
-<li>a text</li>
+</p><ol><li>a javascript code; </li>
+<li>an html element; and</li>
+<li>a text.</li>
 </ol>
 
 <p>
-We define these nodes as follows, starting with its abstract predecessor <code>WebElement</code>, which contains only convinience methods.
+We define these nodes as follows, starting with its abstract predecessor <code>WebElement</code>, which contains methods that ease our testing.
 </p>
 <figure><pre><code class="smalltalk">Object subclass: #WebElement
 	instanceVariableNames: ''
@@ -176,52 +177,7 @@ WebElement&gt;&gt;gtTreeViewIn: composite
 		shouldExpandToLevel: 6</code></pre><figcaption></figcaption></figure>
 
 <p>
-<code>HtmlElement</code> follows:
-</p>
-<figure><pre><code class="smalltalk">WebElement subclass: #HtmlElement
-	instanceVariableNames: 'name children'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'
-
-HtmlElement&gt;&gt;children
-	^ children
-
-HtmlElement&gt;&gt;name
-	^ name
-
-HtmlElement&gt;&gt;name: newName
-	name := newName
-
-HtmlElement&gt;&gt;displayText
-	^ self name</code></pre><figcaption></figcaption></figure>
-
-
-<p>
-As well as <code>UnknownText</code>:
-</p>
-<figure><pre><code class="smalltalk">WebElement subclass: #UnknownText
-	instanceVariableNames: 'text'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PetitParser2-Tutorial'
-
-UnknownText&gt;&gt;text
-	^ text
-
-UnknownText&gt;&gt;text: anObject
-	text := anObject
-
-UnknownText&gt;&gt;gtText: composite
-	&lt;gtInspectorPresentationOrder: 40&gt;
-	
-	composite text
-		title: 'Text';
-		display: [ :context | text ]</code></pre><figcaption></figcaption></figure>
-
-
-<p>
-Last but not least there is <code>JavascriptElement</code>:
+<code>JavascriptElement</code> follows:
 </p>
 <figure><pre><code class="smalltalk">WebElement subclass: #JavascriptElement
 	instanceVariableNames: 'code'
@@ -245,11 +201,57 @@ JavascriptElement&gt;&gt;gtText: composite
 		title: 'Text';
 		display: [ :context | code ]</code></pre><figcaption></figcaption></figure>
 
-</section><section>
-<h2>3. From Grammar to Parser</h2>
+<p>
+As well as <code>HtmlElement</code>:
+</p>
+<figure><pre><code class="smalltalk">WebElement subclass: #HtmlElement
+	instanceVariableNames: 'name children'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PetitParser2-Tutorial'
+
+HtmlElement&gt;&gt;children
+	^ children
+
+HtmlElement&gt;&gt;name
+	^ name
+
+HtmlElement&gt;&gt;name: newName
+	name := newName
+
+HtmlElement&gt;&gt;displayText
+	^ self name</code></pre><figcaption></figcaption></figure>
+
 
 <p>
-Now we override the rules in <code>WebParser</code>, so that the <code>javascript</code> rule returns <code>JavascriptElement</code>, the <code>element</code> rule returns <code>HtmlElement</code> and the <code>text</code> rule returns <code>UnknownText</code>:
+Last but not least <code>UnknownText</code>:
+</p>
+<figure><pre><code class="smalltalk">WebElement subclass: #UnknownText
+	instanceVariableNames: 'text'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PetitParser2-Tutorial'
+
+UnknownText&gt;&gt;text
+	^ text
+
+UnknownText&gt;&gt;text: anObject
+	text := anObject
+
+UnknownText&gt;&gt;gtText: composite
+	&lt;gtInspectorPresentationOrder: 40&gt;
+	
+	composite text
+		title: 'Text';
+		display: [ :context | text ]</code></pre><figcaption></figcaption></figure>
+
+
+
+</section><section>
+<h2>3. From a Grammar to a Parser</h2>
+
+<p>
+Now we override the rules of <code>WebGrammar</code> in <code>WebParser</code> so that the <code>javascript</code> rule returns <code>JavascriptElement</code>, the <code>element</code> rule returns <code>HtmlElement</code> and the <code>text</code> rule returns <code>UnknownText</code>:
 </p>
 
 <figure><pre><code class="smalltalk">WebParser&gt;&gt;javascript
@@ -289,7 +291,7 @@ And finally, for convenience, we trim whitespaces around html elements:
 WebParser&gt;&gt;elOpen
 	^ super elOpen trimRight</code></pre><figcaption></figcaption></figure>
 
-<p class="todo">explain there is <code>trimRight</code> so that the caching is more efficient</p>
+<p class="note">There is <code>trimRight</code> in <code>elOpen</code>, which means that only the whitespace on the right is trimmed. This makes caching of PetitParser slightly more efficient, because element always starts at the first non-whitespace character. If there is a trimming from left and right (using the <code>trim</code>), it might start at any preceding whitespace or the first non-whitespace character and this would lead into lower cache-hit ratio.</p>
 <p>
 By this time all the tests should pass:
 </p>
@@ -299,11 +301,14 @@ By this time all the tests should pass:
 <h2>4. Structured Document</h2>
 
 <p>
-Now the whole HTML document.
-The pieces should be there, we need to connect them.
-Of course, we write tests first:
+Now let us construct the whole HTML document.
+The pieces are already there, we just need to connect them.
 </p>
-
+<p>
+In the previous chapters, we defined document (represented by the <code>document</code> rule) in <code>WebGrammar</code> as a repetition of javascript seas. 
+Now we define a structured document (<code>structuredDocument</code>), i.e. a document with an html structure. 
+Of course, we write tests first and we start with <code>WebGrammarTest</code>:
+</p>
 <figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testStructuredDocumentSimple
 	| input |
 	input := '&lt;html&gt;
@@ -334,16 +339,14 @@ WebGrammarTest&gt;&gt;testStructuredDocument
 	self parse: input rule: #structuredDocument</code></pre><figcaption></figcaption></figure>
 
 <p>
-In the previous chapters, we defined document (represented by the <code>document</code> rule) in <code>WebGrammar</code> as a repetition of javascript seas. 
-Now we define a structured document, i.e. a document with an html structure. 
-The root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define it as sea:
+From the tests we see that the root of an html file is an element that can be surrounded by some other information (e.g. doctype or comments), therefore we define structured document as an element surrounded by a sea:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;structuredDocument
 	^ element sea</code></pre><figcaption></figcaption></figure>
 
-
 <p>
-In order to verify the structure we extract from a document, we write the tests for parser:
+Furthermore, we verify that we extract the correct structure of the document. 
+This can be done in the <code>WebParserTest</code>:
 </p>
 <figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocumentSimple
 	| html body javascript |
@@ -381,27 +384,26 @@ WebParserTest&gt;&gt;testStructuredDocumentWithDoctype
 
 
 WebParserTest&gt;&gt;testStructuredDocument
-	| html |
+	| html body |
 	super testStructuredDocument.
 	
 	self assert: result name equals: 'DOCUMENT'.
 
-
 	html := result secondChild.
 	self assert: html name equals: 'html'.
-
 
 	self assert: html firstChild name equals: 'head'.	
 	self assert: html secondChild name equals: 'body'.</code></pre><figcaption></figcaption></figure>
 
 
 <p>
-In order to pass these tests, we create a root element from the structured document:
+In order to pass these tests, we create a root element called <em>DOCUMENT</em> in <code>structuredDocument</code>.
+Furthermore we add to it the html element as well a its surroundings:
 </p>
 <figure><pre><code class="smalltalk">WebParser&gt;&gt;structuredDocument
 	^ super structuredDocument
 	
-	map: [ :_bw :_document :_aw |
+	map: [ :_bw :_html :_aw |
 		| beforeWater afterWater |
 		beforeWater := UnknownText new
 			text: _bw;
@@ -413,11 +415,11 @@ In order to pass these tests, we create a root element from the structured docum
 			
 		HtmlElement new
 			name: 'DOCUMENT';
-			children: (Array with: beforeWater 
-					 with: _document 
-					 with: afterWater);
+			children: (Array 
+				with: beforeWater 
+				with: _html 
+				with: afterWater);
 			yourself
-	
 	]</code></pre><figcaption></figcaption></figure>
 
 <p>
@@ -428,17 +430,22 @@ By this time all the tests should pass:
 <h2>5. Comments</h2>
 
 <p>
-In this section we focus a bit more how to handle comments. They may contain scripts or other elements and they may confuse the parser. 
+In this section we focus on HTML comments. 
+Comments can contain scripts or other elements that are not part of the html document (they are just comments that look the same). 
+And they may confuse the parser. 
 </p>
 <p>
-Actually we have been cheating a bit and there is an error in <code>WebParser</code>, which extracts one element that is not in the HTML. Inspect the following and switch to the tree view:
+Actually they do and they do so in our tests as well!
+There is an error in <code>WebParser</code> that we have not found. 
+It extracts one extra HTML element, which is not part of the HTML document.
+Inspect the following and switch to the tree view:
 </p>
 <figure><pre><code class="smalltalk">WebParser new parse: input.</code></pre><figcaption></figcaption></figure>
 
 <p>
 There is a <em>&lt;p&gt;</em> element in the <em>&lt;body&gt;</em>. 
-But <em>&lt;p&gt;</em> is a part of comment, it should not be included in the document structure. 
-We fix the <code>testStructuredDocument</code> to cover this:
+But <em>&lt;p&gt;</em> is a part of a comment, it should not be included in the document structure. 
+First, we should fix the <code>testStructuredDocument</code> to cover this case:
 </p>
 <figure><pre><code class="smalltalk">WebParserTest&gt;&gt;testStructuredDocument
 	| html body |
@@ -456,23 +463,23 @@ We fix the <code>testStructuredDocument</code> to cover this:
 	self assert: body children size equals: 4.</code></pre><figcaption></figcaption></figure>
 
 <p>
-The problem is tha same as in the case of prematurely ended javascript.
-<code>WebGrammar</code> has no notion of a comment and handles a content of comment as an ordinary html code. 
-Therefore we define what is an html comment:
+So where does the problem come from?
+The cause is the same as in the case of prematurely ended javascript.
+<code>WebGrammar</code> has no notion of a comment and handles a content of a comment as an ordinary html code. 
+In order to teach it what is an html comment, we have to define it:
 </p>
 
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;comment
 	^ '&lt;!--' asPParser, #any asPParser starLazy, '--&gt;' asPParser</code></pre><figcaption></figcaption></figure>
 
 <p>
-And now we can redefine <code>text</code> so that it knows what is a comment:
+And now we can redefine <code>text</code> so that it takes comments into an account:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
 	^ (comment / #any asPParser) starLazy</code></pre><figcaption></figcaption></figure>
 
-
 <p>
-We already mentioned in the previous text that <code>starLazy</code> utilizes bounded seas and the above code is equivalent to:
+If you are interested in the details of the <code>starLazy</code> operator, check out the <a href="starLazy.html">The <code>starLazy</code> Operator</a> chapter. 
 </p>
 <figure><pre><code class="smalltalk">(#epsilon asPParser)
   waterToken: (comment / #any asPParser);
@@ -490,7 +497,7 @@ This is it, we can parse all of it!
 <h2>6. Conclusion </h2>
 <p>
 In this chapter we have applied the test-driven approach to define our AST nodes.
-We defined <code>WebParser</code>, wchid extends the <code>WebGrammar</code> and builds the AST nodes.
+We defined <code>WebParser</code>, which extends the <code>WebGrammar</code> and builds the AST nodes.
 Last but not least, we had a look how to avoid false positives caused by comments.
 </p>
 
@@ -511,7 +518,7 @@ You can download the sources here:
 </ul>
 
 <p>
-The source for this tutorial is also part of the PetitParser2 package.
+The sources of this tutorial is also part of the PetitParser2 package, so you just need to install PetitParser or use Moose as described in the <a href="../book.html">Introduction</a>.
 </p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>
@@ -519,10 +526,10 @@ The source for this tutorial is also part of the PetitParser2 package.
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
 </p>
 <p>
-Part I, Basics:
+Part I, Developer's Workflow:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
-<li><a href="Chapters/../chapter2.html">From Script to Parser</a></li>
+<li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
 <li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
 <li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
 <li><a href="Chapters/../optimizations.html">Optimizations</a></li>
@@ -532,6 +539,7 @@ Part I, Basics:
 <p>
 Part II, Advanced Topics:
 </p><ul>
+<li><a href="Chapters/../starLazy.html">The <code>starLazy</code> Operator</a></li>
 <li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
 <li><a href="Chapters/../smalltalkOptimization.html">Specializations in Detail</a></li>
 <li><a href="Chapters/../caches.html">Caches in Detail</a></li>
@@ -539,6 +547,7 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
+
 </p></section></section></section></section>
       </section>
     </div>

@@ -3,12 +3,11 @@ ${inputFile:Chapters/navigation.pillar}$
 !Extracting the Structure
 @sec:structure
 
-In the previous chapters we created a parser to extract javascript from HTML source.
-But our parser is rather simple. 
+In the *previous chapter>chapter2.pillar* we created a parser to extract javascript from HTML source.
+Yet our parser is rather simple.
 It sees an input as a list of javascripts.
-In this part we extend the parser and we extract the HTML structure. 
-Again, we use bounded seas to ease our task.
-Bounded seas become handy when skipping a text in html elements and when recoverring from unclosed or malformed elements.
+In this part we extend the parser and we extract the HTML structure as well, thus we will obtain a tree of html elements and javascript.
+%To ease our task we use bounded seas, which help us to skip an uninteresting parts of the html document and to recover from unclosed or malformed elements.
 
 %analyzed the anatomy of bounded seas%.
 %We described how they can be used to:
@@ -22,11 +21,12 @@ Bounded seas become handy when skipping a text in html elements and when recover
 Elements of HTML has an interesting property: the name of an opening tag has to match the name of a closing tag. 
 Though natural for humans, this is, surprisingly, rather difficult task from the parsing theory point of view.
 
-Unfortunately, standard solutions do not fit well into the PetitParser. 
+Unfortunately, standard solutions do not really work as we would like to.
 We describe problem in more details in the supplementary *Matching Tags>../matchingTags.pillar* chapter.
 
-PetitParser2 comes with a special syntax to express constrains of matching open and close tags.
-It can store a result of a rule (e.g. in the rule opening an html tag) onto a stack using the push operator and assert that the result of a rule (e.g. in the rule closing an html tag) matches the top of the stack using the match operator and finally pop the result using the pop operator (after an html tag is sucessfully recognized). 
+To fix the issue, PetitParser2 comes with a special syntax to express constrains of matching open and close tags.
+It can store a result of a rule (e.g. opening an html tag) onto a stack using the ==push== operator and assert that a result of a rule (e.g. closing an html tag) matches the top of the stack using the ==match== operator.
+% and finally pop the result using the pop operator (after an html tag is sucessfully recognized). 
 
 Here is the concrete example:
 First we define an element name as a repetition of letters and digits:
@@ -69,11 +69,11 @@ t printAsCode: (t sourceFor: #elClose in: WebGrammar) stream: stream.
 !!Element Content
 Now we need to define ==elContent== rule, which represents the content of an element. 
 ==elContent== is zero or more repetitions of the following components in the given order: 
-# a javascript code, 
-# another element or 
+# a javascript code; 
+# another element; or 
 # an unknown text. 
-We add javascript to the first position because it is ''kind of'' an element and therefore must be ordered first to take precedence. 
-The same goes for an element, it is also ''kind of'' a text. 
+Javascript is on the first position because it is ''kind of'' element${footnote: any javascript code can be recognized as an html element}$  and therefore must be ordered before an element rule. 
+The same holds for the element rule, it is also ''kind of'' text. 
 
 [[[eval=true
 | t |
@@ -88,7 +88,7 @@ stream
 
 
 Text can be anything.
-Therefore, we define it as with the help of bounded seas:
+Therefore, we define it as with the help of bounded seas, concretely using the ==starLazy== operator:
 
 [[[
 WebGrammar>>text
@@ -97,20 +97,33 @@ WebGrammar>>text
 
 
 !!!Epsilon in Repetitions
-Note, we mark text as ==nonEpsilon==.
-==nonEpsilon== operator is an extension of PEGs that allows only for non-empty parses. 
-The reason for this is that ==#any asPParser starLazy== can consume anything, even the empty string. 
-The star repetition of ==elContent== would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+Note, we mark the ==text== rule with ==nonEpsilon==.
+The ==nonEpsilon== operator is an extension of PEGs that forbids epsilon parses (in other words if the underlying parser does not consume any input, it fails).
+The reason for this is that ==#any asPParser starLazy== can consume anything, even the empty string, because the ==starLazy== operator allows for zero repetitions. 
+
+@@todo there might be possibility to define ==plusLazy== as well.
+
+Without ==nonEpsilon==, the star repetition of ==elContent== would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+You can easily freeze your image by running the following code (we recommend saving your image now):
+
+[[[
+"Tip: save the image before running"
+#any asPParser optional star parse: 'endless loop'
+]]] 
 
 !!Testing the Code
-We have defined a lots of code. Let us try, if it works. 
+We have written a new code, let us try if it works. 
 We start with ==text==:
 
 
 [[[eval=true
 | t |
 t := PP2Tutorial new.
-t printAsCode: (t sourceFor: #testText in: WebGrammarTest) stream: stream.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #testText in: WebGrammarTest); lf;
+	nextPutAll: (t testResultFor: #testText in: WebGrammarTest); lf;
+	nextPutAll: ']]]'
 ]]]
 
 
@@ -154,7 +167,7 @@ stream
 !!Conclusion
 
 So far it looks good. 
-But our tests are telling us only that element can parse the given input, it does not tell us how it parses the input. 
+But our tests are telling us only that element can parse the given input, it does not tell us ''how'' it parses the input. 
 We should assert that the proper element names and the right content is extracted. 
 
 

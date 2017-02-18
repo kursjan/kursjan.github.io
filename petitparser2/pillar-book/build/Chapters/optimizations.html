@@ -41,7 +41,7 @@ The <a href="#toc">table of content</a> can be found at the end of the chapter.
 <section>
 <h1>Optimizations Overview</h1>
 
-<p class="note">Please note that the <code>WebGrammar</code> offered to download in the <a href="AST.html">Abstract Syntax Tree</a> chapter contains already optimized version of an <code>element</code> rule. In this chapter we suppose that <code>element</code> definition looks like defined in <a href="chapter3.html">Extracting the Structure</a> chapter, i.e. it looks like this:b</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
+<p class="note">Please note that the <code>WebGrammar</code> you could download in the <a href="AST.html">Abstract Syntax Tree</a> chapter contains already optimized version of an <code>element</code> rule. In this chapter we suppose that <code>element</code> definition looks like defined in <a href="chapter3.html">Extracting the Structure</a> chapter, i.e. it looks like this:</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;element
 	^ (elOpen, elContent, elClose)</code></pre><figcaption></figcaption></figure>
 
 <section>
@@ -56,13 +56,13 @@ WebParser new debug: input.</code></pre><figcaption></figcaption></figure>
 <section>
 <h3>Report View</h3>
 <p>
-This will run the parser in a debug mode, which collects lots of useful information. Unfortunately, it also takes considerable amount of time so be patient. Once you get the result, inspect the Report tab (note that numbers might slightly differ in your case):
+This will run the parser in a debug mode and collect a lot of useful information. Unfortunately, it also takes considerable amount of time so be patient. Once you get the result, inspect the <em>Report tab</em> (note that numbers might slightly differ in your case):
 </p>
 <p>
 
 <figure>
 	<img src="figures/unoptimized-report.png" width="100%%"/>
-	<figcaption></figcaption>
+	<figcaption>Report view of non-optimized parse</figcaption>
 </figure>
 </p>
 <p>
@@ -87,27 +87,29 @@ Very often only lightweight remember and restore happens, since many grammars ar
 </p>
 <p>
 Regarding the lightweight backtracking, the average of lightweight backtracks per character should be below 1 (in ideal case). 
-This can happen in rase of deterministic grammars, which do not do any (or only a little) speculations and know exactly which alternative of a choice is the correct one. 
+This is also not so unusual case when dealing with deterministic grammars, which do not do any (or only a little) speculations and know exactly which alternative of a choice is the correct one. 
 </p>
 </section><section>
 <h3>Debug View</h3>
 <p>
-So why are the numbers so bad in our case? Let us inspect in more detail how this was happening, using the Debug view:
+But our grammar is obviously not deterministic it does lots of speculations.
+Why are the numbers so bad in our case? 
+Let us inspect in more detail how this was happening, using the <em>Debug view</em>:
 </p>
 <p>
 
 <figure>
 	<img src="figures/unoptimized-debug.png" width="100%%"/>
-	<figcaption></figcaption>
+	<figcaption>Debug View of non-optimized parse.</figcaption>
 </figure>
 </p>
 <p>
 The view shows us that 1502165 parsers were invoked to consume the input. 
-Most of it (751559 invocations) happened when parsing first two lines of the input - the before water of the sea.
+Most of it (751559 invocations) happened when parsing first two lines of the input --- the before water of the sea.
 </p>
 <p>
-This is too much for such a short input. 
-Such a bad performance is caused by the fact that bounded seas have to verify at every position if the next parser can be parsed. 
+This is too much for a short input. 
+Such a bad performance is caused by the fact that bounded seas have to verify at every position if the next parser (i.e. the parser that will be invoked after the sea) will succeed. 
 If the next parser happens to be another sea (as in the case of <code>WebGrammar</code>), the number of invocations grows really fast (exponentially in fact). 
 </p>
 
@@ -116,20 +118,20 @@ We see that the element rule took approximately one half of the invocations (750
 Majority of 751559 invocations of before water were spent by testing for element. 
 </p>
 <p>
-Another glimpse of ineffectivness can be seen in the <code>elOpen</code> rule.
+Another glimpse of ineffectiveness can be seen in the <code>elOpen</code> rule.
 </p>
 <p>
 <a id="elOpenUnoptimized"></a>
 <figure>
 	<img src="figures/unoptimized-elOpen.png" width="100%%"/>
-	<figcaption>0.1. </figcaption>
+	<figcaption>0.1. Debug view of the <code>elOpen</code> rule non-optimized parse.</figcaption>
 </figure>
 </p>
 <p>
 You can see that the whole <em>&lt;html lang=&quot;html&quot; dir=&quot;ltr&quot; class=&quot;js-enabled&quot;&gt;</em> is parsed by invoking 272 parsers.
-This is rather too much for a line with 55 characters.
-One of the reasons is how are the identifiers parsed.
-You can see that when recognizing the <em>html</em> text, 6 different parsers are invoked; for each letter one and two extra parsers.
+This is quite a lot for a line with 55 characters.
+One of the reasons is how are the identifiers (<code>elementName</code>) parsed.
+You can see that when recognizing the <em>html</em> text, 8 different parsers are invoked; for each letter one and some extra boilerplate parsers (flattening, possessive repeating,...).
 </p>
 </section></section><section>
 <h2>2. Using the <code>optimize</code> method</h2>
@@ -141,10 +143,10 @@ Let it give a try:
 
 <p>
 The report looks much better now:
-
+<a id=""></a>
 <figure>
 	<img src="figures/optimized-report.png" width="100%%"/>
-	<figcaption></figcaption>
+	<figcaption>0.2. Report view of the optimized parse.</figcaption>
 </figure>
 </p>
 
@@ -153,24 +155,25 @@ The report looks much better now:
 Only one full remember, and only 7 lightweight backtracks per character. 
 This is reasonably good for a grammar with bounded seas. 
 </p>
-<p class="note">Because of the nature of bounded seas and implementation of PetitParser2, we do not recommend to parse grammars with more complicated bounded seas without optimizations.</p>
+<p class="note">Because of the nature of bounded seas and nature of PetitParser2, we do not recommend to parse grammars with more complicated bounded seas without optimizations.</p>
 <section>
 <h3>Optimization in Detail</h3>
 <p>
 Let us inspect some of the optimizations that happened. 
-Let us try the Debug view:
+We switch to <em>Debug view</em>:
 </p>
 <p>
 
 <figure>
 	<img src="figures/optimized-debug.png" width="100%%"/>
-	<figcaption></figcaption>
+	<figcaption>Debug view of optimized parse</figcaption>
 </figure>
 </p>
 <p>
 We see that the total number of invoked parsers is 55144, roughly 30x less. 
-We also see that, as in the previous case, most of the parsers were invoked in the before-water of the initial sea, even though roughly 10x less. 
-But we can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively! 
+We also see that, as in the previous case, most of the parsers are invoked in the before-water of the initial sea, but it is roughly 10x better now. 
+We can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively.
+This is great, it was half of the total invocations in the case of unoptimized parse!
 </p>
 </section><section>
 <h3>Caches</h3>
@@ -179,13 +182,14 @@ But we can also notice that the following island and after water are parsed usin
 The main reason of reduced invocations is caching. 
 Under the <code>element</code> rule, there is a mapping node. 
 The mapping node returns the complete HTML element just in two invocations. 
-The fact that the result has been cached is visualized via the result reference. 
+The fact that the result has been cached is visualized via the result reference (see <code>DebugResultLink: reference</code>). 
 </p>
 
 <p>
-The reference indicates that at the time of that invocation the result has already been computed during some previous invocation. 
-The parser remembered it and it returned the result without invoking the parser again. 
-This is done by the <code>PP2Cache</code> strategy (you can see its profiling version in the screenshot). The cache has been added to the element during the optimization phase. 
+The reference indicates that at the time of the invocation the result has already been computed during some previous invocation. 
+The parser remembered the result and returned the remembered without invoking the parser again. 
+This work is done by the <code>PP2Cache</code> strategy (you can see its profiling version <code>PP2ProfilingCache</code> in the screenshot). 
+The cache has been added to the element during the optimization phase. 
 </p>
 <p>
 More about caches can be found in the <a href="caches.html">Caching chapter</a>.
@@ -201,13 +205,13 @@ The way specializations work can be demonstrated on the opening of an html eleme
 <a id="elOpenOptimized"></a>
 <figure>
 	<img src="figures/optimized-elOpen.png" width="100%%"/>
-	<figcaption>0.2. Optimized parse of <code>elOpen</code></figcaption>
+	<figcaption>0.3. Debug view of the <code>elOpen</code> rule optimized parse</figcaption>
 </figure>
 </p>
 <p>
-One can see that the <em>html</em> text has been recognized using only one invocation contrary to the six invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.1</a>).
+One can see that the <em>html</em> text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.1</a>).
 In the unoptimized case the <em>html</em> text was parsed using the <em>PossessiveRepeating</em> strategy.
-In the optimized case (see Figure <a href="#elOpenOptimized">0.2</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without underlying parser invocations hence is more efficient.
+In the optimized case (see Figure <a href="#elOpenOptimized">0.3</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without superfluous parser invocations hence is more efficient.
 </p>
 <p>
 The same thing happened with the mapping node. 
@@ -218,12 +222,13 @@ This can be implemented as a single while loop saving 252 parser invocations.
 </section></section><section>
 <h2>3. Conclusion</h2>
 <p>
-In this text we briefly described how inefficiencies of PEG-based parser combinators and we showed how can the <code>optimize</code> method fix most of these.
+Overall, PEG-based parser combinator parsers are great, they are easy to understand, easy to extend and easy to debug.
+But this all comes at the price of inefficiency. 
+Yet, the optimization capabilities of PetitParser can dramatically improve the performance while preserving all the other advantages.
 </p>
 <p>
-Unfortunatelly, not all the optimizations can be done automatically.
-You might have noticed that we described only three out of four different caches used in the PetitParser. 
-The last fourth cache is a bit special and we will dedicate a whole <a href="memoization.html">Memoization</a> chapter to it.
+Unfortunately, not all the optimizations can be done automatically.
+There is one kind of optimizations that has to be done manually and we dedicate a whole <a href="memoization.html">Memoization</a> chapter to it.
 </p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>
@@ -231,10 +236,10 @@ The last fourth cache is a bit special and we will dedicate a whole <a href="mem
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
 </p>
 <p>
-Part I, Basics:
+Part I, Developer's Workflow:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
-<li><a href="Chapters/../chapter2.html">From Script to Parser</a></li>
+<li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
 <li><a href="Chapters/../chapter3.html">Extracting the Structure</a></li>
 <li><a href="Chapters/../AST.html">Abstract Syntax Tree</a></li>
 <li><a href="Chapters/../optimizations.html">Optimizations</a></li>
@@ -252,6 +257,7 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
+
 </p></section></section></section>
       </section>
     </div>

@@ -42,12 +42,10 @@ The <a href="#toc">table of content</a> can be found at the end of the chapter.
 <h1>Extracting the Structure</h1>
 <a id="sec:structure"></a>
 <p>
-In the previous chapters we created a parser to extract javascript from HTML source.
-But our parser is rather simple. 
+In the <a href="chapter2.html">previous chapter</a> we created a parser to extract javascript from HTML source.
+Yet our parser is rather simple.
 It sees an input as a list of javascripts.
-In this part we extend the parser and we extract the HTML structure. 
-Again, we use bounded seas to ease our task.
-Bounded seas become handy when skipping a text in html elements and when recoverring from unclosed or malformed elements.
+In this part we extend the parser and we extract the HTML structure as well, thus we will obtain a tree of html elements and javascript.
 </p>
 
 
@@ -60,12 +58,12 @@ Elements of HTML has an interesting property: the name of an opening tag has to 
 Though natural for humans, this is, surprisingly, rather difficult task from the parsing theory point of view.
 </p>
 <p>
-Unfortunately, standard solutions do not fit well into the PetitParser. 
+Unfortunately, standard solutions do not really work as we would like to.
 We describe problem in more details in the supplementary <a href="../matchingTags.html">Matching Tags</a> chapter.
 </p>
 <p>
-PetitParser2 comes with a special syntax to express constrains of matching open and close tags.
-It can store a result of a rule (e.g. in the rule opening an html tag) onto a stack using the push operator and assert that the result of a rule (e.g. in the rule closing an html tag) matches the top of the stack using the match operator and finally pop the result using the pop operator (after an html tag is sucessfully recognized). 
+To fix the issue, PetitParser2 comes with a special syntax to express constrains of matching open and close tags.
+It can store a result of a rule (e.g. opening an html tag) onto a stack using the <code>push</code> operator and assert that a result of a rule (e.g. closing an html tag) matches the top of the stack using the <code>match</code> operator.
 </p>
 <p>
 Here is the concrete example:
@@ -98,13 +96,13 @@ In <code>elClose</code>, we first match the element name against the top of a st
 <p>
 Now we need to define <code>elContent</code> rule, which represents the content of an element. 
 <code>elContent</code> is zero or more repetitions of the following components in the given order: 
-</p><ol><li>a javascript code, </li>
-<li>another element or </li>
+</p><ol><li>a javascript code; </li>
+<li>another element; or </li>
 <li>an unknown text. </li>
 </ol>
 <p>
-We add javascript to the first position because it is <em>kind of</em> an element and therefore must be ordered first to take precedence. 
-The same goes for an element, it is also <em>kind of</em> a text. 
+Javascript is on the first position because it is <em>kind of</em> element<sup><a href="#footnote1">[1]</a></sup>and therefore must be ordered before an element rule. 
+The same holds for the element rule, it is also <em>kind of</em> text. 
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;elContent
 	^ (javascript / element / text nonEpsilon) star</code></pre><figcaption></figcaption></figure>
@@ -112,7 +110,7 @@ The same goes for an element, it is also <em>kind of</em> a text.
 
 <p>
 Text can be anything.
-Therefore, we define it as with the help of bounded seas:
+Therefore, we define it as with the help of bounded seas, concretely using the <code>starLazy</code> operator:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
 	^ #any starLazy</code></pre><figcaption></figcaption></figure>
@@ -121,20 +119,28 @@ Therefore, we define it as with the help of bounded seas:
 <section>
 <h3>Epsilon in Repetitions</h3>
 <p>
-Note, we mark text as <code>nonEpsilon</code>.
-<code>nonEpsilon</code> operator is an extension of PEGs that allows only for non-empty parses. 
-The reason for this is that <code>#any asPParser starLazy</code> can consume anything, even the empty string. 
-The star repetition of <code>elContent</code> would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+Note, we mark the <code>text</code> rule with <code>nonEpsilon</code>.
+The <code>nonEpsilon</code> operator is an extension of PEGs that forbids epsilon parses (in other words if the underlying parser does not consume any input, it fails).
+The reason for this is that <code>#any asPParser starLazy</code> can consume anything, even the empty string, because the <code>starLazy</code> operator allows for zero repetitions. 
 </p>
+<p class="todo">there might be possibility to define <code>plusLazy</code> as well.</p>
+<p>
+Without <code>nonEpsilon</code>, the star repetition of <code>elContent</code> would end up in an infinite loop recognizing an epsilon in each of its iterations, never failing, never stopping.
+You can easily freeze your image by running the following code (we recommend saving your image now):
+</p>
+<figure><pre><code class="smalltalk">&quot;Tip: save the image before running&quot;
+#any asPParser optional star parse: 'endless loop'</code></pre><figcaption></figcaption></figure>
+
 </section></section><section>
 <h2>3. Testing the Code</h2>
 <p>
-We have defined a lots of code. Let us try, if it works. 
+We have written a new code, let us try if it works. 
 We start with <code>text</code>:
 </p>
 
 <figure><pre><code class="smalltalk">WebGrammarTest&gt;&gt;testText
-	self parse: 'foobar' rule: #text</code></pre><figcaption></figcaption></figure>
+	self parse: 'foobar' rule: #text
+[PASS]</code></pre><figcaption></figcaption></figure>
 
 
 <p>
@@ -173,7 +179,7 @@ WebGrammarTest&gt;&gt;testElementMalformedUnclosed
 
 <p>
 So far it looks good. 
-But our tests are telling us only that element can parse the given input, it does not tell us how it parses the input. 
+But our tests are telling us only that element can parse the given input, it does not tell us <em>how</em> it parses the input. 
 We should assert that the proper element names and the right content is extracted. 
 </p>
 
@@ -187,7 +193,7 @@ We will do this in the <a href="AST.html">following chapter</a>.
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
 </p>
 <p>
-Part I, Basics:
+Part I, Developer's Workflow:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
 <li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
@@ -208,7 +214,11 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
+
 </p></section></section></section>
+<hr></hr>
+<sup id="footnote1">[1]  any javascript code can be recognized as an html element</sup><br/>
+
       </section>
     </div>
 
