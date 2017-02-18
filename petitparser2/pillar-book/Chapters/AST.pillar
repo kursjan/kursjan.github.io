@@ -1,19 +1,19 @@
 ${inputFile:Chapters/navigation.pillar}$
 
 !Create an Abstract Syntax Tree
-In the *previous chapter>chapter3.pillar* we tested that our grammar parses the nested elements,
-but we have very limited knowledge about how does the extracted structure look like.
-So let us improve improve the output from the parser and add some information.
+In the *previous chapter>chapter3.pillar* we tested our grammar to parse the nested elements,
+but we have very limited (none, I would say) knowledge about how does the extracted structure look like.
+So let us improve the output from the parser and add more information.
 
 The direct output of a parser is typically very detailed and not well-readable. 
 It is called concrete syntax tree (CST), which is (in the case of PetitParser) array of arrays of arrays of ... with characters and strings as terminals.
 
-It is the time to return a more convenient representation of the input: ''an abstract syntax tree'', in short AST. 
-Abstract syntax tree, contrary to the very low-level and detailed concrete syntax tree, is conceptually closer to the target domain. 
+It is the time to return a more convenient representation of the input: ''an abstract syntax tree'' (AST). 
+AST, contrary to the very low-level and detailed CST, is conceptually closer to the target domain. 
 In our case the domain should be some kind of a tree with html elements and javascript.
 
 
-It is considered to be a good practice in PetitParser to split grammar, which returns concrete syntax tree, from parser, which returns abstract syntax tree. 
+It is considered to be a good practice in PetitParser to split grammar, which returns CST, from parser, which returns AST. 
 We do this by subclassing ==WebGrammar==:
 
 [[[eval=true
@@ -31,7 +31,7 @@ stream
 
 Parsing is great use case for test driven development. 
 So let us start with tests first. 
-Tests give us a clear idea what kind of interface we expect from abstract syntax tree:
+Anyway, tests give us a clear idea what kind of interface we expect from abstract syntax tree:
 
 [[[eval=true
 | t |
@@ -89,7 +89,7 @@ If we want to pass these test, the result of a parse should be a tree consisting
 # an html element; and
 # a text.
 
-We define these nodes as follows, starting with its abstract predecessor ==WebElement==, which contains methods that ease our testing.
+We define these nodes as follows, starting with its abstract predecessor ==WebElement== with some convenience methods.
 
 [[[eval=true
 | t |
@@ -203,9 +203,21 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-@@note There is ==trimRight== in ==elOpen==, which means that only the whitespace on the right is trimmed. This makes caching of PetitParser slightly more efficient, because element always starts at the first non-whitespace character. If there is a trimming from left and right (using the ==trim==), it might start at any preceding whitespace or the first non-whitespace character and this would lead into lower cache-hit ratio.
+@@note There is ==trimRight== in ==elOpen==, which means that only the whitespace on the right is trimmed. This makes caching of PetitParser slightly more efficient, because element always starts at the first non-whitespace character. If there is a trimming from left and right (using the ==trim==), it might start at any preceding whitespace or the first non-whitespace character and this would lead into lower cache-hit ratio (we will talk about caches later).
 
 By this time all the tests should pass:
+
+[[[
+(WebGrammarTest buildSuiteFromMethods: #(
+	#testElement
+	#testElementEmpty
+	#testElementNested
+	#testElementMalformedUnclosed
+	#testElementMalformedExtraClose
+	#testElementMalformedWrongClose
+	#testJavascript
+	#testJavascriptWithString)) run
+]]]
 
 [[[eval=true
 | t |
@@ -228,7 +240,7 @@ stream
 !!Structured Document
 
 Now let us construct the whole HTML document.
-The pieces are already there, we just need to connect them.
+All the pieces we need are already ready we just need to put them together.
 
 In the previous chapters, we defined document (represented by the ==document== rule) in ==WebGrammar== as a repetition of javascript seas. 
 Now we define a structured document (==structuredDocument==), i.e. a document with an html structure. 
@@ -302,7 +314,24 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
+And we should 
+@@todo here ==start== method 
+
 By this time all the tests should pass:
+[[[
+(WebGrammarTest buildSuiteFromMethods: #(
+	#testElement
+	#testElementEmpty
+	#testElementNested
+	#testElementMalformedUnclosed
+	#testElementMalformedExtraClose
+	#testElementMalformedWrongClose
+	#testJavascript
+	#testJavascriptWithString
+	#testStructuredDocumentSimple
+	#testStructuredDocumentWithDoctype
+	#testStructuredDocument) run
+]]]
 [[[eval=true
 | t |
 t := PP2Tutorial new.
