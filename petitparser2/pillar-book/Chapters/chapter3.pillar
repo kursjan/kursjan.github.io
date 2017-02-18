@@ -160,3 +160,5 @@ We should assert that the proper element names and the right content is extracte
 
 It is the time to return a more convenient representation of the input: ''an abstract syntax tree''.
 We will do this in the *following chapter>AST.pillar*.
+
+${inputFile:Chapters/toc.pillar}$
