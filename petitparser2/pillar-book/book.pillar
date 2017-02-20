@@ -50,6 +50,27 @@ On a concrete example of a Smalltalk grammar, we describe how to develop a parse
 - *Specializations in Detail>../smalltalkOptimization.pillar*
 
 !!Getting Started
+
+
+!!!Installation
+The easiest way to start this tutorial is to use *Moose>http://moosetechnology.org*. 
+Moose is a software and data analysis platform that has everything we need already installed.
+
+Alternatively, you can download clean *Pharo 6>http://pharo.org* (or higher) image and install PetitParser2 using the following command:
+
+[[[
+Metacello new
+	baseline: 'PetitParser2';
+	repository: 'github://kursjan/petitparser2';
+   	load
+]]]
+
+In case nothing of the previous works, please *let us know>kurs.jan@gmail.com*. 
+%or use the following archive, wich contains Pharo images with loaded PetitParser and virutal machines for Linux, Mac and Windows to run the image.
+
+%@@todo create a loaded image.
+
+!!!Book Chapters
 The list of available chapters:
 - *Extracting Javascript>Chapters/chapter1.pillar*
 - *From a Script to a Parser>Chapters/chapter2.pillar*

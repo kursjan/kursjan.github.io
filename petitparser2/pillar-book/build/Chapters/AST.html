@@ -413,7 +413,7 @@ Furthermore we add to it the html element as well a its surroundings:
 <figure><pre><code class="smalltalk">WebParser&gt;&gt;structuredDocument
 	^ super structuredDocument
 	
-	map: [ :_bw :_document :_aw |
+	map: [ :_bw :_html :_aw |
 		| beforeWater afterWater |
 		beforeWater := UnknownText new
 			text: _bw;
@@ -425,13 +425,18 @@ Furthermore we add to it the html element as well a its surroundings:
 			
 		HtmlElement new
 			name: 'DOCUMENT';
-			children: (Array with: beforeWater with: _document with: afterWater);
+			children: (Array 
+				with: beforeWater 
+				with: _html 
+				with: afterWater);
 			yourself
 	]</code></pre><figcaption></figcaption></figure>
 
 <p>
-And we should 
-</p><p class="todo">here <code>start</code> method </p>
+And we should remember to change the <code>start</code> method. 
+</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;start
+	^ structuredDocument </code></pre><figcaption></figcaption></figure>
+
 <p>
 By this time all the tests should pass:
 </p><figure><pre><code class="smalltalk">(WebGrammarTest buildSuiteFromMethods: #(
@@ -492,25 +497,18 @@ In order to teach it what is an html comment, we have to define it:
 </p>
 
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;comment
-	^ '&lt;!--' asPParser, #any asPParser starLazy, '--&gt;' asPParser</code></pre><figcaption></figcaption></figure>
+	^ '&lt;!--' asPParser, any starLazy, '--&gt;' asPParser</code></pre><figcaption></figcaption></figure>
 
 <p>
 And now we can redefine <code>text</code> so that it takes comments into an account:
 </p>
 <figure><pre><code class="smalltalk">WebGrammar&gt;&gt;text
-	^ (comment / #any asPParser) starLazy</code></pre><figcaption></figcaption></figure>
+	^ (comment / any) starLazy</code></pre><figcaption></figcaption></figure>
 
 <p>
 If you are interested in the details of the <code>starLazy</code> operator, check out the <a href="starLazy.html">The <code>starLazy</code> Operator</a> chapter. 
 </p>
-<figure><pre><code class="smalltalk">(#epsilon asPParser)
-  waterToken: (comment / #any asPParser);
-  yourself	 </code></pre><figcaption></figcaption></figure>
 
-
-<p>
-Because now water knows what is a comment, it skips the complete comment including the <em>&lt;p&gt;</em> element inside.
-</p>
 
 <p>
 This is it, we can parse all of it!
@@ -520,7 +518,7 @@ This is it, we can parse all of it!
 <p>
 In this chapter we have applied the test-driven approach to define our AST nodes.
 We defined <code>WebParser</code>, which extends the <code>WebGrammar</code> and builds the AST nodes.
-Last but not least, we had a look how to avoid false positives caused by comments.
+Last but not least, we had a look how to avoid false positives caused by comments. 
 </p>
 
 
@@ -540,7 +538,10 @@ You can download the sources here:
 </ul>
 
 <p>
-The sources of this tutorial is also part of the PetitParser2 package, so you just need to install PetitParser or use Moose as described in the <a href="../book.html">Introduction</a>.
+The sources of this tutorial are part of the PetitParser2 package, you just need to install PetitParser or use Moose as described in the <a href="../book.html">Introduction</a>.
+</p>
+<p>
+In the following text we will show how to improve <a href="optimizations.html">performance</a> of our parser.
 </p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>

@@ -24,7 +24,7 @@ This will run the parser in a debug mode and collect a lot of useful information
 
 The total stream size is 1171 characters. 
 The parser has remembered the full context 510197 times and restored 387667 times. 
-This means that the full copy of the context (including the stack of opened elements) has been created 510197 times and the context has been restored from this full copy (by doing another copy) 387667 times. 
+This means that the full copy of the context (including the stack of opened elements, which we use to match open and close tags) has been created 510197 times and the context has been restored from this full copy (by doing another copy) 387667 times. 
 This is in average 331 backtrackings per consumed character. 
 
 
@@ -47,9 +47,9 @@ But our grammar is obviously not deterministic it does lots of speculations.
 Why are the numbers so bad in our case? 
 Let us inspect in more detail how this was happening, using the ''Debug view'':
 
-+Debug View of non-optimized parse.>figures/unoptimized-debug.png|width=100%+
++Debug View of non-optimized parse.>figures/unoptimized-debug.png|width=100%|label=unoptimizedDebug+
 
-The view shows us that 1502165 parsers were invoked to consume the input. 
+The view in Figure *@unoptimizedDebug* shows that 1502165 parsers were invoked to consume the input. 
 Most of it (751559 invocations) happened when parsing first two lines of the input --- the before water of the sea.
 
 This is too much for a short input. 
@@ -60,11 +60,11 @@ If the next parser happens to be another sea (as in the case of ==WebGrammar==),
 We see that the element rule took approximately one half of the invocations (750598). 
 Majority of 751559 invocations of before water were spent by testing for element. 
 
-Another glimpse of ineffectiveness can be seen in the ==elOpen== rule.
+Another glimpse of ineffectiveness can be seen in the ==elOpen== rule in Figure *@elOpenUnoptimized*.
 
 +Debug view of the ==elOpen== rule non-optimized parse.>figures/unoptimized-elOpen.png|width=100%|label=elOpenUnoptimized+
 
-You can see that the whole ''<html lang="html" dir="ltr" class="js-enabled">'' is parsed by invoking 272 parsers.
+The whole ''<html lang="html" dir="ltr" class="js-enabled">'' is parsed by invoking 272 parsers.
 This is quite a lot for a line with 55 characters.
 One of the reasons is how are the identifiers (==elementName==) parsed.
 You can see that when recognizing the ''html'' text, 8 different parsers are invoked; for each letter one and some extra boilerplate parsers (flattening, possessive repeating,...).
@@ -91,9 +91,9 @@ This is reasonably good for a grammar with bounded seas.
 Let us inspect some of the optimizations that happened. 
 We switch to ''Debug view'':
 
-+Debug view of optimized parse>figures/optimized-debug.png|width=100%+
++Debug view of optimized parse>figures/optimized-debug.png|width=100%|label=optimizedDebug+
 
-We see that the total number of invoked parsers is 55144, roughly 30x less. 
+The Figure *@optimizedDebug* shows that the total number of invoked parsers is 55144, roughly 30x less. 
 We also see that, as in the previous case, most of the parsers are invoked in the before-water of the initial sea, but it is roughly 10x better now. 
 We can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively.
 This is great, it was half of the total invocations in the case of unoptimized parse!
@@ -101,17 +101,21 @@ This is great, it was half of the total invocations in the case of unoptimized p
 !!!Caches
 
 The main reason of reduced invocations is caching. 
-Under the ==element== rule, there is a mapping node. 
-The mapping node returns the complete HTML element just in two invocations. 
+Under the ==element== rule in Figure *@optimizedDebug*, there is a mapping node. 
+The mapping node returns the complete HTML element just in one single invocation. 
 The fact that the result has been cached is visualized via the result reference (see ==DebugResultLink: reference==). 
 
 
 The reference indicates that at the time of the invocation the result has already been computed during some previous invocation. 
 The parser remembered the result and returned the remembered without invoking the parser again. 
-This work is done by the ==PP2Cache== strategy (you can see its profiling version ==PP2ProfilingCache== in the screenshot). 
+There is another mapping node as a child of the reference with 54746 underlying invocations.
+But as mentioned these have happened before and mapping node shows them just for the convenience.
+
+The caching is done by the ==PP2Cache== strategy (you can see its profiling version ==PP2ProfilingCache== in the screenshot). 
 The cache has been added to the element during the optimization phase. 
 
 More about caches can be found in the *Caching chapter>caches.pillar*.
+
 
 !!!Specializations
 

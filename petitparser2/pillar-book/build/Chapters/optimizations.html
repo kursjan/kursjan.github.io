@@ -68,7 +68,7 @@ This will run the parser in a debug mode and collect a lot of useful information
 <p>
 The total stream size is 1171 characters. 
 The parser has remembered the full context 510197 times and restored 387667 times. 
-This means that the full copy of the context (including the stack of opened elements) has been created 510197 times and the context has been restored from this full copy (by doing another copy) 387667 times. 
+This means that the full copy of the context (including the stack of opened elements, which we use to match open and close tags) has been created 510197 times and the context has been restored from this full copy (by doing another copy) 387667 times. 
 This is in average 331 backtrackings per consumed character. 
 </p>
 
@@ -97,14 +97,14 @@ Why are the numbers so bad in our case?
 Let us inspect in more detail how this was happening, using the <em>Debug view</em>:
 </p>
 <p>
-
+<a id="unoptimizedDebug"></a>
 <figure>
 	<img src="figures/unoptimized-debug.png" width="100%%"/>
-	<figcaption>Debug View of non-optimized parse.</figcaption>
+	<figcaption>0.1. Debug View of non-optimized parse.</figcaption>
 </figure>
 </p>
 <p>
-The view shows us that 1502165 parsers were invoked to consume the input. 
+The view in Figure <a href="#unoptimizedDebug">0.1</a> shows that 1502165 parsers were invoked to consume the input. 
 Most of it (751559 invocations) happened when parsing first two lines of the input --- the before water of the sea.
 </p>
 <p>
@@ -118,17 +118,17 @@ We see that the element rule took approximately one half of the invocations (750
 Majority of 751559 invocations of before water were spent by testing for element. 
 </p>
 <p>
-Another glimpse of ineffectiveness can be seen in the <code>elOpen</code> rule.
+Another glimpse of ineffectiveness can be seen in the <code>elOpen</code> rule in Figure <a href="#elOpenUnoptimized">0.2</a>.
 </p>
 <p>
 <a id="elOpenUnoptimized"></a>
 <figure>
 	<img src="figures/unoptimized-elOpen.png" width="100%%"/>
-	<figcaption>0.1. Debug view of the <code>elOpen</code> rule non-optimized parse.</figcaption>
+	<figcaption>0.2. Debug view of the <code>elOpen</code> rule non-optimized parse.</figcaption>
 </figure>
 </p>
 <p>
-You can see that the whole <em>&lt;html lang=&quot;html&quot; dir=&quot;ltr&quot; class=&quot;js-enabled&quot;&gt;</em> is parsed by invoking 272 parsers.
+The whole <em>&lt;html lang=&quot;html&quot; dir=&quot;ltr&quot; class=&quot;js-enabled&quot;&gt;</em> is parsed by invoking 272 parsers.
 This is quite a lot for a line with 55 characters.
 One of the reasons is how are the identifiers (<code>elementName</code>) parsed.
 You can see that when recognizing the <em>html</em> text, 8 different parsers are invoked; for each letter one and some extra boilerplate parsers (flattening, possessive repeating,...).
@@ -146,7 +146,7 @@ The report looks much better now:
 <a id=""></a>
 <figure>
 	<img src="figures/optimized-report.png" width="100%%"/>
-	<figcaption>0.2. Report view of the optimized parse.</figcaption>
+	<figcaption>0.3. Report view of the optimized parse.</figcaption>
 </figure>
 </p>
 
@@ -163,14 +163,14 @@ Let us inspect some of the optimizations that happened.
 We switch to <em>Debug view</em>:
 </p>
 <p>
-
+<a id="optimizedDebug"></a>
 <figure>
 	<img src="figures/optimized-debug.png" width="100%%"/>
-	<figcaption>Debug view of optimized parse</figcaption>
+	<figcaption>0.4. Debug view of optimized parse</figcaption>
 </figure>
 </p>
 <p>
-We see that the total number of invoked parsers is 55144, roughly 30x less. 
+The Figure <a href="#optimizedDebug">0.4</a> shows that the total number of invoked parsers is 55144, roughly 30x less. 
 We also see that, as in the previous case, most of the parsers are invoked in the before-water of the initial sea, but it is roughly 10x better now. 
 We can also notice that the following island and after water are parsed using only 2 and 4 parser invocations respectively.
 This is great, it was half of the total invocations in the case of unoptimized parse!
@@ -180,20 +180,25 @@ This is great, it was half of the total invocations in the case of unoptimized p
 
 <p>
 The main reason of reduced invocations is caching. 
-Under the <code>element</code> rule, there is a mapping node. 
-The mapping node returns the complete HTML element just in two invocations. 
+Under the <code>element</code> rule in Figure <a href="#optimizedDebug">0.4</a>, there is a mapping node. 
+The mapping node returns the complete HTML element just in one single invocation. 
 The fact that the result has been cached is visualized via the result reference (see <code>DebugResultLink: reference</code>). 
 </p>
 
 <p>
 The reference indicates that at the time of the invocation the result has already been computed during some previous invocation. 
 The parser remembered the result and returned the remembered without invoking the parser again. 
-This work is done by the <code>PP2Cache</code> strategy (you can see its profiling version <code>PP2ProfilingCache</code> in the screenshot). 
+There is another mapping node as a child of the reference with 54746 underlying invocations.
+But as mentioned these have happened before and mapping node shows them just for the convenience.
+</p>
+<p>
+The caching is done by the <code>PP2Cache</code> strategy (you can see its profiling version <code>PP2ProfilingCache</code> in the screenshot). 
 The cache has been added to the element during the optimization phase. 
 </p>
 <p>
 More about caches can be found in the <a href="caches.html">Caching chapter</a>.
 </p>
+
 </section><section>
 <h3>Specializations</h3>
 
@@ -205,13 +210,13 @@ The way specializations work can be demonstrated on the opening of an html eleme
 <a id="elOpenOptimized"></a>
 <figure>
 	<img src="figures/optimized-elOpen.png" width="100%%"/>
-	<figcaption>0.3. Debug view of the <code>elOpen</code> rule optimized parse</figcaption>
+	<figcaption>0.5. Debug view of the <code>elOpen</code> rule optimized parse</figcaption>
 </figure>
 </p>
 <p>
-One can see that the <em>html</em> text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.1</a>).
+One can see that the <em>html</em> text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.2</a>).
 In the unoptimized case the <em>html</em> text was parsed using the <em>PossessiveRepeating</em> strategy.
-In the optimized case (see Figure <a href="#elOpenOptimized">0.3</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without superfluous parser invocations hence is more efficient.
+In the optimized case (see Figure <a href="#elOpenOptimized">0.5</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without superfluous parser invocations hence is more efficient.
 </p>
 <p>
 The same thing happened with the mapping node. 
