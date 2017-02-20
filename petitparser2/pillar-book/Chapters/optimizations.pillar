@@ -111,11 +111,13 @@ The parser remembered the result and returned the remembered without invoking th
 There is another mapping node as a child of the reference with 54746 underlying invocations.
 But as mentioned these have happened before and mapping node shows them just for the convenience.
 
+@@todo this seems to be datailed...
 The caching is done by the ==PP2Cache== strategy (you can see its profiling version ==PP2ProfilingCache== in the screenshot). 
 The cache has been added to the element during the optimization phase. 
 
 More about caches can be found in the *Caching chapter>caches.pillar*.
 
+@@todo talk about parser strategies?
 
 !!!Specializations
 
