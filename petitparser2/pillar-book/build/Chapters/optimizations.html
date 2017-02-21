@@ -191,14 +191,8 @@ The parser remembered the result and returned the remembered without invoking th
 There is another mapping node as a child of the reference with 54746 underlying invocations.
 But as mentioned these have happened before and mapping node shows them just for the convenience.
 </p>
-<p class="todo">this seems to be datailed...</p><p>
-The caching is done by the <code>PP2Cache</code> strategy (you can see its profiling version <code>PP2ProfilingCache</code> in the screenshot). 
-The cache has been added to the element during the optimization phase. 
-</p>
-<p>
-More about caches can be found in the <a href="caches.html">Caching chapter</a>.
-</p>
-<p class="todo">talk about parser strategies?</p>
+
+<p class="note">More about caches can be found in the <a href="caches.html">Caching chapter</a>.</p>
 </section><section>
 <h3>Specializations</h3>
 
@@ -214,9 +208,13 @@ The way specializations work can be demonstrated on the opening of an html eleme
 </figure>
 </p>
 <p>
-One can see that the <em>html</em> text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.2</a>).
-In the unoptimized case the <em>html</em> text was parsed using the <em>PossessiveRepeating</em> strategy.
-In the optimized case (see Figure <a href="#elOpenOptimized">0.5</a>) the used strategy is <em>PlusPredicateObject</em>, which is implemented as a while loop without superfluous parser invocations hence is more efficient.
+One can see that the <em>html</em> text (the <code>elementName</code> rule) has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.2</a>).
+In the unoptimized case (see Figure <a href="#elOpenUnoptimized">0.2</a>) the <em>html</em> text was parsed so that one parser combinator was invoked for each of the characters.
+In the optimized case (see Figure <a href="#elOpenOptimized">0.5</a>) the whole <em>html</em> text was parsed by a single parser invocation.
+Internally, the parser is implemented as a while loop, which is much more efficient than multiple parser invocations.
+</p>
+<p>
+ 
 </p>
 <p>
 The same thing happened with the mapping node. 
@@ -227,13 +225,13 @@ This can be implemented as a single while loop saving 252 parser invocations.
 </section></section><section>
 <h2>3. Conclusion</h2>
 <p>
-Overall, PEG-based parser combinator parsers are great, they are easy to understand, easy to extend and easy to debug.
-But this all comes at the price of inefficiency. 
-Yet, the optimization capabilities of PetitParser can dramatically improve the performance while preserving all the other advantages.
+In general, PEG-based parser combinator parsers (such as PetitParser) are popular because they are easy to understand, easy to extend and easy to debug.
+But these advantages come at the price of low efficiency. 
+In order to target this problem, PetitParser comes with the optimizations, which can dramatically improve the efficiency while preserving all the other advantages.
 </p>
 <p>
-Unfortunately, not all the optimizations can be done automatically.
-There is one kind of optimizations that has to be done manually and we dedicate a whole <a href="memoization.html">Memoization</a> chapter to it.
+Yet, some of these optimizations cannot be done automatically.
+There a kind of optimizations that has to be done manually and we dedicate the following <a href="memoization.html">Memoization</a> chapter to it.
 </p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>

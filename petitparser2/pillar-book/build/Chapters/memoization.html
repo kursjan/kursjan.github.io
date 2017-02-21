@@ -59,14 +59,14 @@ sources collect: [ :s |
 <p>
 Unfortunately, this still takes too much time even though we applied the automated optimizations. 
 Can we do something, that the optimizations can't? 
-Usually, hard to say, but in this case, we can.
+Usually, hard to say. 
+It depends on the nature of a grammar and input to be parsed.
+But in this case, we can really improve the performance. (obviously, we wouldn't write this chapter otherwise).
 </p>
 <p>
-It is a good time to check the events morph of a debug result. Events morph shows timeline of parser invocations (dot) at a given position (x axis) in a given time (y axis).
-</p>
-
-<p>
-Inspect a result of the following command again:
+It is a good time to check the events morph of a debug result. 
+Events morph shows timeline of parser invocations (dot) at a given position (x axis) in a given time (y axis).
+Inspect the result of the following command again and switch to 'Events'' view.
 </p>
 <figure><pre><code class="smalltalk">WebParser new optimize debug: input.</code></pre><figcaption></figcaption></figure>
 
@@ -78,25 +78,21 @@ Inspect a result of the following command again:
 	<figcaption></figcaption>
 </figure>
 </p>
-
 <p>
-On a screenshot we see only a part of the story, because we don't have such a high window.
-Anyhow, the story is that parsing progress pretty fast towards the end of input. 
-This is the good part. 
-But when scrolling down, one can notice that at some point, parser backtracks and returns to the beginning. 
-Over and over again.
-And this is the bad part.
+On a screenshot we see only a part of the story (the part that fits into a window).
+The whole story is that parsing progress pretty fast towards the end of input (this is the good part),  but later one can notice (when scrolling down) that parser jumps to the beginning of input and starts again. 
+Over and over again (this is the bad part).
 </p>
-
+<p class="note">Please not that for long inputs the <em>Event</em> tab shows only a beginning of the input and first few thousands of invocations.</p>
 <p>
-Even though optimizations in PetitParser2 work reasonably good, not all of them can be applied automatically. 
+Even though optimizations in PetitParser2 work reasonably well, not all of them can be applied automatically. 
 Some grammars do a lot of backtracking and automated optimizations can reduce only part of it.
 If I ask you why is the backtracking happening you would probably have a hard time to figure this out<sup><a href="#footnote1">[1]</a></sup>.
 So does have the code trying to apply the optimizations, so we have to do this manually.
 </p>
 
 <p>
-Luckily, there are tools to help you. 
+Luckily, there are tools to help us. 
 For convenience of visualization, we use compact and simplified input.
 </p>
 <figure><pre><code class="smalltalk">compact := '
@@ -125,9 +121,9 @@ WebParser new optimize debug: compact.</code></pre><figcaption></figcaption></fi
 
 
 <p>
-In the events morph we see how is the parser backtracking, over and over. 
-We have to play a bit of detective to figure out when and why. 
-Let us navigate through the parsing until the HTML body (represented by the <code>b</code> element in the <code>compact</code> input) is parsed:
+In the events morph we see how does the parser backtrack, over and over. 
+We have to do a bit of detective work to figure out when and why. 
+Let us navigate through the parsing until the HTML body (represented by the <code>b</code> element in the <em>compact</em> input) is parsed:
 </p>
 
 
@@ -152,8 +148,8 @@ Now switch to the traces tab:
 
 
 <p>
-The yellow rectangle highlights 872 underlying invocations of the element rule. 
-The dark red rectangle highlights another invocations of the same element rule that started at the same position. 
+The yellow rectangle highlights 872 underlying invocations of the <code>element</code> rule. 
+The dark red rectangle highlights another invocations of the same <code>element</code> rule that started at the same position. 
 And we see there are quite a few of them. 
 In general, one does not want to see repeating dark-red rectangles, and the more of them or the higher these dark-red rectangles are, the worse. 
 It simply means redundant computations. 
@@ -162,7 +158,7 @@ Remember, each pixel on the y-axis is a parser innvocation.
 
 <p>
 Why do these redundant invocations happen? 
-Because of the unclosed HTML <code>meta</code> elements (represented by <code>m</code> in the <code>compact</code> input). 
+Because of the unclosed HTML <code>meta</code> elements (represented by <code>m</code> in the <em>compact</em> input). 
 The parser sees meta, starts an element, parses the content of meta, including the body element. 
 But it does not find the closing meta. 
 So it returns before the meta element, skips the meta part as a water and continues parsing. 
@@ -274,7 +270,7 @@ The image with the VMs for Linux, Mac OS and Windows can be found here:
 This text is part of the <a href="Chapters/../../book.html">Parsing With PetitParser2</a> series.
 </p>
 <p>
-Part I, Basics:
+Part I, Developer's Workflow:
 </p><ul>
 <li><a href="Chapters/../chapter1.html">Extracting Javascript</a></li>
 <li><a href="Chapters/../chapter2.html">From a Script to a Parser</a></li>
@@ -295,6 +291,7 @@ Part II, Advanced Topics:
 
 <p>
 Go to <a href="#top">top</a>.
+
 </p></section></section></section></section>
 <hr></hr>
 <sup id="footnote1">[1]  actually, it was not easy for the author of this text to pinpoint the root cause as well</sup><br/>

@@ -111,13 +111,11 @@ The parser remembered the result and returned the remembered without invoking th
 There is another mapping node as a child of the reference with 54746 underlying invocations.
 But as mentioned these have happened before and mapping node shows them just for the convenience.
 
-@@todo this seems to be datailed...
-The caching is done by the ==PP2Cache== strategy (you can see its profiling version ==PP2ProfilingCache== in the screenshot). 
-The cache has been added to the element during the optimization phase. 
+%@@todo this seems to be datailed...
+%The caching is done by the ==PP2Cache== strategy (you can see its profiling version ==PP2ProfilingCache== in the screenshot).  
+%The cache has been added to the element during the optimization phase. 
 
-More about caches can be found in the *Caching chapter>caches.pillar*.
-
-@@todo talk about parser strategies?
+@@note More about caches can be found in the *Caching chapter>caches.pillar*.
 
 !!!Specializations
 
@@ -126,9 +124,14 @@ The way specializations work can be demonstrated on the opening of an html eleme
 
 +Debug view of the ==elOpen== rule optimized parse>figures/optimized-elOpen.png|width=100%|label=elOpenOptimized+
 
-One can see that the ''html'' text has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
-In the unoptimized case the ''html'' text was parsed using the ''PossessiveRepeating'' strategy.
-In the optimized case (see Figure *@elOpenOptimized*) the used strategy is ''PlusPredicateObject'', which is implemented as a while loop without superfluous parser invocations hence is more efficient.
+One can see that the ''html'' text (the ==elementName== rule) has been recognized using only three invocation contrary to the eight invocations in the unoptimized case (see Figure *@elOpenUnoptimized*).
+In the unoptimized case (see Figure *@elOpenUnoptimized*) the ''html'' text was parsed so that one parser combinator was invoked for each of the characters.
+In the optimized case (see Figure *@elOpenOptimized*) the whole ''html'' text was parsed by a single parser invocation.
+Internally, the parser is implemented as a while loop, which is much more efficient than multiple parser invocations.
+
+ 
+%In the unoptimized case the ''html'' text was parsed using the ''PossessiveRepeating'' strategy.
+%In the optimized case (see Figure *@elOpenOptimized*) the used strategy is ''PlusPredicateObject'', which is implemented as a while loop without superfluous parser invocations hence is more efficient.
 
 The same thing happened with the mapping node. 
 The specializations recognized an ''any-star-lazy'' pattern, which, in this case, means to consume any character until end of the tag ==>== appears.
@@ -137,11 +140,11 @@ This can be implemented as a single while loop saving 252 parser invocations.
 @@todo More details about specializations are provided in the *Smalltalk Parser>smalltalkOptimizations.pillar* chapter.
 
 !!Conclusion
-Overall, PEG-based parser combinator parsers are great, they are easy to understand, easy to extend and easy to debug.
-But this all comes at the price of inefficiency. 
-Yet, the optimization capabilities of PetitParser can dramatically improve the performance while preserving all the other advantages.
+In general, PEG-based parser combinator parsers (such as PetitParser) are popular because they are easy to understand, easy to extend and easy to debug.
+But these advantages come at the price of low efficiency. 
+In order to target this problem, PetitParser comes with the optimizations, which can dramatically improve the efficiency while preserving all the other advantages.
 
-Unfortunately, not all the optimizations can be done automatically.
-There is one kind of optimizations that has to be done manually and we dedicate a whole *Memoization>memoization.pillar* chapter to it.
+Yet, some of these optimizations cannot be done automatically.
+There a kind of optimizations that has to be done manually and we dedicate the following *Memoization>memoization.pillar* chapter to it.
 
 ${inputFile:Chapters/toc.pillar}$
