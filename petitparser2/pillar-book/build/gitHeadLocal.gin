@@ -1,17 +1,17 @@
 \usepackage[%
-        shash={5f2f23d},
-        lhash={5f2f23dc7e823e4d1857063760b8c946ec47b10a},
+        shash={f8df4ea},
+        lhash={f8df4ea4b95fb9700f6278584676a46f39194cb8},
         authname={Jan Kurs},
         authemail={kurs.jan@gmail.com},
-        authsdate={2017-02-21},
-        authidate={2017-02-21 07:52:35 +0100},
-        authudate={1487659955},
+        authsdate={2017-02-22},
+        authidate={2017-02-22 07:56:21 +0100},
+        authudate={1487746581},
         commname={Jan Kurs},
         commemail={kurs.jan@gmail.com},
-        commsdate={2017-02-21},
-        commidate={2017-02-21 07:52:35 +0100},
-        commudate={1487659955},
+        commsdate={2017-02-22},
+        commidate={2017-02-22 07:56:21 +0100},
+        commudate={1487746581},
         refnames={ (HEAD -> master, origin/master, origin/HEAD)},
-        firsttagdescribe={5f2f23d-*},
-        reltag={5f2f23d-*}
+        firsttagdescribe={f8df4ea-*},
+        reltag={f8df4ea-*}
     ]{gitexinfo}

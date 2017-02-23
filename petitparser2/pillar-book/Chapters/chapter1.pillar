@@ -6,24 +6,6 @@ ${inputFile:Chapters/navigation.pillar}$
 In this chapter we extract javascript from html files using a simple script.
 We create the real parser *later>chapter2.pillar*.
 
-!!!Installation
-The easiest way to start this tutorial is to use *Moose>http://moosetechnology.org*. 
-Moose is a software and data analysis platform that has everything we need already installed.
-
-Alternatively, you can download clean *Pharo 6>http://pharo.org* (or higher) image and install PetitParser2 using the following command:
-
-[[[
-Metacello new
-	baseline: 'PetitParser2';
-	repository: 'github://kursjan/petitparser2';
-   	load
-]]]
-
-In case nothing of the previous works, please *let us know>kurs.jan@gmail.com*. 
-%or use the following archive, wich contains Pharo images with loaded PetitParser and virutal machines for Linux, Mac and Windows to run the image.
-
-%@@todo create a loaded image.
-
 !!!Hands On
 Open your playground and let's start coding. 
 First of all, we define what we want to parse:

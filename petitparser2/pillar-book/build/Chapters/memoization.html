@@ -219,27 +219,28 @@ sources collect: [ :s |
 </section><section>
 <h2>3. Conclusion</h2>
 <p>
-This is the last chapter about the html parser.
-We started with a prototype in the playground in the <a href="chapter1.html">first chapter</a> and end up with a full-fledged and tested parser that is able to parse real sources and that is tolerant to malformed inputs. 
+This is the last chapter of extracting Javascript from HTML sources.
+We started with a prototype in the playground in the <a href="chapter1.html">first chapter</a> and end up with a full-fledged and tested parser returning html structure, parsing real sources and tolerating malformed inputs. 
 </p>
 <p>
-In each step, we wrote only a code that describes what we are interested in
-and we got feedback from the early stages of the development.
-This is in contrast with a traditional parser development, where a grammar implementor has to specify most or a complete grammar before obtaining useful results.
+While specifying the grammar, we wrote only rules that describe the interesting input, we ignored the rest. 
+This way we got feedback about our parser from the early stages of development.
+This is in contrast with a traditional parser development, where a grammar engineer has to specify most or a complete grammar before she obtains useful results.
 </p>
 <p>
-PetitParser allows a grammar implementor to use such a agile approach to parsing thanks to 
-(i) bounded seas, which allows for the tolerant parsing, and (ii) automated optimizations, which significantly improve performance of a removing the burden from the grammar implementor.
+PetitParser allows a grammar engineer to use an agile approach.
+This is thanks to (i) bounded seas, which allows for the tolerant parsing, and (ii) automated optimizations, which significantly improve performance of a removing the burden from the grammar engineer.
 </p>
 <section>
 <h3>Suggestions and ideas?</h3>
 <p>
 The parser we implemented has a reasonable performance considering the simplicity of the grammar and effort we put into specifying it.
 Of course, PetitParser allows you to specify even faster parser, but at a cost of higher implementation effort.
-We discuss optimizations of a high-performance grammar on the concrete example of a <a href="smalltalkOptimizations.html">Smalltalk grammar</a> which can reach the performance of a hand-written parser.
+We discuss optimizations of a high-performance grammar on the concrete example of the <a href="smalltalkOptimizations.html">Smalltalk grammar</a>.
+The Smalltalk grammar reaches performance better than a table-driven approach and is comparable to a performance of a hand-written parser.
 </p>
 <p>
-If you know how to improve the performance even more, please share the ideas or contribute!
+Nevertheless, If you have an ideas how to improve performance even more, please contact us orcontribute!
 </p>
 </section><section>
 <h3>Sources</h3>
@@ -257,11 +258,8 @@ The sources of the html parser can be found here:
 </ul>
 
 <p>
-The source for this tutorial is also part of the PetitParser2 package.
+The sources used to generate this tutorial are part of the PetitParser2 package.
 </p>
-<p>
-The image with the VMs for Linux, Mac OS and Windows can be found here:
-</p><p class="todo">image</p>
 <a id="toc"></a><section>
 <h1>Table of Contents</h1>
 <p>
@@ -278,15 +276,10 @@ Part I, Developer's Workflow:
 <li><a href="Chapters/../memoization.html">Memoization</a></li>
 </ul>
 
-<p>
-Part II, Advanced Topics:
-</p><ul>
-<li><a href="Chapters/../starLazy.html">The <code>starLazy</code> Operator</a></li>
-<li><a href="Chapters/../matchingTags.html">Matching Tags</a></li>
-<li><a href="Chapters/../smalltalkOptimization.html">Specializations in Detail</a></li>
-<li><a href="Chapters/../caches.html">Caches in Detail</a></li>
-</ul>
 
+<p>
+Do you have ideas, suggestions or issues? Write us an <a href="mailto:kurs.jan@gmail.com">email</a>, or contact u on <a href="Chapters/github.com/kursjan/petitparser2/issues">github</a>!
+</p>
 <p>
 Go to <a href="#top">top</a>.
 

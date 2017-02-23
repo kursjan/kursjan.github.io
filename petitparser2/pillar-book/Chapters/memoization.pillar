@@ -155,22 +155,23 @@ sources collect: [ :s |
 ]]]
 
 !!Conclusion
-This is the last chapter about the html parser.
-We started with a prototype in the playground in the *first chapter>chapter1.pillar* and end up with a full-fledged and tested parser that is able to parse real sources and that is tolerant to malformed inputs. 
+This is the last chapter of extracting Javascript from HTML sources.
+We started with a prototype in the playground in the *first chapter>chapter1.pillar* and end up with a full-fledged and tested parser returning html structure, parsing real sources and tolerating malformed inputs. 
 
-In each step, we wrote only a code that describes what we are interested in
-and we got feedback from the early stages of the development.
-This is in contrast with a traditional parser development, where a grammar implementor has to specify most or a complete grammar before obtaining useful results.
+While specifying the grammar, we wrote only rules that describe the interesting input, we ignored the rest. 
+This way we got feedback about our parser from the early stages of development.
+This is in contrast with a traditional parser development, where a grammar engineer has to specify most or a complete grammar before she obtains useful results.
 
-PetitParser allows a grammar implementor to use such a agile approach to parsing thanks to 
-(i) bounded seas, which allows for the tolerant parsing, and (ii) automated optimizations, which significantly improve performance of a removing the burden from the grammar implementor.
+PetitParser allows a grammar engineer to use an agile approach.
+This is thanks to (i) bounded seas, which allows for the tolerant parsing, and (ii) automated optimizations, which significantly improve performance of a removing the burden from the grammar engineer.
 
 !!!Suggestions and ideas?
 The parser we implemented has a reasonable performance considering the simplicity of the grammar and effort we put into specifying it.
 Of course, PetitParser allows you to specify even faster parser, but at a cost of higher implementation effort.
-We discuss optimizations of a high-performance grammar on the concrete example of a *Smalltalk grammar>smalltalkOptimizations.pillar* which can reach the performance of a hand-written parser.
+We discuss optimizations of a high-performance grammar on the concrete example of the *Smalltalk grammar>smalltalkOptimizations.pillar*.
+The Smalltalk grammar reaches performance better than a table-driven approach and is comparable to a performance of a hand-written parser.
 
-If you know how to improve the performance even more, please share the ideas or contribute!
+Nevertheless, If you have an ideas how to improve performance even more, please contact us orcontribute!
 
 !!!Sources
 The sources of the html parser can be found here: 
@@ -183,9 +184,6 @@ The sources of the html parser can be found here:
 - *==HtmlElement==>../HtmlElement.st*
 - *==UnknownText==>../UnknownText.st*
 
-The source for this tutorial is also part of the PetitParser2 package.
-
-The image with the VMs for Linux, Mac OS and Windows can be found here:
-@@todo image
+The sources used to generate this tutorial are part of the PetitParser2 package.
 
 ${inputFile:Chapters/toc.pillar}$
