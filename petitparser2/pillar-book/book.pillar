@@ -81,7 +81,7 @@ The list of available chapters:
 @@note Part two is not yet finished
 If you are interested in more details:
 - *The ==starLazy== operator>Chapters/starLazy.pillar*
-- *Matching Tags>Chapters>matchingTags.pillar* (context-sensitive parsing)
+- *Matching Tags>Chapters/matchingTags.pillar* (context-sensitive parsing)
 - *Specializations in Detail>specializations.pillar*
 - *Caches in Detail>caches.pillar*
 
