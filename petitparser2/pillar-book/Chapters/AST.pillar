@@ -314,8 +314,15 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-And we should 
-@@todo here ==start== method 
+And we should not forget to change the ==start== method:
+[[[eval=true
+t := PP2Tutorial new.
+stream 
+	nextPutAll: '[[['; lf;
+	nextPutAll: (t sourceFor: #start in: WebGrammar); lf;
+	lf;
+	nextPutAll: ']]]'
+]]]
 
 By this time all the tests should pass:
 [[[

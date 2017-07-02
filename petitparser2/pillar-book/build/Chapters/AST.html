@@ -430,8 +430,10 @@ Furthermore we add to it the html element as well a its surroundings:
 	]</code></pre><figcaption></figcaption></figure>
 
 <p>
-And we should 
-</p><p class="todo">here <code>start</code> method </p>
+And we should not forget to change the <code>start</code> method:
+</p><figure><pre><code class="smalltalk">WebGrammar&gt;&gt;start
+	^ structuredDocument </code></pre><figcaption></figcaption></figure>
+
 <p>
 By this time all the tests should pass:
 </p><figure><pre><code class="smalltalk">(WebGrammarTest buildSuiteFromMethods: #(
