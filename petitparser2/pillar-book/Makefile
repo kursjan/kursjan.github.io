@@ -6,6 +6,7 @@ CHAPTERS = \
 	Chapters/optimizations \
 	Chapters/memoization \
 	Chapters/matchingTags \
+	Chapters/context \
 	Chapters/AST \
 	Chapters/caches \
 	Chapters/starLazy \

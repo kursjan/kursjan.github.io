@@ -314,7 +314,7 @@ stream
 	nextPutAll: ']]]'
 ]]]
 
-And we should not forget to change the ==start== method:
+And we should remember to change the ==start== method. 
 [[[eval=true
 t := PP2Tutorial new.
 stream 
@@ -410,14 +410,14 @@ t printAsCode: (t sourceFor: #text in: WebGrammar) stream: stream.
 
 If you are interested in the details of the ==starLazy== operator, check out the *The ==starLazy== Operator>starLazy.pillar* chapter. 
 
-[[[
-(#epsilon asPParser)
-  waterToken: (comment / #any asPParser);
-  yourself	 
-]]]
-
-
-Because now water knows what is a comment, it skips the complete comment including the ''<p>'' element inside.
+%[[[
+%(#epsilon asPParser)
+%  waterToken: (comment / #any asPParser);
+%  yourself	 
+%]]]
+%
+%
+%Because now water knows what is a comment, it skips the complete comment including the ''<p>'' element inside.
 
 
 This is it, we can parse all of it!
@@ -425,7 +425,7 @@ This is it, we can parse all of it!
 !!Conclusion 
 In this chapter we have applied the test-driven approach to define our AST nodes.
 We defined ==WebParser==, which extends the ==WebGrammar== and builds the AST nodes.
-Last but not least, we had a look how to avoid false positives caused by comments.
+Last but not least, we had a look how to avoid false positives caused by comments. 
 
 
 [[[eval=true
@@ -450,6 +450,8 @@ You can download the sources here:
 - *==HtmlElement==>../HtmlElement.st*
 - *==UnknownText==>../UnknownText.st*
 
-The sources of this tutorial is also part of the PetitParser2 package, so you just need to install PetitParser or use Moose as described in the *Introduction>../book.pillar*.
+The sources of this tutorial are part of the PetitParser2 package, you just need to install PetitParser or use Moose as described in the *Introduction>../book.pillar*.
+
+In the following text we will show how to improve *performance>optimizations.pillar* of our parser.
 
 ${inputFile:Chapters/toc.pillar}$

@@ -5,21 +5,20 @@ In this series we describe *PetitParser2>https://github.com/kursjan/petitparser2
 !!Structure
 
 The text is organized into two parts, the first part covers the basic developer's workflow with PetitParser.
-It is suitable for anyone who has a bit of experience with PetitParser and would like to learn more.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to understand PetitParser more or would like to extend PetitParser to better fit their needs.
+It is suitable for anyone who has a bit of experience with PetitParser and would like to learn how to efficiently develop production quality parsers with PetitParser.
+The second part covers advanced topics and inspects internals of PettiParser into more depth.It is for those who would like to fully levereage capatbilities of PetitParser to better fit their needs.
 
 !!!Prerequsities
 This text expects a basic knowledge of parsing with PetitParser.
 If you are not sure, if you have the required level of knoledge, we recommend the *Writing Parser with PetitParser>https://www.lukas-renggli.ch/blog/petitparser-1* from Lukas Renggli and *Introduction to PetitParser2>http://www.humane-assessment.com/blog/introducing-petitparser2/* by Tudor Girba.
 Optionally, there is a dedicated *PetitParser chapter>http://scg.unibe.ch/archive/papers/Kurs13a-PetitParser.pdf* in the *Deep into Pharo>http://www.deepintopharo.com/* book.
 
- 
 
 !!!Part I, Developer's Workflow
-In the first part, basics, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
+In the first part, developer's workflow, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
 
 We start by prototyping in a playground and throughout several steps we reach a full-fledged and tested parser that effectively builds a structured representation of the parsed source. 
-During the tutorial, we will cover many topics, some of them are well-known in the area of parsing. 
+During the tutorial, we cover many topics, some of them are well-known in the area of parsing. 
 Nevertheless, the following ones are unique to PetitParser:
 # We utilize bounded seas \-\-\- a technology that allows a programmer to focus on the interesting parts of an input (i.e. Javascript code in our case) and ignore the rest (i.e. the remaining HTML code).
 # We utilize context-sensitive rules that will allow us to properly (and formally!) detect matching begin and end HTML tags and recover from malformed inputs.
@@ -35,9 +34,9 @@ and in *Memoizations>Chapters/memoization.pillar* we describe tooling of PetitPa
 
 !!!Part II, Advanced Topics
 In the second part we describe advanced topics or get into the details of the topics we mentioned in the first part.
-For example, we provide more details to context-sensitive parsing, optimizations with caches and specializations, we show how to parse streams or how to efficiently highlight text.${footnote: useful especially for text editors}$
+For example, we provide more details to context-sensitive parsing, optimizations with caches and specializations, we show how to parse streams or how to efficiently highlight text (Especially useful for text editors).
 
-On a concrete example of a Smalltalk grammar, we describe how to develop a parser whose performance is comparable to a table-driven parsers such as *SmaCC>https://github.com/ThierryGoubier/SmaCC* or hand-written parsers such as RBParser.${footnote: parser used in Pharo compiler}$
+On a concrete example of a Smalltalk grammar, we describe how to develop a parser whose performance is comparable to a table-driven parsers such as *SmaCC>https://github.com/ThierryGoubier/SmaCC* or hand-written parsers such as RBParser (a parser used by Pharo compiler).
 
 @@todo add some graphs?
 
@@ -50,6 +49,27 @@ On a concrete example of a Smalltalk grammar, we describe how to develop a parse
 - *Specializations in Detail>../smalltalkOptimization.pillar*
 
 !!Getting Started
+
+
+!!!Installation
+The easiest way to start this tutorial is to use *Moose>http://moosetechnology.org*. 
+Moose is a software and data analysis platform that has everything we need already installed.
+
+Alternatively, you can download clean *Pharo 6>http://pharo.org* (or higher) image and install PetitParser2 using the following command:
+
+[[[
+Metacello new
+	baseline: 'PetitParser2';
+	repository: 'github://kursjan/petitparser2';
+   	load
+]]]
+
+In case nothing of the previous works, please *let us know>kurs.jan@gmail.com*. 
+%or use the following archive, wich contains Pharo images with loaded PetitParser and virutal machines for Linux, Mac and Windows to run the image.
+
+%@@todo create a loaded image.
+
+!!!Book Chapters
 The list of available chapters:
 - *Extracting Javascript>Chapters/chapter1.pillar*
 - *From a Script to a Parser>Chapters/chapter2.pillar*
@@ -58,17 +78,20 @@ The list of available chapters:
 - *Optimizations>Chapters/optimization.pillar*
 - *Memoization>Chapters/memoization.pillar*
 
+@@note Part two is not yet finished
 If you are interested in more details:
 - *The ==starLazy== operator>Chapters/starLazy.pillar*
-- *Matching Tags>Chapters>matchingTags.pillar* (context-sensitive parsing)
+- *Matching Tags>Chapters/matchingTags.pillar* (context-sensitive parsing)
 - *Specializations in Detail>specializations.pillar*
 - *Caches in Detail>caches.pillar*
 
 !!Changelog
 @changelog
 
-''2017-01-19'' - First draft of he Part I
+''2017-02-21'' - First draft of he Developer's workflow 
 
 !!License
 The text is released under the *MIT license>LICENSE.pillar*.
 
+!!Contact
+Do you have ideas, suggestions or issues? Write us an *email>kurs.jan@gmail.com*, or contact us on *github>github.com/kursjan/petitparser2/issues*!

@@ -41,8 +41,8 @@ In this series we describe <a href="https://github.com/kursjan/petitparser2">Pet
 
 <p>
 The text is organized into two parts, the first part covers the basic developer's workflow with PetitParser.
-It is suitable for anyone who has a bit of experience with PetitParser and would like to learn more.
-The second part covers advanced topics and is for those who already use PetitParser and who would like to understand PetitParser more or would like to extend PetitParser to better fit their needs.
+It is suitable for anyone who has a bit of experience with PetitParser and would like to learn how to efficiently develop production quality parsers with PetitParser.
+The second part covers advanced topics and inspects internals of PettiParser into more depth.It is for those who would like to fully levereage capatbilities of PetitParser to better fit their needs.
 </p>
 <section>
 <h3>Prerequsities</h3>
@@ -51,17 +51,15 @@ This text expects a basic knowledge of parsing with PetitParser.
 If you are not sure, if you have the required level of knoledge, we recommend the <a href="https://www.lukas-renggli.ch/blog/petitparser-1">Writing Parser with PetitParser</a> from Lukas Renggli and <a href="http://www.humane-assessment.com/blog/introducing-petitparser2/">Introduction to PetitParser2</a> by Tudor Girba.
 Optionally, there is a dedicated <a href="http://scg.unibe.ch/archive/papers/Kurs13a-PetitParser.pdf">PetitParser chapter</a> in the <a href="http://www.deepintopharo.com/">Deep into Pharo</a> book.
 </p>
-<p>
- 
-</p>
+
 </section><section>
 <h3>Part I, Developer's Workflow</h3>
 <p>
-In the first part, basics, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
+In the first part, developer's workflow, we demonstrate how to quickly build a high-performance parser on the concrete example of extracting a Javascript code from any HTML source (including malformed ones).
 </p>
 <p>
 We start by prototyping in a playground and throughout several steps we reach a full-fledged and tested parser that effectively builds a structured representation of the parsed source. 
-During the tutorial, we will cover many topics, some of them are well-known in the area of parsing. 
+During the tutorial, we cover many topics, some of them are well-known in the area of parsing. 
 Nevertheless, the following ones are unique to PetitParser:
 </p><ol><li>We utilize bounded seas --- a technology that allows a programmer to focus on the interesting parts of an input (i.e. Javascript code in our case) and ignore the rest (i.e. the remaining HTML code).</li>
 <li>We utilize context-sensitive rules that will allow us to properly (and formally!) detect matching begin and end HTML tags and recover from malformed inputs.</li>
@@ -82,10 +80,10 @@ and in <a href="Chapters/memoization.html">Memoizations</a> we describe tooling 
 <h3>Part II, Advanced Topics</h3>
 <p>
 In the second part we describe advanced topics or get into the details of the topics we mentioned in the first part.
-For example, we provide more details to context-sensitive parsing, optimizations with caches and specializations, we show how to parse streams or how to efficiently highlight text.<sup><a href="#footnote1">[1]</a></sup>
+For example, we provide more details to context-sensitive parsing, optimizations with caches and specializations, we show how to parse streams or how to efficiently highlight text (Especially useful for text editors).
 </p>
 <p>
-On a concrete example of a Smalltalk grammar, we describe how to develop a parser whose performance is comparable to a table-driven parsers such as <a href="https://github.com/ThierryGoubier/SmaCC">SmaCC</a> or hand-written parsers such as RBParser.<sup><a href="#footnote2">[2]</a></sup>
+On a concrete example of a Smalltalk grammar, we describe how to develop a parser whose performance is comparable to a table-driven parsers such as <a href="https://github.com/ThierryGoubier/SmaCC">SmaCC</a> or hand-written parsers such as RBParser (a parser used by Pharo compiler).
 </p>
 <p class="todo">add some graphs?</p>
 <ul>
@@ -100,6 +98,28 @@ On a concrete example of a Smalltalk grammar, we describe how to develop a parse
 
 </section></section><section>
 <h2>2. Getting Started</h2>
+
+
+<section>
+<h3>Installation</h3>
+<p>
+The easiest way to start this tutorial is to use <a href="http://moosetechnology.org">Moose</a>. 
+Moose is a software and data analysis platform that has everything we need already installed.
+</p>
+<p>
+Alternatively, you can download clean <a href="http://pharo.org">Pharo 6</a> (or higher) image and install PetitParser2 using the following command:
+</p>
+<figure><pre><code class="smalltalk">Metacello new
+	baseline: 'PetitParser2';
+	repository: 'github://kursjan/petitparser2';
+   	load</code></pre><figcaption></figcaption></figure>
+
+<p>
+In case nothing of the previous works, please <a href="mailto:kurs.jan@gmail.com">let us know</a>. 
+</p>
+
+</section><section>
+<h3>Book Chapters</h3>
 <p>
 The list of available chapters:
 </p><ul>
@@ -111,31 +131,32 @@ The list of available chapters:
 <li><a href="Chapters/memoization.html">Memoization</a></li>
 </ul>
 
-<p>
+<p class="note">Part two is not yet finished</p><p>
 If you are interested in more details:
 </p><ul>
 <li><a href="Chapters/starLazy.html">The <code>starLazy</code> operator</a></li>
-<li><a href="Chapters>matchingTags.html">Matching Tags</a> (context-sensitive parsing)</li>
+<li><a href="Chapters/matchingTags.html">Matching Tags</a> (context-sensitive parsing)</li>
 <li><a href="specializations.html">Specializations in Detail</a></li>
 <li><a href="caches.html">Caches in Detail</a></li>
 </ul>
 
-</section><section>
+</section></section><section>
 <h2>3. Changelog</h2>
 <a id="changelog"></a>
 <p>
-<em>2017-01-19</em> - First draft of he Part I
+<em>2017-02-21</em> - First draft of he Developer's workflow 
 </p>
 </section><section>
 <h2>4. License</h2>
 <p>
 The text is released under the <a href="LICENSE.html">MIT license</a>.
 </p>
-</section>
-<hr></hr>
-<sup id="footnote1">[1]  useful especially for text editors</sup><br/>
-<sup id="footnote2">[2]  parser used in Pharo compiler</sup><br/>
+</section><section>
+<h2>5. Contact</h2>
+<p>
+Do you have ideas, suggestions or issues? Write us an <a href="mailto:kurs.jan@gmail.com">email</a>, or contact us on <a href="github.com/kursjan/petitparser2/issues">github</a>!
 
+</p></section>
       </section>
     </div>
 

@@ -23,36 +23,34 @@ sources collect: [ :s |
 
 Unfortunately, this still takes too much time even though we applied the automated optimizations. 
 Can we do something, that the optimizations can't? 
-Usually, hard to say, but in this case, we can.
+Usually, hard to say. 
+It depends on the nature of a grammar and input to be parsed.
+But in this case, we can really improve the performance. (obviously, we wouldn't write this chapter otherwise).
 
-It is a good time to check the events morph of a debug result. Events morph shows timeline of parser invocations (dot) at a given position (x axis) in a given time (y axis).
-
-
-Inspect a result of the following command again:
+It is a good time to check the events morph of a debug result. 
+Events morph shows timeline of parser invocations (dot) at a given position (x axis) in a given time (y axis).
+Inspect the result of the following command again and switch to ''Events'' view.
 
 [[[
 WebParser new optimize debug: input.
 ]]]
 
 
-+>figures/optimized-trace.png|width=100%+
++Visualization of invocations of the optimized parser on input>figures/optimized-trace.png|width=100%|label=optimizedTrace+
 
+On the screenshot in Figure *@optimizedTrace* we see only a part of the story (the part that fits into a window).
+The whole story is that parsing progress pretty fast towards the end of input (this is the good part),  but later one can notice (when scrolling down) that parser jumps to the beginning of input and starts again. 
+Over and over again (this is the bad part).
 
-On a screenshot we see only a part of the story, because we don't have such a high window.
-Anyhow, the story is that parsing progress pretty fast towards the end of input. 
-This is the good part. 
-But when scrolling down, one can notice that at some point, parser backtracks and returns to the beginning. 
-Over and over again.
-And this is the bad part.
+@@note Please not that for long inputs the ''Event'' tab shows only a beginning of the input and first few thousands of invocations.
 
-
-Even though optimizations in PetitParser2 work reasonably good, not all of them can be applied automatically. 
+Even though optimizations in PetitParser2 work reasonably well, not all of them can be applied automatically. 
 Some grammars do a lot of backtracking and automated optimizations can reduce only part of it.
 If I ask you why is the backtracking happening you would probably have a hard time to figure this out${footnote: actually, it was not easy for the author of this text to pinpoint the root cause as well}$.
 So does have the code trying to apply the optimizations, so we have to do this manually.
 
 
-Luckily, there are tools to help you. 
+Luckily, there are tools to help us. 
 For convenience of visualization, we use compact and simplified input.
 
 [[[
@@ -70,37 +68,36 @@ WebParser new optimize debug: compact.
 ]]]
 
 
-+>figures/short-trace.png|width=100%+
++Visualization of invocations of the optimized parser on compact input>figures/short-trace.png|width=100%|label=shortTrace+
 
 
 !!Searching for the cause
 
 
-In the events morph we see how is the parser backtracking, over and over. 
-We have to play a bit of detective to figure out when and why. 
-Let us navigate through the parsing until the HTML body (represented by the ==b== element in the ==compact== input) is parsed:
+In the events morph we see how does the parser backtrack, over and over. 
+We have to do a bit of detective work to figure out when and why. 
+Let us navigate through the parsing until the HTML body (represented by the ==b== element in the ''compact'' input) is parsed:
 
 
 
-+>figures/optimized-debug-element.png|width=100%+
++Debug view of the ==element== rule>figures/optimized-debug-element.png|width=100%|label=optimizedDebugElement+
 
 
 Now switch to the traces tab:
 
-+>figures/optimized-trace-element.png|width=100%+
++Debug view of the ==element== rule, traces tab>figures/optimized-trace-element.png|width=100%|label=optimizedTraceElement+
 
 
-
-The yellow rectangle highlights 872 underlying invocations of the element rule. 
-The dark red rectangle highlights another invocations of the same element rule that started at the same position. 
+The yellow rectangle in Figure *@optimizedTraceElement* highlights 872 underlying invocations of the ==element== rule. 
+The dark red rectangle highlights another invocations of the same ==element== rule that started at the same position. 
 And we see there are quite a few of them. 
 In general, one does not want to see repeating dark-red rectangles, and the more of them or the higher these dark-red rectangles are, the worse. 
 It simply means redundant computations. 
-Remember, each pixel on the y-axis is a parser innvocation.
+Remember, each pixel on the y-axis is a parser invocation.
 
 
 Why do these redundant invocations happen? 
-Because of the unclosed HTML ==meta== elements (represented by ==m== in the ==compact== input). 
+Because of the unclosed HTML ==meta== elements (represented by ==m== in the ''compact'' input). 
 The parser sees meta, starts an element, parses the content of meta, including the body element. 
 But it does not find the closing meta. 
 So it returns before the meta element, skips the meta part as a water and continues parsing. 
@@ -108,15 +105,17 @@ This means it re-parses the body element again.
 The more ==meta== elements, the worse.
 
 If yo are watchful, you might have noticed a line behind a dark-red bar. 
-This line is created by ==PP2Cache== which immediately returns the result of a ==body== element and prevents the whole execution.
-But because it can remember only last result, it can prevent only half of the executions.
+This line is created by automated cache, which immediately returns the result of a ==body== element and prevents the whole execution.
+But because it can remember only the last result, it can prevent only half of the executions.
+Twice as fast is good, but we can do even better.
 
 !!Fixing the Cause
 There is a solution to this, called memoization. 
-Memoization is a technique to remember all the results for all the positions. 
-We already saw memoizations applied to the bounded seas.
-Now we should suggest PetitParser2 to apply the same trick for the element rule.
-We do this by adding a ==memoize== keyword to the ==element== rule.
+Memoization is a technique to remember all the results for all the positions (while caching remembered only the last result for the last position).
+The more power comes at a cost of less efficiency, therefore memoizations should not be used superfluously
+%We already saw memoizations applied to the bounded seas.
+%Now we should suggest PetitParser2 to apply the same trick for the element rule.
+To suggest PetitParser2 to add memoization, add a ==memoize== keyword to the ==element== rule.
 
 [[[
 WebGrammar>>element
@@ -125,10 +124,7 @@ WebGrammar>>element
 		yourself
 ]]]
 
-As we have already discussed, ==memoize== is specified manually. 
-Suitable positions for memoization are hard to detect automatically and memoizations are relatively expensive. 
-Mamoizations should not be used superfluously
-
+@@note Please note currently PetitParser2 does not support memoizations of push and pop parsers. The ''"neutral"'' parsers, for example a sequence of push and pop, as in the case of the ==element== rule, can be memoized.
 
 Let us check the result now:
 
@@ -137,14 +133,18 @@ WebParser new optimize debug: compact.
 ]]]
 
 
-+>figures/memoized-trace.png|width=100%+
++Memoized trace of a compact input>figures/memoized-trace.png|width=100%|label=memoizedTrace+
 
 
-This is the result we want to see. 
-Even though the parser still backtracks because of the nature of the grammar (i.e. we see two big backtrackings, one for each ==meta== in the input), the html body itself is not reparsed over and over again and the precious time is saved.
+The Figure *@memoizedTrace* is the result we want to see. 
+Even though the parser still backtracks, it is because of the nature of the grammar.
+Grammar is defined in a way it can speculate and so it speculates. 
+We see two big backtrackings: one for each ==meta== in the input, the html body itself is not re-parsed over and over again and the precious time is saved.
+
+@@note If you want to avoid backtracking of ==meta== elements, you have to include syntax of ==meta== into the grammar.
 
 
-You can try to parse some big sources as well. 
+You can try to parse some big sources as well, they should be parsed in reasonable time:
 
 [[[
 sources := PP2Sources current htmlSourcesAll.
@@ -155,22 +155,23 @@ sources collect: [ :s |
 ]]]
 
 !!Conclusion
-This is the last chapter about the html parser.
-We started with a prototype in the playground in the *first chapter>chapter1.pillar* and end up with a full-fledged and tested parser that is able to parser real sources and being tolerant to malformed inputs in this chapter. 
+This is the last chapter of extracting Javascript from HTML sources.
+We started with a prototype in the playground in the *first chapter>chapter1.pillar* and end up with a full-fledged and tested parser returning html structure, parsing real sources and tolerating malformed inputs. 
 
-In each step, we wrote only a code that describes what we are interested in
-and we got feedback from the early stages of the development.
-This is in contrast with a traditional parser development, where a grammar implementor has to specify most or a complete grammar before obtaining useful results.
+While specifying the grammar, we wrote only rules that describe the interesting input, we ignored the rest. 
+This way we got feedback about our parser from the early stages of development.
+This is in contrast with a traditional parser development, where a grammar engineer has to specify most or a complete grammar before she obtains useful results.
 
-PetitParser allows a grammar implementor to use such a agile approach to parsing thanks to 
-(i) bounded seas, which allows for the tolerant parsing, and (ii) automated optimizations, which significantly improve performance of a removing the burden from the grammar implementor.
+PetitParser allows a grammar engineer to use an agile approach.
+This is thanks to (i) bounded seas, which allows for the tolerant parsing, and (ii) automated optimizations, which significantly improve performance of a removing the burden from the grammar engineer.
 
 !!!Suggestions and ideas?
 The parser we implemented has a reasonable performance considering the simplicity of the grammar and effort we put into specifying it.
 Of course, PetitParser allows you to specify even faster parser, but at a cost of higher implementation effort.
-We discuss optimizations of a high-performance grammar on the concrete example of a *Smalltalk grammar>smalltalkOptimizations.pillar* which can reach the performance of a hand-written parser.
+We discuss optimizations of a high-performance grammar on the concrete example of the *Smalltalk grammar>smalltalkOptimizations.pillar*.
+The Smalltalk grammar reaches performance better than a table-driven approach and is comparable to a performance of a hand-written parser.
 
-If you know how to improve the performance even more, please share the ideas or contribute!
+Nevertheless, If you have an ideas how to improve performance even more, please contact us orcontribute!
 
 !!!Sources
 The sources of the html parser can be found here: 
@@ -183,9 +184,6 @@ The sources of the html parser can be found here:
 - *==HtmlElement==>../HtmlElement.st*
 - *==UnknownText==>../UnknownText.st*
 
-The source for this tutorial is also part of the PetitParser2 package.
-
-The image with the VMs for Linux, Mac OS and Windows can be found here:
-@@todo image
+The sources used to generate this tutorial are part of the PetitParser2 package.
 
 ${inputFile:Chapters/toc.pillar}$
